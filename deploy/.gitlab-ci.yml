@@ -1,0 +1,82 @@
+# Deployment Package Pipeline
+#
+## Requirements
+#   - a source project
+#
+## General Pipeline Steps
+#
+#   1. Parse pipeline trigger
+#   2. Run tests
+#   3. Make a working copy
+#   4. Hydrate with updated values
+#   5. Commit changes back
+#   6. Release
+
+stages:
+  - parse
+  - test
+  - update
+  - release
+
+# Parse pipeline trigger variables
+parse trigger payload:
+  stage: parse
+  extends:
+    - ".parse-pipeline-trigger-payload"
+    - ".pipeline_trigger_rules"
+
+# Update package info and commit back to deployment project
+update packages:
+  stage: update
+  extends:
+    - ".update-packages"
+    - ".pipeline_trigger_rules"
+
+# Determine the TARGET_ENV
+parse commit message:
+  stage: parse
+  extends:
+    - ".parse-commit"
+    - ".deployment_rules"
+
+# Release package metajob
+release:
+  stage: release
+  extends:
+    - ".release-deployment"
+    - ".deployment_rules"
+
+#
+#
+#
+## ---------- It's generally bad to change anything below here ----------
+#
+#
+#
+## Other common pipeline variables
+##  - other global variables are set in GitLab Admin: https://issues.ltc.bcit.ca/admin/application_settings/ci_cd
+variables:
+  PIPELINE_DEBUG: "true"
+
+## Include common scripts
+include:
+  - project: deployments/ci-config
+    file:
+      - rules.yml
+      - update-release.yml
+      - ".common-utilities.yml"
+      - ".vault.yml"
+      - ".release-utilities.yml"
+      - SAST.gitlab-ci.yml
+      - Secret-Detection.gitlab-ci.yml
+
+## Specify which runner should pick up pipeline jobs
+default:
+  tags:
+    - utility
+
+## Configure security scanning
+sast:
+  stage: test
+  extends:
+    - ".deploy_stable_rules"

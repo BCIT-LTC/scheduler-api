@@ -1,0 +1,40 @@
+<link href= "/public/css/home.css" rel="stylesheet" type="text/css" />
+
+<!-- nav bar goes here -->
+<h3>BCIT BSN Program</h3>
+
+
+<!-- link to calendar and other resources  -->
+<div class="menu-items"  href=""> 
+<form action="/calendar" method="get">
+    <button type="submit">Calendar </button> 
+</form>
+</div> 
+<div class="menu-items" href="">  
+    <form action="">
+    <button type="submit">Open Lab</button> 
+</form>
+</div> 
+<div class="menu-items" href=""> 
+    <form action="">
+    <button type="submit">Case Studies</button> 
+</form>
+</div> 
+<div class="menu-items" href=""> 
+    <form action="">
+    <button type="submit">Lab Survey</button> 
+</form>
+</div> 
+
+
+
+<!-- logout button: THE ACTION IS COMING FROM THE OVERRIDE METHOD -->
+<!-- <form action="/logout?_method=DELETE" method="post">
+    <button type="submit">Logout</button>
+
+</form> -->
+
+<form action="/logout" method="post">
+    <button class="logout-button" type="submit">Logout</button>
+
+</form>

@@ -1,0 +1,65 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
+
+.react-calendar {
+  line-height: 1.125em;
+  border: 1.5px solid #ffffff;
+  width: 350px;
+  max-width: 100%;
+  background-color: #023455;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 0.5em;
+  color: #ffffff;
+  font-family: "Roboto Condensed", sans-serif;
+  font-size: small;
+  font-weight: lighter;
+}
+
+.react-calendar__navigation button {
+  font-family: "Roboto Condensed", sans-serif;
+  color: #ffffff;
+}
+
+.calendar-day {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.calendar-day .lab {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #FEF200;
+}
+
+.react-calendar__tile {
+  position: relative;
+  background-color: #114265;
+}
+
+.react-calendar__tile abbr {
+  z-index: 5;
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: bold;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: #012941;
+}
+
+.react-calendar__month-view__days__day--weekend {
+  color: #ffffff4e;
+}
+
+.calendar-day .no-lab {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #023455;
+  z-index: 0;
+}

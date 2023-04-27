@@ -1,0 +1,7 @@
+apiVersion: kpt.dev/v1alpha1
+kind: ResourceGroup
+metadata:
+  name: resourcegroup
+  namespace: bsn-openlab-scheduler
+  labels:
+    cli-utils.sigs.k8s.io/inventory-id: 6d8446ab80eaba90a63c39e191f0f465c3a31d59-1679630945463253663

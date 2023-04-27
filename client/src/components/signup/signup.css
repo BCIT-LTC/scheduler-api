@@ -1,0 +1,92 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto+Flex);
+
+/* Accessibility Settings */
+@media (prefers-reduced-motion: reduce) {
+    .submit-button, .login-Link {
+      transition: none;
+    }
+  }
+
+.signup-wrapper {
+    justify-content: center;
+    display: flex;
+    font-family: "Roboto Flex", sans-serif;
+    font-weight: 600;
+    flex-direction: column;
+    align-items: center;
+    color: #023455;
+    background-image: url(images/labpic.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #ffffff; /* temp bg while the bg image loads*/
+}
+
+h3 {
+    align-self: auto;
+    font-family: "Roboto Flex", sans-serif;
+    font-weight: 600;
+    font-size: 25px;
+    color: #023455;
+    margin-left: 5.5rem;
+    margin-top: 30px;
+}
+
+h5 {
+    font-family: "Roboto Flex", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #023455;
+    margin-top: 0;
+    margin-left: 0.3rem;
+}
+
+.form  {
+    margin-left: 5.5rem;
+    /* margin-top: 10px; */
+    position: relative;
+    border-radius: 8px;
+    border: 0;
+    box-sizing: border-box;
+    /* padding: 20px; */
+    height: 500px;
+    width: 320px;
+}
+
+.signup-wrapper input {
+    border: 1px solid #023455;
+    border-radius: 8px;
+    height: 35px;
+    width: 240px;
+    font-weight: 600;
+}
+
+.submit-button {
+    margin-top: 40px;
+    align-content: center;
+    margin-left:0%;
+}
+
+.submit-button button {
+    font-family: "Roboto Flex", sans-serif;
+    background: #023455;
+    color: white;
+    font-weight: 500;
+    font-size: medium;
+    text-align: center;
+    height: 36px;
+    width: 170px;
+    border-radius: 8px;
+    border-color: #023455;
+    will-change: transform;
+}
+
+.login-link {
+    font-family: "Roboto Flex", sans-serif;
+    margin-top: 20px;
+    margin-left: 7.5rem;
+    font-size: 17px;
+    color: #023455;
+    text-decoration: none;
+}

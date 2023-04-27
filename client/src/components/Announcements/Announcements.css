@@ -1,0 +1,129 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto+Flex);
+
+h3 {
+  color: white;
+}
+
+#description{
+    font-family: "Roboto Flex", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height:150px;
+    width:240px;
+    border: 1px solid #023455;
+    border-radius: 10px;
+}
+
+.announcement-wrapper {
+    display: flex;
+    font-family: "Roboto Flex", sans-serif;
+    flex-direction: column;
+    align-items: center;
+    color: #023455;
+}
+
+.announcement-wrapper input {
+    border: 1px solid #023455;
+    border-radius: 10px;
+    height: 35px;
+    width: 240px;
+}
+
+.submit-button {
+    margin-top: 20px;
+    align-content: center;
+}
+
+.submit-button button {
+    background: #023455;
+    color: white;
+    font-weight: 500;
+    font-size: medium;
+    text-align: center;
+    height: 36px;
+    width: 245px;
+    border-radius: 10px;
+    border-color: #023455;
+}
+
+body.active-modal {
+  overflow-y: hidden !important;
+  position: relative;
+ background-color:red;
+  
+  
+}
+
+
+
+table {
+    background-color: rgba(255, 255, 255, 0.700);
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed ;
+  }
+
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    width: 25%;
+    overflow: hidden;
+
+  }
+
+  tr:nth-child(even) {
+    background-color: #dddddd;
+    height: 50px;
+
+  }
+
+  /* .text-overflow {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  } */
+
+
+  #edit-button{
+  display: inline-block;
+  outline: 0;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: medium;
+  border-radius: 4px;
+  height: 30px;
+  background-color: #023455;
+  color: white;
+  padding: 0 20px;
+  width: 40%;
+  }
+
+  #edit-button:hover {
+      background-color: #2C5F8C;
+  }
+
+  #delete-button{
+    font-family: "Roboto Flex", sans-serif;
+    display: inline-block;
+    outline: 0;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: medium;
+    border-radius: 4px;
+    height: 40px;
+    background-color: #8B0000;
+    color: white;
+    /* padding: 0 20px; */
+    width: 50%;
+
+    }
+
+    #delete-button:hover {
+        background-color: #A30000;
+        font-weight: 900;
+        letter-spacing: 1px;
+    }

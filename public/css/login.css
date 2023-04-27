@@ -1,0 +1,74 @@
+/* .login-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.submit-button {
+    margin-top: 30px;
+} */
+
+@import url(https://fonts.googleapis.com/css?family=Roboto+Flex);
+h3 {
+    font-family: "Roboto Flex", sans-serif;
+    font-size: 30px;
+    color: #023455;
+    margin-left: 4rem;
+    margin-top: 30px;
+}
+.login-wrapper {
+    display: flex;
+    font-family: "Roboto Flex", sans-serif;
+    flex-direction: column;
+    align-items: center; 
+    color: #023455;
+    margin-top: 150px;
+}
+
+.login-wrapper input {
+    border: 1px solid #023455;
+    border-radius: 10px;
+    height: 35px;
+    width: 240px;
+}
+
+.submit-button {
+    margin-top: 40px;
+    align-content: center;
+    margin-left:0%;
+}
+
+.submit-button button {
+    background: #023455;
+    color: white;
+    font-weight: 500;
+    font-size: medium;
+    text-align: center;
+    height: 36px;
+    width: 170px;
+    border-radius: 10px;
+    border-color: #023455;
+}
+
+.form label {
+    font-size: 17px;
+    /* font-weight: 400; */
+}
+
+.form  {
+    margin-left: 2rem;
+    margin-top: 10px;
+
+}
+
+.create-Link {
+    margin-top: 20px;
+    margin-left: 3rem;
+    font-size: 17px;
+    color: #023455;
+    text-decoration: none;
+}
+
+
+

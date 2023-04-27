@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  db:
+    image: mariadb
+    environment:
+      - 'MARIADB_ROOT_PASSWORD=isajrqwoihjwaor'
+      - 'MARIADB_USER=bsnmysql'
+      - 'MARIADB_PASSWORD=bcitbsn491'
+      - 'MARIADB_DATABASE=bsn-openlab-scheduler'
+    healthcheck:
+      test: ["CMD-SHELL", "mysql $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'  || exit 1"]
+      timeout: 5s
+      retries: 10
+    volumes:
+      - api_db:/var/lib/mysql
+
+  app:
+    command:
+      - /bin/sh
+      - -c
+      - |
+        npm install
+        npm start
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=America/Vancouver
+      - MYSQL_DB=bsn-openlab-scheduler
+      - MYSQL_HOST=db
+      - MYSQL_USER=bsnmysql
+      - MYSQL_PASSWORD=bcitbsn491
+      - SECRET_KEY=ahuaejsdb
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+  adminer:
+    image: adminer
+    ports:
+      - 9000:8080
+
+volumes:
+  api_db:

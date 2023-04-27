@@ -1,0 +1,148 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
+
+.App {
+  text-align: center;
+  font-family: "Roboto Condensed", sans-serif;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #023455;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  font-family: "Roboto Condensed", sans-serif;
+}
+
+.App-link {
+  color: #023455;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.wrapper {
+  padding: 20px;
+}
+.react-calendar__month-view__days {
+  min-height: 300px;
+  background-color: #023455;
+}
+
+/* .react-calendar__month-view__days__day:hover abbr {
+  color: #023455;
+} */
+
+.react-calendar__tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+/* .react-calendar__navigation button.react-calendar__navigation__label {
+  pointer-events: none;
+} */
+
+nav a {
+  margin-right: 10px;
+}
+
+
+/* 
+temporary style to see if announcement works. Please change the style 
+There is another temporary style for icon in component/Announcement/announcement.js file
+*/
+.navbar {
+  display: flex;
+  align-items: center;
+}
+
+.announcement-container {
+  position: relative;
+  display: inline-block;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+}
+
+
+.dropdown-announcement {
+  position: absolute;
+  left: -200%;
+  top: 100%;
+  transform: translate(-50%, 0);
+  background-color: white;
+  padding: 20px;
+  border: 1px solid black;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.announcement-item {
+  padding: 20px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid black;
+}
+
+.navbar {
+  background-color: yellow;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#navIcon {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.home-logo {
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+}
+
+.bcit-logo {
+  width: 40px;
+  height: 40px;
+  margin: 5px 5px 5px 5px;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.logout-button {
+  height: 25px;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  cursor: pointer;
+  font-weight: 700;
+}
