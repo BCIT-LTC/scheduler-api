@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const {
-  ensureAuthenticated,
-  isAdmin,
-  checkNotAuthenticated,
+  authenticateToken,
 } = require("../middleware/checkAuth");
+
+
 const passport = require("../middleware/passport");
 const jwt = require("jsonwebtoken");
 const path = require("path");
@@ -22,7 +22,8 @@ function getUserToken(email) {
 }
 
 router.get("/", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../client/build/index.html"));
+  // res.sendFile(path.resolve(__dirname, "../client/build/index.html"));
+  res.send("test")
 });
 
 router.post(

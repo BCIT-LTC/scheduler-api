@@ -14,7 +14,6 @@ WORKDIR /app
 COPY controllers ./controllers
 COPY middleware ./middleware
 COPY models ./models
-COPY public ./public
 COPY routes ./routes
 COPY views ./views
 COPY app.js ./
