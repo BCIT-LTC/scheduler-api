@@ -20,6 +20,8 @@ services:
       - /bin/sh
       - -c
       - |
+        (cd /app/client && npm install)
+        (cd /app/client && npm run build)
         npm install
         npm start
     build: .
@@ -31,6 +33,10 @@ services:
       - MYSQL_HOST=db
       - MYSQL_USER=bsnmysql
       - MYSQL_PASSWORD=bcitbsn491
+      - MARIADB_USER=bsnmysql
+      - MARIADB_PASSWORD=bcitbsn491
+      - MARIADB_DATABASE=bsn-openlab-scheduler
+      - MARIADB_ROOT_HOST=db
       - SECRET_KEY=ahuaejsdb
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]

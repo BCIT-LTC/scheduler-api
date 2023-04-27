@@ -4,38 +4,40 @@
     "description": "server for the bsn-openlab-scheduler app",
     "main": "app.js",
     "scripts": {
-      "start": "nodemon app.js",
-      "prod": "NODE_ENV=production node app.js"
+        "start": "nodemon app.js",
+        "prod": "NODE_ENV=production node app.js"
     },
     "repository": {
-      "type": "git",
-      "url": "git@issues.ltc.bcit.ca:web-apps/bsn-openlab-scheduler.git"
+        "type": "git",
+        "url": "git@issues.ltc.bcit.ca:web-apps/bsn-openlab-scheduler.git"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "dependencies": {
-      "bcryptjs": "^2.4.3",
-      "body-parser": "^1.20.1",
-      "cors": "^2.8.5",
-      "dotenv": "^16.0.3",
-      "ejs": "^3.1.6",
-      "express": "^4.17.1",
-      "express-ejs-layouts": "^2.5.0",
-      "express-layouts": "^1.0.0",
-      "express-session": "^1.17.1",
-      "jsonwebtoken": "^9.0.0",
-      "method-override": "^3.0.0",
-      "mysql2": "^3.1.2",
-      "passport": "^0.4.1",
-      "passport-local": "^1.0.0"
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.20.1",
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.3",
+        "ejs": "^3.1.6",
+        "express": "^4.17.1",
+        "express-ejs-layouts": "^2.5.0",
+        "express-layouts": "^1.0.0",
+        "express-session": "^1.17.1",
+        "jsonwebtoken": "^9.0.0",
+        "method-override": "^3.0.0",
+        "mysql2": "^3.1.2",
+        "passport": "^0.4.1",
+        "passport-local": "^1.0.0"
     },
     "devDependencies": {
-      "nodemon": "^2.0.21"
+        "nodemon": "^2.0.21",
+        "prisma": "^4.13.0"
     },
     "nodemonConfig": {
-      "ignore": ["**/client/**"],
-      "delay": 2500
+        "ignore": [
+            "**/client/**"
+        ],
+        "delay": 2500
     }
-  }
-  
+}

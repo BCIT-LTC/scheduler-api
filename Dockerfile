@@ -4,6 +4,11 @@ RUN apk --update add \
     mariadb-client \
     curl;
 
+WORKDIR /app/client
+COPY client .
+RUN npm install
+RUN npm run build
+
 WORKDIR /app
 
 COPY controllers ./controllers
