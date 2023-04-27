@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 set -e
 
->&2 echo "Seeding db with initial data"
-# add your sql commands to add initial data here
-mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD $MYSQL_DB < /app/bsn_dump.sql
+# >&2 echo "Seeding db with initial data"
+# # add your sql commands to add initial data here
+# mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD $MYSQL_DB < /app/bsn_dump.sql
 
 # Verify that the minimally required environment variables are set.
 if [ -z "$MARIADB_ROOT_HOST" ] || [ -z "$MARIADB_USER" ] || [ -z "$MARIADB_PASSWORD" ] || [ -z "$MARIADB_DATABASE" ]; then
@@ -27,6 +27,10 @@ fi
 echo DATABASE_URL="mysql://$MARIADB_USER:$MARIADB_PASSWORD@$MARIADB_ROOT_HOST:3306/$MARIADB_DATABASE" >> .env
 echo APP_URL=$APP_URL >> .env
 
+
+# Initialize prisma
+>&2 echo "Running migrations..."
+npx prisma migrate reset --force
 
 # Return to parent shell to run app
 >&2 echo "Starting app..."
