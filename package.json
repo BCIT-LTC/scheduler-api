@@ -40,5 +40,8 @@
             "**/client/**"
         ],
         "delay": 2500
+    },
+    "prisma": {
+        "seed": "node prisma/seed.js"
     }
 }

@@ -24,6 +24,7 @@ if [ "${DEBUG}" == "true" ]; then echo -e " \
 fi
 # Configure and store connection info
 >&2 echo "Writing ENV VARS to .env file..."
+echo -n "" > .env
 echo DATABASE_URL="mysql://$MARIADB_USER:$MARIADB_PASSWORD@$MARIADB_ROOT_HOST:3306/$MARIADB_DATABASE" >> .env
 echo APP_URL=$APP_URL >> .env
 
@@ -31,6 +32,10 @@ echo APP_URL=$APP_URL >> .env
 # Initialize prisma
 >&2 echo "Running migrations..."
 npx prisma migrate reset --force
+
+# Seed database with initial data
+>&2 echo "seeding db..."
+npx prisma db seed
 
 # Return to parent shell to run app
 >&2 echo "Starting app..."
