@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const {
@@ -9,40 +10,39 @@ const passport = require("../middleware/passport");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 const updateForm = require("../models/openLabForm");
-const {
-  getAnnouncement,
-  addAnnouncement,
-  deleteAnnouncement,
-} = require("../models/announcement");
+// const {
+//   getAnnouncement,
+//   addAnnouncement,
+//   deleteAnnouncement,
+// } = require("../models/announcement");
 const { saveLogoutTime, logoutTime } = require("../models/logoutTime");
-require("dotenv").config();
 
-function getUserToken(email) {
-  return jwt.sign({ email }, process.env.SECRET_KEY);
-}
+// function getUserToken(email) {
+//   return jwt.sign({ email }, process.env.SECRET_KEY);
+// }
 
 router.get("/", (req, res) => {
   // res.sendFile(path.resolve(__dirname, "../client/build/index.html"));
   res.send("test")
 });
 
-router.post(
-  "/api/login",
-  passport.authenticate("local", {
-    failureMessage: true,
-  }),
-  (req, res) => {
-    console.log("req user", req.user, req.authInfo, req.params);
-    const token = getUserToken(req.user.email);
-    res
-      .status(200)
-      .json({ token, email: req.user.email, isAdmin: req.user.isAdmin });
-    res.end();
-  },
-  (req, res) => {
-    const logoutTime = logoutTime(req.user.email);
-  }
-);
+// router.post(
+//   "/api/login",
+//   passport.authenticate("local", {
+//     failureMessage: true,
+//   }),
+//   (req, res) => {
+//     console.log("req user", req.user, req.authInfo, req.params);
+//     const token = getUserToken(req.user.email);
+//     res
+//       .status(200)
+//       .json({ token, email: req.user.email, isAdmin: req.user.isAdmin });
+//     res.end();
+//   },
+//   (req, res) => {
+//     const logoutTime = logoutTime(req.user.email);
+//   }
+// );
 
 router.post("/api/getMonth", function (req, res) {
   console.log(Object.keys(req));
@@ -94,80 +94,81 @@ router.post('/updateOpenLabDay', function(req, res) {
 })
 
 // logout function
-router.post('/api/logout', function(req, res, next) {
-  saveLogoutTime(req.body.email, req.body.logoutTime);
-  res.status(200).send();
+// router.post('/api/logout', function(req, res, next) {
+//   saveLogoutTime(req.body.email, req.body.logoutTime);
+//   res.status(200).send();
 
-  req.logout(function (err) {
-    if (err) return next(err);
-    res.redirect("/login");
-  });
-});
+//   req.logout(function (err) {
+//     if (err) return next(err);
+//     res.redirect("/login");
+//   });
+// });
 
-router.get("/api/announcement", async (req, res) => {
-  try {
-    const announcement = await getAnnouncement();
+// router.get("/api/announcement", async (req, res) => {
+//   try {
+//     const announcement = await getAnnouncement();
 
-    return res.status(200).send(announcement);
-  } catch (error) {
-    return res.status(401).send({ error: error.message });
-  }
-});
+//     return res.status(200).send(announcement);
+//   } catch (error) {
+//     return res.status(401).send({ error: error.message });
+//   }
+// });
 
-router.post("/api/announcement", async (req, res) => {
-  const getLogoutTime = await logoutTime(req.body.email)
+// router.post("/api/announcement", async (req, res) => {
+//   const getLogoutTime = await logoutTime(req.body.email)
   
-  return res.status(200).send(getLogoutTime)
-});
+//   return res.status(200).send(getLogoutTime)
+// });
 
 //endpoint for announcement table
-router.get("/api/announcementTable", async (req, res) => {
-  try {
-    const announcement = await getAnnouncement();
-    return res.status(200).send(announcement);
-  } catch (error) {
-    return res.status(401).send({ error: error.message });
-  }
-});
+// router.get("/api/announcementTable", async (req, res) => {
+//   try {
+//     const announcement = await getAnnouncement();
+//     return res.status(200).send(announcement);
+//   } catch (error) {
+//     return res.status(401).send({ error: error.message });
+//   }
+// });
 
-//endpoint for adding announcements
-router.post("/api/add", async (req, res) => {
-  let title = req.body.title;
-  let description = req.body.description;
-  let date = req.body.date;
-  try {
-    const announcement = addAnnouncement(title, description, date);
-    res.status(200).send(announcement);
-  } catch (error) {
-    res.status(401).send({ error: error.message });
-  }
-});
+// //endpoint for adding announcements
+// router.post("/api/add", async (req, res) => {
+//   let title = req.body.title;
+//   let description = req.body.description;
+//   let date = req.body.date;
+//   try {
+//     const announcement = addAnnouncement(title, description, date);
+//     res.status(200).send(announcement);
+//   } catch (error) {
+//     res.status(401).send({ error: error.message });
+//   }
+// });
 
-//endpoint for deleting announcements
-router.post("/api/delete", async (req, res) => {
-  let id = req.body.id;
-  try {
-    await deleteAnnouncement(id);
+// //endpoint for deleting announcements
+// router.post("/api/delete", async (req, res) => {
+//   let id = req.body.id;
+//   try {
+//     await deleteAnnouncement(id);
 
-    return res.status(200).send({ message: "Success" });
-  } catch (error) {
-    return res.status(401).send({ error: error.message });
-  }
-});
+//     return res.status(200).send({ message: "Success" });
+//   } catch (error) {
+//     return res.status(401).send({ error: error.message });
+//   }
+// });
 
-//endpoint for editing announcements
-router.post("/api/edit", async (req, res) => {
-  let title = req.body.title;
-  try {
-    const announcement = await editAnnouncement(title);
-    res.status(200).send(announcement);
-  } catch (error) {
-    res.status(401).send({ error: error.message });
-  }
-});
+// //endpoint for editing announcements
+// router.post("/api/edit", async (req, res) => {
+//   let title = req.body.title;
+//   try {
+//     const announcement = await editAnnouncement(title);
+//     res.status(200).send(announcement);
+//   } catch (error) {
+//     res.status(401).send({ error: error.message });
+//   }
+// });
 
-router.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../client/build/index.html"));
-});
+// router.get("*", (req, res) => {
+//   // res.sendFile(path.resolve(__dirname, "../client/build/index.html"));
+//   return res.redirect('/');
+// });
 
 module.exports = router;

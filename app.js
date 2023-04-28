@@ -1,63 +1,69 @@
 const express = require("express");
-const expressLayouts = require("express-ejs-layouts");
-const session = require("express-session");
+const bodyParser = require("body-parser");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 const path = require("path");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const port = 8080;
 const overrideMethod = require('method-override')
 
 const app = express();
-app.use(express.static('build'))
+
 app.use(bodyParser.json());
 app.use(cors());
+app.use(overrideMethod('_method'))
 
-app.set("view engine", "ejs"); // probably dont need this since we're using react
-// app.use(express.static(path.join(__dirname, "public"))); // also probably wont need this
-app.use(express.static('client/build'));
-
-app.use(
-  session({
-    secret: "secret_value",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: false,
-      maxAge: 24 * 60 * 60 * 1000,
-    },
-  })
-);
+// app.use(
+//   session({
+//     secret: "secret_value",
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       httpOnly: true,
+//       secure: false,
+//       maxAge: 24 * 60 * 60 * 1000,
+//     },
+//   })
+// );
 
 const passport = require("./middleware/passport");
 const indexRoute = require("./routes/indexRoute");
+const announcements = require("./routes/announcements");
 const { checkNotAuthenticated } = require("./middleware/checkAuth");
 
-app.use(expressLayouts);
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(overrideMethod('_method'))
 
+app.use("/", indexRoute, announcements);
 
-app.options('*', (req, res) => {
-  // this is temporary for development
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000')
-  res.status(200)
-  res.end()
-})
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Scheduler-API",
+      version: "dev",
+      description:
+        "This is the API for the BSN Openlab Scheduler",
+    },
+    servers: [
+      {
+        url: "http://localhost:8080",
+      },
+    ],
+  },
+  apis: ["./routes/*.js"],
+};
 
-app.use("/", indexRoute);
-// app.get("/*", (req, res) => {
-//   res.sendFile(
-//     path.join(__dirname, "/components", "announcements.js"),
-//     (err) => {
-//       if (err) console.log(err);
-//     }
-//   );
-// });
-
+const specs = swaggerJsdoc(options);
+app.use(
+  "/api",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true })
+);
 
 app.listen(port, () => {
   console.log(`Server on port ${port}`);
 });
+
+
