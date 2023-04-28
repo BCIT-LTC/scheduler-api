@@ -25,7 +25,7 @@ RUN npm install
 
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-EXPOSE 8080
+EXPOSE 8000
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 # HEALTHCHECK --interval=1m30s --timeout=10s \

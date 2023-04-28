@@ -4,7 +4,7 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const path = require("path");
 const cors = require("cors");
-const port = 8080;
+const port = 8000;
 const overrideMethod = require('method-override')
 
 const app = express();
@@ -48,7 +48,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:8080",
+        url: "http://localhost:8000",
       },
     ],
   },
