@@ -13,19 +13,6 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(overrideMethod('_method'))
 
-// app.use(
-//   session({
-//     secret: "secret_value",
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: {
-//       httpOnly: true,
-//       secure: false,
-//       maxAge: 24 * 60 * 60 * 1000,
-//     },
-//   })
-// );
-
 const passport = require("./middleware/passport");
 const indexRoute = require("./routes/indexRoute");
 const announcements = require("./routes/announcements");
@@ -44,7 +31,7 @@ const options = {
       title: "Scheduler-API",
       version: "dev",
       description:
-        "This is the API for the BSN Openlab Scheduler",
+        "Welcome to the API for the BSN Openlab Scheduler",
     },
     servers: [
       {
