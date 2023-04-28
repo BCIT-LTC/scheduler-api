@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset
+  labels:
+    tier: mariadb
+spec:
+  serviceName: "mariadb"
+  selector:
+    matchLabels:
+      tier: mariadb
+  template:
+    metadata:
+      labels:
+        tier: mariadb
+    spec:
+      serviceAccountName: bsn-openlab-scheduler-serviceaccount
+      containers:
+        - name: mariadb
+          image: mariadb
+          env:
+            - name: MARIADB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: mariadb-config
+                  key: MARIADB_DATABASE
+            - name: MARIADB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-credentials
+                  key: MARIADB_USER
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-credentials
+                  key: MARIADB_PASSWORD

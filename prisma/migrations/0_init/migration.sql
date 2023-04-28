@@ -1,0 +1,39 @@
+-- CreateTable
+CREATE TABLE `announcements` (
+    `announcements_id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(50) NOT NULL,
+    `description` VARCHAR(200) NOT NULL,
+    `date` DATETIME(0) NOT NULL,
+
+    PRIMARY KEY (`announcements_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `calendar` (
+    `calendar_id` INTEGER NOT NULL AUTO_INCREMENT,
+    `date` DATETIME(0) NOT NULL,
+    `start-time` VARCHAR(20) NOT NULL,
+    `end-time` VARCHAR(20) NOT NULL,
+    `facilitator` VARCHAR(45) NOT NULL,
+    `room` VARCHAR(20) NOT NULL,
+    `stat` TINYINT NOT NULL,
+
+    PRIMARY KEY (`calendar_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `openlabGuidelines` (
+    `filename` VARCHAR(50) NOT NULL
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `users` (
+    `userid` INTEGER NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(50) NOT NULL,
+    `password` VARCHAR(100) NOT NULL,
+    `isAdmin` BOOLEAN NOT NULL DEFAULT false,
+    `logoutTime` DATETIME(0) NULL,
+
+    PRIMARY KEY (`userid`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+

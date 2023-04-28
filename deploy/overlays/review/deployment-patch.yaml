@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+spec:
+  selector:
+    matchLabels:
+      app: bsn-openlab-scheduler
+  template:
+    spec:
+      containers:
+        - name: bsn-openlab-scheduler
+          image: bsn-openlab-scheduler
+          env:
+            - name: MYSQL_DB
+              valueFrom:
+                secretKeyRef:
+                  name: vault-secrets-override
+                  key: MYSQL_DB
+            - name: MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: vault-secrets-override
+                  key: MYSQL_HOST
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: vault-secrets-override
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vault-secrets-override
+                  key: MYSQL_PASSWORD
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vault-secrets-override
+                  key: SECRET_KEY
+            - name: TZ
+              valueFrom:
+                secretKeyRef:
+                  name: vault-secrets-override
+                  key: TZ

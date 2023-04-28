@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bsn-openlab-scheduler
+  template:
+    metadata:
+      labels:
+        app: bsn-openlab-scheduler
+        # annotations:
+        #   vault.hashicorp.com/agent-inject: "true"
+        #   vault.hashicorp.com/role: "bsn-openlab-scheduler-kubeauthbot-stable"
+        #   vault.hashicorp.com/agent-inject-secret-config: "web-apps/data/bsn-openlab-scheduler"
+        #   vault.hashicorp.com/agent-inject-template-config: |
+        #     {{ with secret "web-apps/data/bsn-openlab-scheduler" -}}
+        #       ADMIN_PASSWORD="{{ .Data.data.ADMIN_PASSWORD }}"
+        #     {{- end }}
+    spec:
+      serviceAccountName: bsn-openlab-scheduler-serviceaccount
+      containers:
+      - name: bsn-openlab-scheduler
+        image: bsn-openlab-scheduler:stable

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+  labels:
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      serviceAccountName: bsn-openlab-scheduler-serviceaccount
+      containers:
+        - name: bsn-openlab-scheduler
+          image: bsn-openlab-scheduler
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: MARIADB_ROOT_HOST
+              value: bsn-openlab-scheduler-mariadb-service
+            - name: MARIADB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: mariadb-config
+                  key: MARIADB_DATABASE
+            - name: MARIADB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-credentials
+                  key: MARIADB_USER
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-credentials
+                  key: MARIADB_PASSWORD
+          readinessProbe:
+            tcpSocket:
+              port: 8007
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          livenessProbe:
+            tcpSocket:
+              port: 8007
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 1Gi
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+          volumeMounts:
+            - name: bsn-openlab-scheduler-data
+              mountPath: /app/data
+      volumes:
+        - name: bsn-openlab-scheduler-data
+          emptyDir: {}
