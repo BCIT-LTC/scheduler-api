@@ -63,7 +63,7 @@ app.use(
 );
 
 app.listen(port, () => {
-  console.log(`Server on port ${port}`);
+  console.log(`Server started on port ${port}`);
 });
 
 

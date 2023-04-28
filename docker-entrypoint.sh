@@ -1,10 +1,6 @@
 #!/usr/bin/env sh
 set -e
 
-# >&2 echo "Seeding db with initial data"
-# # add your sql commands to add initial data here
-# mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD $MYSQL_DB < /app/bsn_dump.sql
-
 # Verify that the minimally required environment variables are set.
 if [ -z "$MARIADB_ROOT_HOST" ] || [ -z "$MARIADB_USER" ] || [ -z "$MARIADB_PASSWORD" ] || [ -z "$MARIADB_DATABASE" ]; then
     printf '\n\nEnvironment variables are not set.\n\tYou need to specify MARIADB_ROOT_HOST, MARIADB_DATABASE, MARIADB_USER, and MARIADB_PASSWORD\n\n'

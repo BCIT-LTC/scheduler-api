@@ -4,11 +4,6 @@ RUN apk --update add \
     mariadb-client \
     curl;
 
-WORKDIR /app/client
-COPY client .
-RUN npm install
-RUN npm run build
-
 WORKDIR /app
 
 COPY controllers ./controllers
@@ -17,11 +12,8 @@ COPY models ./models
 COPY routes ./routes
 COPY views ./views
 COPY app.js ./
-COPY encryption.js ./
 COPY package.json ./
 RUN npm install
-
-# COPY bsn_dump.sql .
 
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
