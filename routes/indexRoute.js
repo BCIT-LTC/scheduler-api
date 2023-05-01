@@ -78,19 +78,19 @@ router.post("/api/updateCalendar", function (req, res) {
     })
 });
 
-router.post('/updateOpenLabDay', function(req, res) {
-  console.log("updateOpenLab req.body", req.body )
+router.post('/updateOpenLabDay', function (req, res) {
+  console.log("updateOpenLab req.body", req.body)
   updateForm.updateOpenLabDay(req.body.forms[0])
-  .then((results) => {
-    console.log("update open lab form results", results)
-    if (results) {
-      res.status(200).json({ results })
-    } else {
-      throw new Error("posting to update open lab form day", {cause: results})
-    }
-  }).catch((err) => {
-    console.error("updateForm.updateOpenLabDay", err)
-  })
+    .then((results) => {
+      console.log("update open lab form results", results)
+      if (results) {
+        res.status(200).json({ results })
+      } else {
+        throw new Error("posting to update open lab form day", { cause: results })
+      }
+    }).catch((err) => {
+      console.error("updateForm.updateOpenLabDay", err)
+    })
 })
 
 // logout function
@@ -114,21 +114,6 @@ router.post('/updateOpenLabDay', function(req, res) {
 //   }
 // });
 
-// router.post("/api/announcement", async (req, res) => {
-//   const getLogoutTime = await logoutTime(req.body.email)
-  
-//   return res.status(200).send(getLogoutTime)
-// });
-
-//endpoint for announcement table
-// router.get("/api/announcementTable", async (req, res) => {
-//   try {
-//     const announcement = await getAnnouncement();
-//     return res.status(200).send(announcement);
-//   } catch (error) {
-//     return res.status(401).send({ error: error.message });
-//   }
-// });
 
 // //endpoint for adding announcements
 // router.post("/api/add", async (req, res) => {

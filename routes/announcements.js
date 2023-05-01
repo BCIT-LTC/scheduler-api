@@ -57,20 +57,19 @@ const {
     getAnnouncement,
     addAnnouncement,
     deleteAnnouncement,
-  } = require("../models/announcement");
+} = require("../models/announcement");
 
 router.get("/api/announcement", async (req, res) => {
     try {
         const announcement = await getAnnouncement();
-
         return res.status(200).send(announcement);
     } catch (error) {
         return res.status(401).send({ error: error.message });
     }
 });
 
-//endpoint for adding announcements
-router.post("/api/add", async (req, res) => {
+//endpoint for adding or editing announcements
+router.post("/api/announcement", async (req, res) => {
     let title = req.body.title;
     let description = req.body.description;
     let date = req.body.date;
@@ -83,25 +82,13 @@ router.post("/api/add", async (req, res) => {
 });
 
 //endpoint for deleting announcements
-router.post("/api/delete", async (req, res) => {
+router.delete("/api/delete", async (req, res) => {
     let id = req.body.id;
     try {
         await deleteAnnouncement(id);
-
         return res.status(200).send({ message: "Success" });
     } catch (error) {
         return res.status(401).send({ error: error.message });
-    }
-});
-
-//endpoint for editing announcements
-router.post("/api/edit", async (req, res) => {
-    let title = req.body.title;
-    try {
-        const announcement = await editAnnouncement(title);
-        res.status(200).send(announcement);
-    } catch (error) {
-        res.status(401).send({ error: error.message });
     }
 });
 

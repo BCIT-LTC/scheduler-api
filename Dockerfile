@@ -10,7 +10,7 @@ COPY controllers ./controllers
 COPY middleware ./middleware
 COPY models ./models
 COPY routes ./routes
-COPY views ./views
+# COPY views ./views
 COPY app.js ./
 COPY package.json ./
 RUN npm install
