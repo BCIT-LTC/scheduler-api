@@ -3,7 +3,7 @@ const router = express.Router();
 const updateForm = require("../models/openLabForm");
 
 
-router.post("/api/getMonth", function (req, res) {
+router.post("/api/month", function (req, res) {
     console.log(Object.keys(req));
     console.log("req.body", req.body);
     updateForm

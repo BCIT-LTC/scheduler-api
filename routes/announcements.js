@@ -93,11 +93,5 @@ router.delete("/api/announcement", async (req, res) => {
     }
 });
 
-router.post("/api/logouttime", async (req, res) => {
-    const getLogoutTime = await logoutTime(req.body.email)
-
-    return res.status(200).send(getLogoutTime)
-});
-
 
 module.exports = router;
