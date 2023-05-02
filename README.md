@@ -16,6 +16,6 @@ With Docker:
 - Ensure Docker is running on your local machine
 - In the root of the project, run `docker compose up`
 - This may take a long time, be patient
-  - The database will be filled with one welcome announcement, a sample calendar day and two users (one admin and one student)
+  - The database will be filled with one welcome announcement
 - Open `http://localhost:8000/api` to see the Rest endpoints
 - If you run into an error that says `"can't find file \r\n"`, go to the `docker-entrypoint.sh` file and change the End of Line sequence from `CRLF` to `LF` (in the bottom right)
