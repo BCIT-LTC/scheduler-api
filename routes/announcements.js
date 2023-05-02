@@ -62,6 +62,7 @@ const {
 router.get("/api/announcement", async (req, res) => {
     try {
         const announcement = await getAnnouncement();
+        console.log(announcement);
         return res.status(200).send(announcement);
     } catch (error) {
         return res.status(401).send({ error: error.message });
@@ -82,7 +83,7 @@ router.post("/api/announcement", async (req, res) => {
 });
 
 //endpoint for deleting announcements
-router.delete("/api/delete", async (req, res) => {
+router.delete("/api/announcement", async (req, res) => {
     let id = req.body.id;
     try {
         await deleteAnnouncement(id);
@@ -91,5 +92,12 @@ router.delete("/api/delete", async (req, res) => {
         return res.status(401).send({ error: error.message });
     }
 });
+
+router.post("/api/logouttime", async (req, res) => {
+    const getLogoutTime = await logoutTime(req.body.email)
+
+    return res.status(200).send(getLogoutTime)
+});
+
 
 module.exports = router;

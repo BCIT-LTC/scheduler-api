@@ -16,13 +16,15 @@ app.use(overrideMethod('_method'))
 const passport = require("./middleware/passport");
 const indexRoute = require("./routes/indexRoute");
 const announcements = require("./routes/announcements");
+const auth = require("./routes/auth");
+const calendar = require("./routes/calendar");
 const { checkNotAuthenticated } = require("./middleware/checkAuth");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/", indexRoute, announcements);
+app.use("/", announcements, auth, calendar, indexRoute);
 
 const options = {
   definition: {
