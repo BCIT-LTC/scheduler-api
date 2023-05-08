@@ -11,7 +11,7 @@
  *         - date
  *       properties:
  *         announcements_id:
- *           type: int
+ *           type: integer
  *           description: The auto-generated id of the announcement
  *         title:
  *           type: string
@@ -48,7 +48,44 @@
  *               $ref: '#/components/schemas/announcements'
  *       500:
  *         description: Some server error
- *
+ *   post:
+ *     summary: Update or add announcements
+ *     tags: [announcements]
+ *     consumes:
+ *      - application/json
+ *     parameters:
+ *      - in: body
+ *        name: title
+ *        required: true
+ *      - in: body
+ *        name: description
+ *        required: true
+ *      - in: body
+ *        name: date
+ *        required: true
+ *     responses:
+ *       200:
+ *         description: Announcement that was added
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/announcements'
+ *       500:
+ *         description: Some server error
+ *   delete:
+ *     summary: Remove an annoucement
+ *     tags: [announcements]
+ *     consumes:
+ *      - application/json
+ *     parameters:
+ *      - in: body
+ *        name: id
+ *        required: true
+ *     responses:
+ *       200:
+ *         description: Announcement is delete
+ *       500:
+ *         description: Some server error
  */
 
 const express = require("express");
@@ -57,20 +94,20 @@ const {
     getAnnouncement,
     addAnnouncement,
     deleteAnnouncement,
-  } = require("../models/announcement");
+} = require("../models/announcement");
 
 router.get("/api/announcement", async (req, res) => {
     try {
         const announcement = await getAnnouncement();
-
+        console.log(announcement);
         return res.status(200).send(announcement);
     } catch (error) {
-        return res.status(401).send({ error: error.message });
+        return res.status(500).send({ error: error.message });
     }
 });
 
-//endpoint for adding announcements
-router.post("/api/add", async (req, res) => {
+//endpoint for adding or editing announcements
+router.post("/api/announcement", async (req, res) => {
     let title = req.body.title;
     let description = req.body.description;
     let date = req.body.date;
@@ -78,31 +115,20 @@ router.post("/api/add", async (req, res) => {
         const announcement = addAnnouncement(title, description, date);
         res.status(200).send(announcement);
     } catch (error) {
-        res.status(401).send({ error: error.message });
+        res.status(500).send({ error: error.message });
     }
 });
 
 //endpoint for deleting announcements
-router.post("/api/delete", async (req, res) => {
+router.delete("/api/announcement", async (req, res) => {
     let id = req.body.id;
     try {
         await deleteAnnouncement(id);
-
         return res.status(200).send({ message: "Success" });
     } catch (error) {
-        return res.status(401).send({ error: error.message });
+        return res.status(500).send({ error: error.message });
     }
 });
 
-//endpoint for editing announcements
-router.post("/api/edit", async (req, res) => {
-    let title = req.body.title;
-    try {
-        const announcement = await editAnnouncement(title);
-        res.status(200).send(announcement);
-    } catch (error) {
-        res.status(401).send({ error: error.message });
-    }
-});
 
 module.exports = router;
