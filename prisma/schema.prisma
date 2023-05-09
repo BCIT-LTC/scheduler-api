@@ -32,9 +32,10 @@ model openlabGuidelines {
 }
 
 model users {
-  userid     Int       @id @default(autoincrement())
-  email      String    @db.VarChar(50)
-  password   String    @db.VarChar(100)
+  email      String    @id @db.VarChar(50)
+  firstName      String    @db.VarChar(50)
+  lastName      String    @db.VarChar(50)
   isAdmin    Boolean   @default(false)
+  eligibleAdmin Boolean @default(false)
   logoutTime DateTime? @db.DateTime(0)
 }

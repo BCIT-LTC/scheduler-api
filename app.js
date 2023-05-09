@@ -5,6 +5,7 @@ const swaggerUi = require("swagger-ui-express");
 const path = require("path");
 const cors = require("cors");
 const port = 8000;
+const hostname = '0.0.0.0';
 const overrideMethod = require('method-override')
 
 const app = express();
@@ -13,14 +14,11 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(overrideMethod('_method'))
 
-const passport = require("./middleware/passport");
 const announcements = require("./routes/announcements");
 const auth = require("./routes/auth");
 const calendar = require("./routes/calendar");
 
 app.use(express.urlencoded({ extended: true }));
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use("/", announcements, auth, calendar);
 
@@ -49,7 +47,7 @@ app.use(
   swaggerUi.setup(specs, { explorer: true })
 );
 
-app.listen(port, () => {
+app.listen(port, hostname, () => {
   console.log(`Server started on port ${port}`);
 });
 

@@ -3,43 +3,24 @@ const {
 } = require("../middleware/checkAuth");
 const { saveLogoutTime, logoutTime } = require("../models/logoutTime");
 const passport = require("../middleware/passport");
-const jwt = require("jsonwebtoken");
-const path = require("path");
 const express = require("express");
 const router = express.Router();
+const jwtDecode = require('jwt-decode');
+const userModel = require("../models/userModel").userModel;
 
-function getUserToken(email) {
-    return jwt.sign({ email }, process.env.SECRET_KEY);
-}
 
-// logout function
-router.post('/api/logout', function (req, res, next) {
-    saveLogoutTime(req.body.email, req.body.logoutTime);
-    res.status(200).send();
 
-    req.logout(function (err) {
-        if (err) return next(err);
-        res.redirect("/login");
-    });
-});
 
-router.post(
-    "/api/login",
-    passport.authenticate("local", {
-        failureMessage: true,
-    }),
-    (req, res) => {
-        console.log("req user", req.user, req.authInfo, req.params);
-        const token = getUserToken(req.user.email);
-        res
-            .status(200)
-            .json({ token, email: req.user.email, isAdmin: req.user.isAdmin });
-        res.end();
-    },
-    (req, res) => {
-        const logoutTime = logoutTime(req.user.email);
+router.get("/api/login", async (req, res) => {
+    let jwt = req.headers.authorization.split(' ')[1];
+    if (!jwt) {
+        return;
     }
-);
+    let user = jwtDecode(jwt);
+    await userModel.addUser(user.email, user.firstname, user.lastname, false, user.eligibleAdmin);
+    let details = await userModel.findOne(user.email);
+    return res.status(200).send(details.isAdmin);
+});
 
 router.post("/api/logouttime", async (req, res) => {
     const getLogoutTime = await logoutTime(req.body.email)
