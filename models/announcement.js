@@ -8,12 +8,18 @@ const getAnnouncement = async () => {
 };
 
 //add announcements to MySQL database
-const addAnnouncement = async (title, description, date) => {
-    const announcement = await prisma.announcement.create({
-        data: {
-            title,
-            description,
-            date,
+const addAnnouncement = async (id, title, description, date) => {
+    const announcement = await prisma.announcement.upsert({
+        where: { announcements_id: id },
+        update: {
+            title: title,
+            description: description,
+            date: date,
+        },
+        create: {
+            title: title,
+            description: description,
+            date: date,
         },
     });
     return announcement;
