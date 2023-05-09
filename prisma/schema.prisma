@@ -34,7 +34,7 @@ model openlabGuidelines {
 model users {
   userid     Int       @id @default(autoincrement())
   email      String    @db.VarChar(50)
-  password   String    @db.VarChar(100)
   isAdmin    Boolean   @default(false)
+  eligibleAdmin Boolean @default(false)
   logoutTime DateTime? @db.DateTime(0)
 }

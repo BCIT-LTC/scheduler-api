@@ -27,6 +27,10 @@ echo APP_URL=$APP_URL >> .env
 
 # Initialize prisma
 >&2 echo "Running migrations..."
+npx prisma migrate diff \
+--from-empty \
+--to-schema-datamodel prisma/schema.prisma \
+--script > prisma/migrations/0_init/migration.sql
 npx prisma migrate reset --force
 
 # Seed database with initial data

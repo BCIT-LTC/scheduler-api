@@ -30,8 +30,8 @@ CREATE TABLE `openlabGuidelines` (
 CREATE TABLE `users` (
     `userid` INTEGER NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(50) NOT NULL,
-    `password` VARCHAR(100) NOT NULL,
     `isAdmin` BOOLEAN NOT NULL DEFAULT false,
+    `eligibleAdmin` BOOLEAN NOT NULL DEFAULT false,
     `logoutTime` DATETIME(0) NULL,
 
     PRIMARY KEY (`userid`)

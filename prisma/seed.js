@@ -12,18 +12,6 @@ async function main() {
             date: new Date(),
         },
     });
-
-    // to be deleted
-    const defaultUser = await prisma.users.upsert({
-        where: { userid: 1 },
-        update: {},
-        create: {
-            email: "test@test.com",
-            password: await bcrypt.hash("test", 10),
-            isAdmin: true,
-        },
-    });
-    console.log({ first_announcement });
 }
 
 main()
