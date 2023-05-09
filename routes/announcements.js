@@ -111,7 +111,7 @@ router.post("/api/announcement", async (req, res) => {
     let description = req.body.description;
     let date = req.body.date;
     try {
-        const announcement = addAnnouncement(title, description, date);
+        const announcement = addAnnouncement(title, description, new Date(date));
         res.status(200).send(announcement);
     } catch (error) {
         res.status(500).send({ error: error.message });
