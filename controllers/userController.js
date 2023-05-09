@@ -29,20 +29,7 @@ function isUserValid(user, password) {
     });
   });
 };
-// function ifAdmin(user) {
-//   return new Promise((resolve, reject) => {
-//     if (user.isAdmin === "1") {
-//       // set admin to true, true means that the user is an admin
-//       var userPriv;
-//       userPriv = true;
-//       resolve(userPriv);
-//     } else if (user.isAdmin === "0") {
-//       // false means that its a regular user
-//       userPriv = false;
-//       resolve(userPriv);
-//     }
-//   });
-// } 
+
 
 module.exports = {
   getUserByEmailIdAndPassword,

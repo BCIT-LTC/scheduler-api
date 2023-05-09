@@ -13,14 +13,11 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(overrideMethod('_method'))
 
-const passport = require("./middleware/passport");
 const announcements = require("./routes/announcements");
 const auth = require("./routes/auth");
 const calendar = require("./routes/calendar");
 
 app.use(express.urlencoded({ extended: true }));
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use("/", announcements, auth, calendar);
 

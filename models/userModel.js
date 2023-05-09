@@ -13,9 +13,9 @@ const db = mysql.createConnection({
   database: MYSQL_DB
 });
 
-db.connect(function(err) {
+db.connect(function (err) {
   if (err) {
-      throw err;
+    throw err;
   }
   console.log(" Database Connected");
 })
@@ -31,7 +31,7 @@ const userModel = {
 
         if (results.length !== 0 && results[0].email === email) {
           return resolve(results[0]);
-        } 
+        }
         reject(new Error(`Couldn't find user with email: '${email}'`));
       })
     })
@@ -42,7 +42,7 @@ const userModel = {
     return new Promise((resolve, reject) => {
       db.query(sql, (error, results) => {
         if (error) return reject(error);
-        
+
         if (results[0].userid === id) {
           return resolve(results[0]);
         }
@@ -50,7 +50,6 @@ const userModel = {
       })
     })
   },
-
 }
 
 const addUser = (email, password) => {
@@ -66,10 +65,10 @@ const addUser = (email, password) => {
         resolve(results);
       }
     })
-    }
-    )
-
   }
+  )
+
+}
 
 // const addUser = (email, password) => {
 //   let sql = `INSERT INTO users (email, password) VALUES ('${email}', '${password}')`;
@@ -85,6 +84,6 @@ const addUser = (email, password) => {
 //   // })
 // }
 
-module.exports = { db, userModel, addUser};
+module.exports = { db, userModel, addUser };
 
 
