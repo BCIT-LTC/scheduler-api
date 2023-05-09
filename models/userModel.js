@@ -3,35 +3,39 @@ const prisma = new PrismaClient();
 
 const userModel = {
   findOne: (email) => {
-    return prisma.user.findUnique({
+    return prisma.users.findUnique({
       where: { email },
     });
   },
   findById: (id) => {
-    return prisma.user.findUnique({
+    return prisma.users.findUnique({
       where: { id },
     });
   },
-};
-
-const addUser = async (email, isAdmin, eligibleAdmin, logoutTime) => {
-  try {
-    const user = await prisma.users.upsert({
-      where: { email },
-      update: {},
-      create: {
-        email: email,
-        isAdmin: isAdmin,
-        eligibleAdmin: eligibleAdmin,
-        logoutTime: logoutTime,
-      },
-    });
-    console.log("User added successfully");
-    return user;
-  } catch (error) {
-    console.log("Error: " + error);
-    throw error;
+  addUser: async (email, firstName, lastName, isAdmin, eligibleAdmin) => {
+    try {
+      const user = await prisma.users.upsert({
+        where: { email },
+        update: {
+          firstName: firstName,
+          lastName: lastName,
+          eligibleAdmin: eligibleAdmin,
+        },
+        create: {
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          isAdmin: isAdmin,
+          eligibleAdmin: eligibleAdmin
+        },
+      });
+      console.log("User added successfully");
+      return user;
+    } catch (error) {
+      console.log("Error: " + error);
+      throw error;
+    }
   }
 };
 
-module.exports = { prisma, userModel, addUser };
+module.exports = { prisma, userModel };

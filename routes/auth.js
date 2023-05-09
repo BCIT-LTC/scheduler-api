@@ -6,6 +6,8 @@ const passport = require("../middleware/passport");
 const express = require("express");
 const router = express.Router();
 const jwtDecode = require('jwt-decode');
+const userModel = require("../models/userModel").userModel;
+
 
 
 
@@ -15,8 +17,9 @@ router.get("/api/login", async (req, res) => {
         return;
     }
     let user = jwtDecode(jwt);
-    console.log(user.email);
-    return res.status(200).send(true);
+    await userModel.addUser(user.email, user.firstname, user.lastname, false, user.eligibleAdmin);
+    let details = await userModel.findOne(user.email);
+    return res.status(200).send(details.isAdmin);
 });
 
 router.post("/api/logouttime", async (req, res) => {

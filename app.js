@@ -5,6 +5,7 @@ const swaggerUi = require("swagger-ui-express");
 const path = require("path");
 const cors = require("cors");
 const port = 8000;
+const hostname = '0.0.0.0';
 const overrideMethod = require('method-override')
 
 const app = express();
@@ -46,7 +47,7 @@ app.use(
   swaggerUi.setup(specs, { explorer: true })
 );
 
-app.listen(port, () => {
+app.listen(port, hostname, () => {
   console.log(`Server started on port ${port}`);
 });
 

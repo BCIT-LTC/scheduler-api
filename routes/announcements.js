@@ -99,7 +99,6 @@ const {
 router.get("/api/announcement", async (req, res) => {
     try {
         const announcement = await getAnnouncement();
-        console.log(announcement);
         return res.status(200).send(announcement);
     } catch (error) {
         return res.status(500).send({ error: error.message });

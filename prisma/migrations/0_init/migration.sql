@@ -28,12 +28,13 @@ CREATE TABLE `openlabGuidelines` (
 
 -- CreateTable
 CREATE TABLE `users` (
-    `userid` INTEGER NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(50) NOT NULL,
+    `firstName` VARCHAR(50) NOT NULL,
+    `lastName` VARCHAR(50) NOT NULL,
     `isAdmin` BOOLEAN NOT NULL DEFAULT false,
     `eligibleAdmin` BOOLEAN NOT NULL DEFAULT false,
     `logoutTime` DATETIME(0) NULL,
 
-    PRIMARY KEY (`userid`)
+    PRIMARY KEY (`email`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
