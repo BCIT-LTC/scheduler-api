@@ -28,7 +28,7 @@ const addAnnouncement = async (title, description, date, id = -1) => {
 //delete announcements from MySQL database
 const deleteAnnouncement = async (id) => {
     const deletedAnnouncement = await prisma.announcements.delete({
-        where: { id },
+        where: { announcements_id: id },
     });
     console.log("Deleted Announcement: ", deletedAnnouncement);
     return deletedAnnouncement;
