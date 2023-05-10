@@ -5,6 +5,7 @@
     "main": "app.js",
     "scripts": {
         "start": "nodemon app.js",
+        "test": "jest --watchAll --coverage",
         "prod": "NODE_ENV=production node app.js"
     },
     "repository": {
@@ -19,6 +20,7 @@
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.20.1",
         "cors": "^2.8.5",
+        "cross-env": "^7.0.3",
         "dotenv": "^16.0.3",
         "ejs": "^3.1.6",
         "express": "^4.17.1",
@@ -32,10 +34,12 @@
         "passport": "^0.4.1",
         "passport-jwt": "^4.0.1",
         "passport-local": "^1.0.0",
+        "supertest": "^6.3.3",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^4.6.2"
     },
     "devDependencies": {
+        "jest": "^29.5.0",
         "nodemon": "^2.0.21",
         "prisma": "^4.13.0"
     },
