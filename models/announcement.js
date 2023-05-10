@@ -34,8 +34,18 @@ const deleteAnnouncement = async (id) => {
     return deletedAnnouncement;
 };
 
+//edit announcements from MySQL database
+const editAnnouncement = async (id) => {
+    const editedAnnouncement = await prisma.announcements.update({
+        where: { announcements_id: id },
+    });
+    console.log("Edited Announcement: ", editedAnnouncement);
+    return editedAnnouncement;
+}
+
 module.exports = {
     getAnnouncement,
     addAnnouncement,
     deleteAnnouncement,
+    editAnnouncement,
 };
