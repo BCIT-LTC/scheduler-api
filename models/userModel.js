@@ -2,6 +2,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const userModel = {
+  findEligable: () => {
+    return prisma.users.findMany({
+      where: { eligibleAdmin: true }
+    });
+  },
   findOne: (email) => {
     return prisma.users.findUnique({
       where: { email },
@@ -31,6 +36,21 @@ const userModel = {
       });
       console.log("User added successfully");
       return user;
+    } catch (error) {
+      console.log("Error: " + error);
+      throw error;
+    }
+  },
+  updateAdmin: async (list, isAdmin) => {
+    console.log(list);
+    console.log(isAdmin);
+    try {
+      await prisma.users.updateMany({
+        where: { email: { in: list } },
+        data: {
+          isAdmin: isAdmin
+        }
+      })
     } catch (error) {
       console.log("Error: " + error);
       throw error;
