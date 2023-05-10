@@ -36,6 +36,7 @@
         "swagger-ui-express": "^4.6.2"
     },
     "devDependencies": {
+        "jest": "^29.5.0",
         "nodemon": "^2.0.21",
         "prisma": "^4.13.0"
     },
