@@ -1,8 +1,4 @@
-const {
-    authenticateToken,
-} = require("../middleware/checkAuth");
-const { saveLogoutTime, logoutTime } = require("../models/logoutTime");
-const passport = require("../middleware/passport");
+
 const express = require("express");
 const router = express.Router();
 const jwtDecode = require('jwt-decode');
