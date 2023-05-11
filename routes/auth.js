@@ -8,9 +8,6 @@ const router = express.Router();
 const jwtDecode = require('jwt-decode');
 const userModel = require("../models/userModel").userModel;
 
-
-
-
 router.get("/api/login", async (req, res) => {
     let jwt = req.headers.authorization.split(' ')[1];
     if (!jwt) {
@@ -27,5 +24,25 @@ router.post("/api/logouttime", async (req, res) => {
     return res.status(200).send(getLogoutTime)
 });
 
+router.get("/api/admin", async (req, res) => {
+    return res.status(200).send(await userModel.findAdmins());
+});
+
+router.post("/api/admin", async (req, res) => {
+    let admin = req.body;
+    if (!admin.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        return res.status(400).send({ error: "Must be a valid email" });
+    }
+    let exist = await userModel.findOne(admin.email);
+    let response = await userModel.updateAdmin(admin.email, admin.isAdmin);
+    if (response) {
+        return res.status(400).send({ error: response });
+    }
+    if (exist == null || exist.firstName === 'N/A') {
+        return res.status(200).send({ error: "User has never logged in!" });
+    } else {
+        return res.status(200).send({ error: '' });
+    }
+});
 module.exports = router;
 
