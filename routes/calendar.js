@@ -149,6 +149,8 @@ const updateForm = require("../models/openLabForm");
 
 
 router.get("/api/calendar", function (req, res) {
+    if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
+
     updateForm
         .findMonth(req.query.month)
         .then((results) => {
@@ -164,6 +166,8 @@ router.get("/api/calendar", function (req, res) {
 });
 
 router.post("/api/calendar", function (req, res) {
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+
     updateForm
         .updateCalendar(req.body.forms)
         .then((results) => {
@@ -179,6 +183,8 @@ router.post("/api/calendar", function (req, res) {
 });
 
 router.post('/api/openlab', function (req, res) {
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+
     updateForm.updateOpenLabDay(req.body.forms[0])
         .then((results) => {
             console.log("update open lab form results", results)

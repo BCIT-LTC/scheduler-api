@@ -20,15 +20,18 @@ router.get("/api/login", async (req, res) => {
 });
 
 router.post("/api/logouttime", async (req, res) => {
+    if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
     const getLogoutTime = await logoutTime(req.body.email)
     return res.status(200).send(getLogoutTime)
 });
 
 router.get("/api/admin", async (req, res) => {
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
     return res.status(200).send(await userModel.findAdmins());
 });
 
 router.post("/api/admin", async (req, res) => {
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
     let admin = req.body;
     if (!admin.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
         return res.status(400).send({ error: "Must be a valid email" });
