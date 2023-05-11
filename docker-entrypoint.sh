@@ -39,5 +39,10 @@ npx prisma db seed
 
 # Return to parent shell to run app
 >&2 echo "Starting app..."
+
+# run tests
+>&2 echo "Running Tests..."
+npm run test
+
 exec "$@"
 
