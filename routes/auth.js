@@ -1,4 +1,53 @@
+/**
+ * @swagger
+ * tags:
+ *   name: login
+ *   description: endpoints of managing login
+ * /api/login:
+ *   get:
+ *     summary: Creates user the the API database using JWT info (email, firstname, lastname, elidgibleAdmin)
+ *     tags: [login]
+ *     responses:
+ *       200:
+ *         description: User created or updated successfully. Returns true if they are admin.
+ *       500:
+ *         description: Some server error
+*/
 
+/**
+ * @swagger
+ * tags:
+ *   name: admin
+ *   description: endpoints for managing admins
+ * /api/admin:
+ *   get:
+ *     summary: Get a list of the current admins
+ *     tags: [admin]
+ *     responses:
+ *       200:
+ *         description: List successfully found and returned
+ *       500:
+ *         description: Some server error
+ *   post:
+ *     summary: Update if a user is an admin or not
+ *     tags: [admin]
+ *     consumes:
+ *      - application/json
+ *     parameters:
+ *      - in: body
+ *        required: true
+ *        name: email
+ *        type: string
+ *      - in: body
+ *        required: true
+ *        name: isAdmin
+ *        type: boolean
+ *     responses:
+ *       200:
+ *         description: Event updated successfully
+ *       500:
+ *         description: Some server error
+ */
 const express = require("express");
 const router = express.Router();
 const jwtDecode = require('jwt-decode');
@@ -15,6 +64,7 @@ router.get("/api/login", async (req, res) => {
     return res.status(200).send(details.isAdmin);
 });
 
+//no swagger yet
 router.post("/api/logouttime", async (req, res) => {
     if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
     const getLogoutTime = await logoutTime(req.body.email)
