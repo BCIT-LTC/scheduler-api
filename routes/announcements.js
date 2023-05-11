@@ -95,8 +95,10 @@ const {
     addAnnouncement,
     deleteAnnouncement,
 } = require("../models/announcement");
+const auth = require("../middleware/checkAuth");
 
 router.get("/api/announcement", async (req, res) => {
+    if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
     try {
         const announcement = await getAnnouncement();
         return res.status(200).send(announcement);
@@ -107,6 +109,7 @@ router.get("/api/announcement", async (req, res) => {
 
 //endpoint for adding or editing announcements
 router.post("/api/announcement", async (req, res) => {
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
     let title = req.body.title;
     let description = req.body.description;
     let date = req.body.date;
@@ -120,6 +123,7 @@ router.post("/api/announcement", async (req, res) => {
 
 //endpoint for deleting announcements
 router.delete("/api/announcement", async (req, res) => {
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
     let id = req.body.id;
     try {
         await deleteAnnouncement(id);
