@@ -25,23 +25,24 @@ router.post("/api/logouttime", async (req, res) => {
 });
 
 router.get("/api/admin", async (req, res) => {
-    return res.status(200).send(await userModel.findEligable());
+    return res.status(200).send(await userModel.findAdmins());
 });
 
 router.post("/api/admin", async (req, res) => {
-    let admins = req.body.admins;
-    let isAdmins = [];
-    let isntAdmins = [];
-    admins.forEach(admin => {
-        if (admin.isAdmin === true) {
-            isAdmins.push(admin.email);
-        } else {
-            isntAdmins.push(admin.email);
-        }
-    });
-    userModel.updateAdmin(isAdmins, true);
-    userModel.updateAdmin(isntAdmins, false);
-    res.sendStatus(200);
+    let admin = req.body;
+    if (!admin.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        return res.status(400).send({ error: "Must be a valid email" });
+    }
+    let exist = await userModel.findOne(admin.email);
+    let response = await userModel.updateAdmin(admin.email, admin.isAdmin);
+    if (response) {
+        return res.status(400).send({ error: response });
+    }
+    if (exist == null || exist.firstName === 'N/A') {
+        return res.status(200).send({ error: "User has never logged in!" });
+    } else {
+        return res.status(200).send({ error: '' });
+    }
 });
 module.exports = router;
 

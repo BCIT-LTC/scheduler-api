@@ -2,9 +2,9 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const userModel = {
-  findEligable: () => {
+  findAdmins: () => {
     return prisma.users.findMany({
-      where: { eligibleAdmin: true }
+      where: { isAdmin: true }
     });
   },
   findOne: (email) => {
@@ -19,12 +19,16 @@ const userModel = {
   },
   addUser: async (email, firstName, lastName, isAdmin, eligibleAdmin) => {
     try {
+      const current = prisma.users.findUnique({
+        where: { email },
+      });
       const user = await prisma.users.upsert({
         where: { email },
         update: {
           firstName: firstName,
           lastName: lastName,
           eligibleAdmin: eligibleAdmin,
+          isAdmin: (eligibleAdmin && current.isAdmin)
         },
         create: {
           email: email,
@@ -41,14 +45,24 @@ const userModel = {
       throw error;
     }
   },
-  updateAdmin: async (list, isAdmin) => {
-    console.log(list);
-    console.log(isAdmin);
+  updateAdmin: async (email, isAdmin) => {
     try {
-      await prisma.users.updateMany({
-        where: { email: { in: list } },
-        data: {
+      const current = await prisma.users.findUnique({
+        where: { email },
+      });
+      if (current != null && !current.eligibleAdmin && isAdmin && current.firstName != "N/A") {
+        return "Ineligible user";
+      }
+      await prisma.users.upsert({
+        where: { email: email },
+        update: {
           isAdmin: isAdmin
+        },
+        create: {
+          email: email,
+          isAdmin: isAdmin,
+          firstName: 'N/A',
+          lastName: "N/A"
         }
       })
     } catch (error) {
