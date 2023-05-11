@@ -1,25 +1,27 @@
-const db = require("./index");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-const saveLogoutTime = (email, logoutTime) => {
-    let sql = `UPDATE users SET logoutTime='${logoutTime}' WHERE email=${email}`;
-    
-    return new Promise((resolve, reject) => {
-        db.query(sql, (error, results) => {
-            if (error) return reject(error);
-        })
-    })
-}
+const saveLogoutTime = async (email, logoutTime) => {
+    const updateLogTime = await prisma.users.update({
+        where: {
+            email: email,
+        },
+        data: { logoutTime: logoutTime },
+    });
+    return updateLogTime;
+};
 
-const logoutTime = (email) => {
-    let sql = `SELECT logoutTime FROM users WHERE email=${email}`;
+const logoutTime = async (email) => {
+    const logoutTime = await prisma.users.findUnique({
+        where: {
+            email: email,
+        },
+        select: {
+            logoutTime: true,
+        },
+    });
 
-    return new Promise((resolve, reject) => {
-        db.query(sql, (error, results) => {
-            if (error) return reject(error);
-
-            return resolve(results);
-        })
-    })
-}
+    return logoutTime;
+};
 
 module.exports = { saveLogoutTime, logoutTime };
