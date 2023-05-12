@@ -16,14 +16,11 @@ services:
       - api_db:/var/lib/mysql
 
   app:
-    command:
-      - /bin/sh
-      - -c
-      - |
-        (cd /app/client && npm install)
-        (cd /app/client && npm run build)
-        npm install
-        npm start
+    # command:
+    #   - /bin/sh
+    #   - -c
+    #   - |
+    #     npm start
     build: .
     ports:
       - "8000:8000"

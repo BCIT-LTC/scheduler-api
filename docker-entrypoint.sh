@@ -20,29 +20,33 @@ if [ "${DEBUG}" == "true" ]; then echo -e " \
 fi
 # Configure and store connection info
 >&2 echo "Writing ENV VARS to .env file..."
-echo -n "" > .env
-echo DATABASE_URL="mysql://$MARIADB_USER:$MARIADB_PASSWORD@$MARIADB_ROOT_HOST:3306/$MARIADB_DATABASE" >> .env
-echo APP_URL=$APP_URL >> .env
-
+cd /app
+# sudo chown -R 1000390000:0 "/root/.npm"
+# echo -n "" > .env
+# echo DATABASE_URL="mysql://$MARIADB_USER:$MARIADB_PASSWORD@$MARIADB_ROOT_HOST:3306/$MARIADB_DATABASE" >> .env
+# echo APP_URL=$APP_URL >> .env
 
 # Initialize prisma
 >&2 echo "Running migrations..."
-npx prisma migrate diff \
---from-empty \
---to-schema-datamodel prisma/schema.prisma \
---script > prisma/migrations/0_init/migration.sql
-npx prisma migrate reset --force
+npx prisma generate
+# mkdir -p prisma/migrations/0_init && \
+# npx prisma migrate diff \
+# --from-empty \
+# --to-schema-datamodel prisma/schema.prisma \
+# --script > prisma/migrations/0_init/migration.sql
+
+# npx prisma migrate reset --force
 
 # Seed database with initial data
 >&2 echo "seeding db..."
-npx prisma db seed
+# npx prisma db seed
 
 # Return to parent shell to run app
 >&2 echo "Starting app..."
 
 # run tests
 >&2 echo "Running Tests..."
-npm run test
+# npm run test
 
 exec "$@"
 

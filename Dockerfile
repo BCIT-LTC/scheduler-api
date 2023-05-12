@@ -1,4 +1,4 @@
-FROM node:19.4.0-alpine
+FROM node:20-alpine
 
 RUN apk --update add \
     mariadb-client \
@@ -11,9 +11,12 @@ COPY middleware ./middleware
 COPY models ./models
 COPY routes ./routes
 # COPY views ./views
+COPY prisma ./prisma
 COPY app.js ./
 COPY package.json ./
+RUN export npm_config_cache=/app/cache
 RUN npm install
+
 
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
