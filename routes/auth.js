@@ -12,7 +12,7 @@
  *         description: User created or updated successfully. Returns true if they are admin.
  *       500:
  *         description: Some server error
-*/
+ */
 
 /**
  * @swagger
@@ -50,16 +50,23 @@
  */
 const express = require("express");
 const router = express.Router();
-const jwtDecode = require('jwt-decode');
+const jwtDecode = require("jwt-decode");
 const userModel = require("../models/userModel").userModel;
+const auth = require("../middleware/checkAuth");
 
 router.get("/api/login", async (req, res) => {
-    let jwt = req.headers.authorization.split(' ')[1];
+    let jwt = req.headers.authorization.split(" ")[1];
     if (!jwt) {
         return;
     }
     let user = jwtDecode(jwt);
-    await userModel.addUser(user.email, user.firstname, user.lastname, false, user.eligibleAdmin);
+    await userModel.addUser(
+        user.email,
+        user.firstname,
+        user.lastname,
+        false,
+        user.eligibleAdmin
+    );
     let details = await userModel.findOne(user.email);
     return res.status(200).send(details.isAdmin);
 });
@@ -67,8 +74,8 @@ router.get("/api/login", async (req, res) => {
 //no swagger yet
 router.post("/api/logouttime", async (req, res) => {
     if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
-    const getLogoutTime = await logoutTime(req.body.email)
-    return res.status(200).send(getLogoutTime)
+    const getLogoutTime = await logoutTime(req.body.email);
+    return res.status(200).send(getLogoutTime);
 });
 
 router.get("/api/admin", async (req, res) => {
@@ -87,11 +94,10 @@ router.post("/api/admin", async (req, res) => {
     if (response) {
         return res.status(400).send({ error: response });
     }
-    if (exist == null || exist.firstName === 'N/A') {
+    if (exist == null || exist.firstName === "N/A") {
         return res.status(200).send({ error: "User has never logged in!" });
     } else {
-        return res.status(200).send({ error: '' });
+        return res.status(200).send({ error: "" });
     }
 });
 module.exports = router;
-

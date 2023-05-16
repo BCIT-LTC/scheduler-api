@@ -146,7 +146,7 @@
 const express = require("express");
 const router = express.Router();
 const updateForm = require("../models/openLabForm");
-
+const auth = require("../middleware/checkAuth");
 
 router.get("/api/calendar", function (req, res) {
     if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
@@ -160,9 +160,10 @@ router.get("/api/calendar", function (req, res) {
             } else {
                 return res.status(404).send({ error: "Error finding month" });
             }
-        }).catch((err) => {
-            return res.status(500).send({ error: err.message });
         })
+        .catch((err) => {
+            return res.status(500).send({ error: err.message });
+        });
 });
 
 router.post("/api/calendar", function (req, res) {
@@ -177,25 +178,30 @@ router.post("/api/calendar", function (req, res) {
             } else {
                 return res.status(500).send({ error: "Error updateing month" });
             }
-        }).catch((err) => {
-            return res.status(500).send({ error: err.message });
         })
+        .catch((err) => {
+            return res.status(500).send({ error: err.message });
+        });
 });
 
-router.post('/api/openlab', function (req, res) {
+router.post("/api/openlab", function (req, res) {
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
 
-    updateForm.updateOpenLabDay(req.body.forms[0])
+    updateForm
+        .updateOpenLabDay(req.body.forms[0])
         .then((results) => {
-            console.log("update open lab form results", results)
+            console.log("update open lab form results", results);
             if (results) {
-                res.status(200).json({ results })
+                res.status(200).json({ results });
             } else {
-                throw new Error("posting to update open lab form day", { cause: results })
+                throw new Error("posting to update open lab form day", {
+                    cause: results,
+                });
             }
-        }).catch((err) => {
-            console.error("updateForm.updateOpenLabDay", err)
         })
-})
+        .catch((err) => {
+            console.error("updateForm.updateOpenLabDay", err);
+        });
+});
 
 module.exports = router;

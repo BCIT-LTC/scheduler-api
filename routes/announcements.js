@@ -86,6 +86,24 @@
  *         description: Announcement is delete
  *       500:
  *         description: Some server error
+ *   put:
+ *      summary: Edit an announcement
+ *      tags: [announcements]
+ *      consumes:
+ *       - application/json
+ *      parameters:
+ *      - in: body
+ *        name: title
+ *        required: true
+ *      - in: body
+ *        name: description
+ *        required: true
+ *       responses:
+ *       200:
+ *         description: Announcement is edited
+ *       500:
+ *         description: Some server error
+ * 
  */
 
 const express = require("express");
@@ -94,6 +112,7 @@ const {
     getAnnouncement,
     addAnnouncement,
     deleteAnnouncement,
+    editAnnouncement,
 } = require("../models/announcement");
 const auth = require("../middleware/checkAuth");
 
@@ -128,6 +147,19 @@ router.delete("/api/announcement", async (req, res) => {
     let id = req.body.id;
     try {
         await deleteAnnouncement(id);
+        return res.status(200).send({ message: "Success" });
+    } catch (error) {
+        return res.status(500).send({ error: error.message });
+    }
+});
+
+//endpoint for editing announcements
+router.put("/api/announcement", async (req, res) => {
+    let id = req.body.id;
+    let title = req.body.title;
+    let description = req.body.description;
+    try {
+        await editAnnouncement(id, title, description);
         return res.status(200).send({ message: "Success" });
     } catch (error) {
         return res.status(500).send({ error: error.message });

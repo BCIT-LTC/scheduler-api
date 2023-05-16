@@ -1,8 +1,9 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 module.exports = {
     authenticateToken: function (req, requireAdmin) {
-        let token = req.headers.authorization.split(' ')[1];
+        if (!req.headers.authorization) return false;
+        let token = req.headers.authorization.split(" ")[1];
         if (!token) {
             return false;
         }
@@ -19,9 +20,7 @@ module.exports = {
             return false;
         }
         return true;
-    }
-}
-
+    },
+};
 
 //email, firstname, lastname, isAdmin
-
