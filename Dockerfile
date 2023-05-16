@@ -1,5 +1,5 @@
-FROM node:20-alpine
-
+FROM node:19.4.0-alpine
+ENV npm_config_cache /app/.cacheapi
 RUN apk --update add \
     mariadb-client \
     curl;
@@ -14,10 +14,10 @@ COPY routes ./routes
 COPY prisma ./prisma
 COPY app.js ./
 COPY package.json ./
-RUN export npm_config_cache=/app/cache
-RUN npm install
+RUN npm install  --cache="/app/.cacheapi" --unsafe-perm=true --allow-root
+RUN chown -R node:node /app
 
-
+RUN chown -R node:node /app/node_modules/.prisma
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 EXPOSE 8000

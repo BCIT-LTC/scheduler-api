@@ -2,10 +2,10 @@
 set -e
 
 # Verify that the minimally required environment variables are set.
-if [ -z "$MARIADB_ROOT_HOST" ] || [ -z "$MARIADB_USER" ] || [ -z "$MARIADB_PASSWORD" ] || [ -z "$MARIADB_DATABASE" ]; then
-    printf '\n\nEnvironment variables are not set.\n\tYou need to specify MARIADB_ROOT_HOST, MARIADB_DATABASE, MARIADB_USER, and MARIADB_PASSWORD\n\n'
-    exit 1
-fi
+# if [ -z "$MARIADB_ROOT_HOST" ] || [ -z "$MARIADB_USER" ] || [ -z "$MARIADB_PASSWORD" ] || [ -z "$MARIADB_DATABASE" ]; then
+#     printf '\n\nEnvironment variables are not set.\n\tYou need to specify MARIADB_ROOT_HOST, MARIADB_DATABASE, MARIADB_USER, and MARIADB_PASSWORD\n\n'
+#     exit 1
+# fi
 
 # Environment variable trace
 if [ "${DEBUG}" == "true" ]; then echo -e " \
@@ -22,13 +22,14 @@ fi
 >&2 echo "Writing ENV VARS to .env file..."
 cd /app
 # sudo chown -R 1000390000:0 "/root/.npm"
-# echo -n "" > .env
+# echo -n "" > /app/.env
 # echo DATABASE_URL="mysql://$MARIADB_USER:$MARIADB_PASSWORD@$MARIADB_ROOT_HOST:3306/$MARIADB_DATABASE" >> .env
 # echo APP_URL=$APP_URL >> .env
 
 # Initialize prisma
 >&2 echo "Running migrations..."
-npx prisma generate
+# npm cache clean --force
+npx prisma db push --schema='/app/prisma/schema.prisma'
 # mkdir -p prisma/migrations/0_init && \
 # npx prisma migrate diff \
 # --from-empty \
