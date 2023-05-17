@@ -16,7 +16,7 @@ model announcements {
 
 model calendar {
   calendar_id Int      @id @default(autoincrement())
-  date        DateTime @db.DateTime(0)
+  date        DateTime @db.DateTime(0) @unique
   start_time  String   @map("start-time") @db.VarChar(20)
   end_time    String   @map("end-time") @db.VarChar(20)
   facilitator String   @db.VarChar(45)

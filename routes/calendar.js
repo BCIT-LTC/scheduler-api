@@ -184,24 +184,4 @@ router.post("/api/calendar", function (req, res) {
         });
 });
 
-router.post("/api/openlab", function (req, res) {
-    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-
-    updateForm
-        .updateOpenLabDay(req.body.forms[0])
-        .then((results) => {
-            console.log("update open lab form results", results);
-            if (results) {
-                res.status(200).json({ results });
-            } else {
-                throw new Error("posting to update open lab form day", {
-                    cause: results,
-                });
-            }
-        })
-        .catch((err) => {
-            console.error("updateForm.updateOpenLabDay", err);
-        });
-});
-
 module.exports = router;

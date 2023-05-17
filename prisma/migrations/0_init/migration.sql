@@ -18,6 +18,7 @@ CREATE TABLE `calendar` (
     `room` VARCHAR(20) NOT NULL,
     `stat` TINYINT NOT NULL,
 
+    UNIQUE INDEX `calendar_date_key`(`date`),
     PRIMARY KEY (`calendar_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
