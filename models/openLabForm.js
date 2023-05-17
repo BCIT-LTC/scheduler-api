@@ -22,12 +22,19 @@ const dataForm = {
     updateCalendar: (forms) => {
         return Promise.all(
             forms.map((form) => {
-                const date = new Date(
-                    form.date.replace(/T/, " ").replace(/Z/, "000")
-                );
-                return prisma.calendar.create({
-                    data: {
+                const date = new Date(form.date);
+                date.setUTCHours(0, 0, 0, 0); // Set the time component to 00:00:00.000
+                return prisma.calendar.upsert({
+                    where: { date },
+                    create: {
                         date,
+                        start_time: form["start-time"],
+                        end_time: form["end-time"],
+                        facilitator: form["facilitator"],
+                        room: form["room"],
+                        stat: form["stat"],
+                    },
+                    update: {
                         start_time: form["start-time"],
                         end_time: form["end-time"],
                         facilitator: form["facilitator"],
@@ -37,21 +44,6 @@ const dataForm = {
                 });
             })
         );
-    },
-
-    updateOpenLabDay: (form) => {
-        const date = new Date(form.date.replace(/T/, " ").replace(/Z/, "000"));
-        return prisma.calendar.update({
-            where: { calendar_id: form.calendar_id },
-            data: {
-                date,
-                start_time: form["start-time"],
-                end_time: form["end-time"],
-                facilitator: form["facilitator"],
-                room: form["room"],
-                stat: form["stat"],
-            },
-        });
     },
 };
 
