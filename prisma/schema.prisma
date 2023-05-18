@@ -16,7 +16,7 @@ model announcements {
 
 model calendar {
   calendar_id Int      @id @default(autoincrement())
-  date        DateTime @db.DateTime(0) @unique
+  date        DateTime @unique @db.DateTime(0)
   start_time  String   @map("start-time") @db.VarChar(20)
   end_time    String   @map("end-time") @db.VarChar(20)
   facilitator String   @db.VarChar(45)
@@ -24,18 +24,10 @@ model calendar {
   stat        Int      @db.TinyInt
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model openlabGuidelines {
-  filename String @db.VarChar(50)
-
-  @@ignore
-}
-
 model users {
-  email      String    @id @db.VarChar(50)
-  firstName      String    @db.VarChar(50)
+  email         String    @id @db.VarChar(50)
+  firstName     String    @db.VarChar(50)
   lastName      String    @db.VarChar(50)
-  isAdmin    Boolean   @default(false)
-  eligibleAdmin Boolean @default(false)
-  logoutTime DateTime? @db.DateTime(0)
+  isAdmin       Boolean   @default(false)
+  eligibleAdmin Boolean   @default(false)
 }
