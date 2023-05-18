@@ -5,22 +5,23 @@ const swaggerUi = require("swagger-ui-express");
 const path = require("path");
 const cors = require("cors");
 const port = 8000;
-const hostname = '0.0.0.0';
-const overrideMethod = require('method-override')
+const hostname = "0.0.0.0";
+const overrideMethod = require("method-override");
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(cors());
-app.use(overrideMethod('_method'))
+app.use(overrideMethod("_method"));
 
 const announcements = require("./routes/announcements");
 const auth = require("./routes/auth");
 const calendar = require("./routes/calendar");
+const faq = require("./routes/faq");
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/", announcements, auth, calendar);
+app.use("/", announcements, auth, calendar, faq);
 
 const options = {
   definition: {
@@ -28,8 +29,7 @@ const options = {
     info: {
       title: "Scheduler-API",
       version: "dev",
-      description:
-        "Welcome to the API for the BSN Openlab Scheduler",
+      description: "Welcome to the API for the BSN Openlab Scheduler",
     },
     servers: [
       {
@@ -41,11 +41,7 @@ const options = {
 };
 
 const specs = swaggerJsdoc(options);
-app.use(
-  "/api",
-  swaggerUi.serve,
-  swaggerUi.setup(specs, { explorer: true })
-);
+app.use("/api", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
 app.listen(port, hostname, () => {
   console.log(`Server started on port ${port}`);
