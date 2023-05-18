@@ -154,7 +154,12 @@ const app = express();
 
 // Set up Multer storage
 const storage = multer.diskStorage({
-  destination: "uploads/"
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
 });
 
 // Create Multer instance
@@ -162,16 +167,40 @@ const upload = multer({
   storage
 });
 
+const uploadSinglePdfFile = upload.single('pdfFile');
+
 router.get("/api/labGuidelines", function (req, res) {
   if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
   console.log(req.body)
 
 });
 
-router.post("/api/labGuidelines", upload.single('pdfFile'), function (req, res) {
+router.post("/api/labGuidelines", function (req, res) {
   if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
   console.log(req.body);
-  res.status(200);
+  
+  // TODO: uploading file middleware
+  uploadSinglePdfFile(req, res, (err) => {
+    console.log(req.body);
+    if (err instanceof multer.MulterError) {
+      // A Multer error occurred
+      return res.status(400).json({
+        error: err.message
+      });
+    } else if (err) {
+      // An unknown error occurred
+      return res.status(500).json({
+        error: 'An error occurred'
+      });
+    }
+
+    // File has been uploaded and saved, do further processing if needed
+    res.status(200).send('File uploaded successfully!');
+  });
+  // console.log(req.body);
+  // if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+  // console.log(req.body);
+  // res.status(200);
 });
 
 module.exports = router;
