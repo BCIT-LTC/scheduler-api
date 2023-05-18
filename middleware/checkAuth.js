@@ -1,6 +1,11 @@
 const jwt = require("jsonwebtoken");
-
 module.exports = {
+    /**
+     * Read the token from the authentication header and verify that the user is legit.
+     * @param {*} req - the request information from the auth
+     * @param {*} requireAdmin - if the token should only be from an admin
+     * @returns boolean of authenticity
+     */
     authenticateToken: function (req, requireAdmin) {
         if (!req.headers.authorization) return false;
         let token = req.headers.authorization.split(" ")[1];
@@ -22,5 +27,3 @@ module.exports = {
         return true;
     },
 };
-
-//email, firstname, lastname, isAdmin

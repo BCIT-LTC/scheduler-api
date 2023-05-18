@@ -1,7 +1,14 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-//retrieve announcements for announcement table
+
+/**
+ * Retrieve a list of all the annoucements.
+ * @date 2023-05-17 - 10:41:51 p.m.
+ *
+ * @async
+ * @returns {Object} list of all the a annoucements.
+ */
 const getAnnouncement = async () => {
     try {
         const announcements = await prisma.announcements.findMany();
@@ -11,7 +18,18 @@ const getAnnouncement = async () => {
     }
 };
 
-//add announcements to MySQL database
+
+/**
+ * Add an announcement to the database.
+ * @date 2023-05-17 - 10:42:41 p.m.
+ *
+ * @async
+ * @param {*} title - announcement title
+ * @param {*} description - details about the announcement
+ * @param {*} date - date the announcement was made
+ * @param {number} [id=-1] id of the new announcement, if its an update
+ * @returns {unknown}
+ */
 const addAnnouncement = async (title, description, date, id = -1) => {
     try {
         const announcement = await prisma.announcements.upsert({
@@ -33,7 +51,15 @@ const addAnnouncement = async (title, description, date, id = -1) => {
     }
 };
 
-//delete announcements from MySQL database
+
+/**
+ * Delete an announcement given an id
+ * @date 2023-05-17 - 10:43:52 p.m.
+ *
+ * @async
+ * @param {*} id of the announcement to delete
+ * @returns {Object} deleted announcement
+ */
 const deleteAnnouncement = async (id) => {
     try {
         const deletedAnnouncement = await prisma.announcements.delete({
@@ -49,7 +75,17 @@ const deleteAnnouncement = async (id) => {
     }
 };
 
-//edit announcements from MySQL database
+
+/**
+ * Update an announcement with its id
+ * @date 2023-05-17 - 10:44:51 p.m.
+ *
+ * @async
+ * @param {*} id - id of announcement to update
+ * @param {*} updatedTitle - the new title
+ * @param {*} updatedDescription - the new description
+ * @returns {Object} the updated announcement
+ */
 const editAnnouncement = async (id, updatedTitle, updatedDescription) => {
     try {
         const editedAnnouncement = await prisma.announcements.update({

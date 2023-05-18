@@ -2,6 +2,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const userModel = {
+    /**
+     * finds a list of all the existing admins
+     * @async
+     * @returns array of users who are admins
+     */
     findAdmins: async () => {
         try {
             return await prisma.users.findMany({
@@ -11,7 +16,12 @@ const userModel = {
             console.error("An error occurred while fetching admins:", error);
         }
     },
-
+    /**
+     * Find a specific user
+     * @param {*} email
+     * @async
+     * @returns first/last name, email, and if the user is an admin
+     */
     findOne: async (email) => {
         try {
             return await prisma.users.findUnique({
@@ -25,6 +35,12 @@ const userModel = {
         }
     },
 
+    /**
+     * Find a user by their id
+     * @param {*} id - id of the user to find
+     * @async
+     * @returns first/last name, email, and if the user is an admin
+     */
     findById: async (id) => {
         try {
             return await prisma.users.findUnique({
@@ -38,6 +54,15 @@ const userModel = {
         }
     },
 
+    /**
+     * Add a new user to the database
+     * @param {*} email - users email
+     * @param {*} firstName - users first name
+     * @param {*} lastName - users last name
+     * @param {*} isAdmin - if the user is an admin
+     * @param {*} eligibleAdmin - if the user is allowed to be an admin
+     * @returns the user who was added
+     */
     addUser: async (email, firstName, lastName, isAdmin, eligibleAdmin) => {
         try {
             const current = prisma.users.findUnique({
@@ -65,6 +90,13 @@ const userModel = {
             console.log("Error: " + error);
         }
     },
+    /**
+     * update an existing users admin status
+     * @param {*} email - email of user to update
+     * @param {*} isAdmin - admin status of the user
+     * @async
+     * @returns possible error message
+     */
     updateAdmin: async (email, isAdmin) => {
         try {
             const current = await prisma.users.findUnique({
