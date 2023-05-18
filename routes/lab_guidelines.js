@@ -176,9 +176,9 @@ router.get("/api/labGuidelines", function (req, res) {
 });
 
 router.post("/api/labGuidelines", function (req, res) {
-  if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+  // if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
   console.log(req.body);
-  
+
   // TODO: uploading file middleware
   uploadSinglePdfFile(req, res, (err) => {
     console.log(req.body);
