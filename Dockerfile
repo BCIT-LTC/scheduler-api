@@ -6,7 +6,6 @@ RUN apk --update add \
 
 WORKDIR /app
 
-# COPY controllers ./controllers
 COPY middleware ./middleware
 COPY models ./models
 COPY routes ./routes
