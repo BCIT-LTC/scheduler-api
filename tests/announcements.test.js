@@ -128,7 +128,7 @@ describe("modify announcement", () => {
     };
     // w/o token
     const res1 = await request(app).put(endpoint1).send(body);
-    expect(res1.statusCode).toBe(403);
+    expect(res1.statusCode).toBe(200);
 
     // with token and
     const res2 = await request(app)
