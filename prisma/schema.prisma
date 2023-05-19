@@ -2,9 +2,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// datasource db {
+//   provider = "mysql"
+//   url      = "mysql://root:isajrqwoihjwaor@mariadb:3306/db"
+// }
+
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:isajrqwoihjwaor@mariadb:3306/db"
+  url      = env("DATABASE_URL")
 }
 
 model announcements {
