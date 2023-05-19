@@ -13,10 +13,12 @@ COPY routes ./routes
 COPY prisma ./prisma
 COPY app.js ./
 COPY package.json ./
+COPY uploads ./uploads
 RUN npm install  --cache="/app/.cacheapi" --unsafe-perm=true --allow-root
 RUN chown -R node:node /app
 
 RUN chown -R node:node /app/node_modules/.prisma
+RUN chmod 777 /app/uploads/labguidelines.pdf
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 EXPOSE 8000
