@@ -31,3 +31,9 @@ model users {
   isAdmin       Boolean   @default(false)
   eligibleAdmin Boolean   @default(false)
 }
+
+model faqs {
+  faqs_id Int      @id @default(autoincrement())
+  question           String   @db.VarChar(200)
+  answer      String   @db.VarChar(200)
+}
