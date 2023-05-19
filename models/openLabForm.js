@@ -44,8 +44,9 @@ const dataForm = {
                 forms.map(async (form) => {
                     const date = new Date(form.date);
                     date.setUTCHours(0, 0, 0, 0); // Set the time component to 00:00:00.000
+                    if (form.calendar_id === undefined) form.calendar_id = -1;
                     return await prisma.calendar.upsert({
-                        where: { date },
+                        where: { calendar_id: form.calendar_id },
                         create: {
                             date,
                             start_time: form["start_time"],
