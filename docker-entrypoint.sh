@@ -38,7 +38,7 @@ npx prisma db seed
 
 # run tests
 >&2 echo "Running Tests..."
-# npm run test
+npm run test
 
 exec "$@"
 
