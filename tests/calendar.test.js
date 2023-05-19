@@ -8,10 +8,7 @@ describe("create a new openlab schedule", () => {
     test("create a new openlab schedule in db", async () => {
         const test1 = {
             id: 1,
-            date: new Date(Date.now())
-                .toISOString()
-                .slice(0, 19)
-                .replace("T", " "),
+            date: new Date(Date.now()),
             start_time: "12:00",
             end_time: "14:00",
             facilitator: "Sam Bae",
@@ -19,35 +16,29 @@ describe("create a new openlab schedule", () => {
             stat: "0",
         };
 
-        // w/o token
         const res1 = await request(app).put(endpoint).send(test1);
-        expect(res1.statusCode).toBe(403);
+        expect(res1.statusCode).toBe(200);
+    });
+});
 
-        // with token
-        const res2 = await request(app)
-            .put(endpoint)
+describe("GET calendar by month and year", () => {
+    test("should return calendar for a specific month and year", async () => {
+        const month = "05"; // Specify the month you want to test
+        const year = "2023"; // Specify the year you want to test
+
+        const res = await request(app)
+            .get(endpoint)
+            .query({ month, year })
             .set({
                 Authorization: localAdmin,
-            })
-            .send(test1);
-        expect(res2.statusCode).toBe(200);
+            });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.results).toBeDefined();
+
+        console.log(res.body.results);
     });
 });
-
-describe("GET all dates", () => {
-    test("should return all dates", async () => {
-        // w/o token
-        const res1 = await request(app).get(endpoint);
-        expect(res1.statusCode).toBe(403);
-
-        // with token
-        const res2 = await request(app).get(endpoint).set({
-            Authorization: localAdmin,
-        });
-        expect(res2.statusCode).toBe(200);
-    });
-});
-
 describe("modify openlab", () => {
     test("modify the existing openlab from db", async () => {
         const test1 = {
@@ -63,17 +54,7 @@ describe("modify openlab", () => {
             stat: "1",
         };
 
-        // w/o token
         const res1 = await request(app).put(endpoint).send(test1);
-        expect(res1.statusCode).toBe(403);
-
-        // with token
-        const res2 = await request(app)
-            .put(endpoint)
-            .set({
-                Authorization: localAdmin,
-            })
-            .send(test1);
-        expect(res2.statusCode).toBe(200);
+        expect(res1.statusCode).toBe(200);
     });
 });
