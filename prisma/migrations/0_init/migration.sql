@@ -12,19 +12,13 @@ CREATE TABLE `announcements` (
 CREATE TABLE `calendar` (
     `calendar_id` INTEGER NOT NULL AUTO_INCREMENT,
     `date` DATETIME(0) NOT NULL,
-    `start-time` VARCHAR(20) NOT NULL,
-    `end-time` VARCHAR(20) NOT NULL,
+    `start_time` VARCHAR(20) NOT NULL,
+    `end_time` VARCHAR(20) NOT NULL,
     `facilitator` VARCHAR(45) NOT NULL,
     `room` VARCHAR(20) NOT NULL,
     `stat` TINYINT NOT NULL,
 
-    UNIQUE INDEX `calendar_date_key`(`date`),
     PRIMARY KEY (`calendar_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `openlabGuidelines` (
-    `filename` VARCHAR(50) NOT NULL
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -34,7 +28,6 @@ CREATE TABLE `users` (
     `lastName` VARCHAR(50) NOT NULL,
     `isAdmin` BOOLEAN NOT NULL DEFAULT false,
     `eligibleAdmin` BOOLEAN NOT NULL DEFAULT false,
-    `logoutTime` DATETIME(0) NULL,
 
     PRIMARY KEY (`email`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

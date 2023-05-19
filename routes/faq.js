@@ -78,18 +78,18 @@
  *       500:
  *         description: Some server error
  *   put:
- *      summary: Edit an faq
- *      tags: [faqs]
- *      consumes:
- *       - application/json
- *      parameters:
+ *     summary: Edit an faq
+ *     tags: [faqs]
+ *     consumes:
+ *      - application/json
+ *     parameters:
  *      - in: body
  *        name: question
  *        required: true
  *      - in: body
  *        name: answer
  *        required: true
- *       responses:
+ *     responses:
  *       200:
  *         description: Faq is edited
  *       500:
@@ -103,51 +103,51 @@ const { getFaq, addFaq, deleteFaq, editFaq } = require("../models/faqs");
 const auth = require("../middleware/checkAuth");
 
 router.get("/api/faq", async (req, res) => {
-  if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
-  try {
-    const faq = await getFaq();
-    return res.status(200).send(faq);
-  } catch (error) {
-    return res.status(500).send({ error: error.message });
-  }
+    if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
+    try {
+        const faq = await getFaq();
+        return res.status(200).send(faq);
+    } catch (error) {
+        return res.status(500).send({ error: error.message });
+    }
 });
 
 //endpoint for adding or editing faqs
 router.post("/api/faq", async (req, res) => {
-  if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-  let question = req.body.question;
-  let answer = req.body.answer;
-  try {
-    const faq = addFaq(question, answer);
-    res.status(200).send(faq);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+    let question = req.body.question;
+    let answer = req.body.answer;
+    try {
+        const faq = addFaq(question, answer);
+        res.status(200).send(faq);
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
 });
 
 //endpoint for deleting faqs
 router.delete("/api/faq", async (req, res) => {
-  if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-  let id = req.body.id;
-  try {
-    await deleteFaq(id);
-    return res.status(200).send({ message: "Success" });
-  } catch (error) {
-    return res.status(500).send({ error: error.message });
-  }
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+    let id = req.body.id;
+    try {
+        await deleteFaq(id);
+        return res.status(200).send({ message: "Success" });
+    } catch (error) {
+        return res.status(500).send({ error: error.message });
+    }
 });
 
 //endpoint for editing faqs
 router.put("/api/faq", async (req, res) => {
-  let id = req.body.id;
-  let question = req.body.question;
-  let answer = req.body.answer;
-  try {
-    await editFaq(id, question, answer);
-    return res.status(200).send({ message: "Success" });
-  } catch (error) {
-    return res.status(500).send({ error: error.message });
-  }
+    let id = req.body.id;
+    let question = req.body.question;
+    let answer = req.body.answer;
+    try {
+        await editFaq(id, question, answer);
+        return res.status(200).send({ message: "Success" });
+    } catch (error) {
+        return res.status(500).send({ error: error.message });
+    }
 });
 
 module.exports = router;
