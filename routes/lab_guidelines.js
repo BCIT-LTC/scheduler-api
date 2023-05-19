@@ -39,7 +39,6 @@ const path = require('path');
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
 
-
 router.get("/api/labGuidelines", function (req, res) {
     if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
     try {
