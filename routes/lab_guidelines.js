@@ -1,145 +1,30 @@
 /**
  * @swagger
- * components:
- *   schemas:
- *     calendar:
- *       type: object
- *       required:
- *         - calendar_id
- *         - date
- *         - start_time
- *         - end_time
- *         - facilitator
- *         - room
- *         - stat
- *       properties:
- *         calendar_id:
- *           type: integer
- *           description: The auto-generated id of the calendar
- *         date:
- *           type: string
- *           format: date
- *           description: Date of the Open Lab
- *         start_time:
- *           type: string
- *           format: time
- *           description: Start time of the Open Lab
- *         end_time:
- *           type: string
- *           format: time
- *           description: Start time of the Open Lab
- *         facilitator:
- *           type: string
- *           description: The supervisor of the Open Lab
- *         room:
- *           type: string
- *           description: The room the Open Lab is in
- *         stat:
- *           type: integer
- *           description: If it is on a stat
- *       example:
- *         calendar_id: 1
- *         date: 2023-04-28
- *         start_time: 10:00:00.000Z
- *         end_time: 12:00:00.000Z
- *         facilitator: Sam
- *         room: SE12-327
- *         stat: 0
- */
-
-/**
- * @swagger
  * tags:
- *   name: calendar
- *   description: The announcements managing API
- * /api/calendar:
+ *   name: guidelilnes
+ *   description: endpoint for getting and setting lab guidelines pdf
+ * /api/admin:
  *   get:
- *     summary: Retrieve the details for a month
- *     tags: [calendar]
- *     parameters:
- *      - in: query
- *        name: month
- *        schema:
- *         - type: integer
- *        description: Which month to retrieve details for
+ *     summary: get blob of pdf
+ *     tags: [guidelilnes]
  *     responses:
  *       200:
- *         description: The list of data for the month
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/calendar'
- *       404:
- *         description: Month data not found
+ *         description: Pdf blob returned
  *       500:
  *         description: Some server error
  *   post:
- *     summary: Add calendar events
- *     tags: [calendar]
+ *     summary: Sets the new pdf
+ *     tags: [guidelilnes]
  *     consumes:
- *      - application/json
+ *      - multipart/form-data
  *     parameters:
- *      - in: body
+ *      - in: form
  *        required: true
- *        type: array
- *        items:
- *          type: object
- *          properties:
- *            calendar_id:
- *              type: integer
- *            date:
- *              type: string
- *              format: date
- *            start_time:
- *             type: string
- *             format: time
- *            end_time:
- *             type: string
- *             format: time
- *            facilitator:
- *             type: string
- *            room:
- *             type: string
- *            stat:
- *             type: integer
+ *        name: pdfFile
+ *        type: file
  *     responses:
  *       200:
- *         description: Event added successfully
- *       500:
- *         description: Some server error
- * /api/openlab:
- *   post:
- *     summary: Update calendar events
- *     tags: [calendar]
- *     consumes:
- *      - application/json
- *     parameters:
- *      - in: body
- *        required: true
- *        type: array
- *        items:
- *          type: object
- *          properties:
- *            calendar_id:
- *              type: integer
- *            date:
- *              type: string
- *              format: date
- *            start_time:
- *             type: string
- *             format: time
- *            end_time:
- *             type: string
- *             format: time
- *            facilitator:
- *             type: string
- *            room:
- *             type: string
- *            stat:
- *             type: integer
- *     responses:
- *       200:
- *         description: Event updated successfully
+ *         description: pdf updated successfully
  *       500:
  *         description: Some server error
  */
@@ -149,29 +34,39 @@ const auth = require("../middleware/checkAuth");
 
 const multer = require('multer');
 const fs = require('fs');
+const path = require('path');
 
-const app = express();
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
 
-// Set up Multer storage
-const storage = multer.diskStorage({
-  destination: "uploads/"
-});
-
-// Create Multer instance
-const upload = multer({
-  storage
-});
 
 router.get("/api/labGuidelines", function (req, res) {
-  if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
-  console.log(req.body)
-
+    if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
+    try {
+        var filePath = path.join(__dirname, '..', 'uploads', 'labguidelines.pdf');
+        if (fs.existsSync(filePath)) {
+            var file = fs.createReadStream(filePath);
+            var stat = fs.statSync(filePath);
+            res.setHeader('Content-Length', stat.size);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'attachment; filename=labguidelines.pdf');
+            file.pipe(res);
+        }
+    } catch (error) {
+        console.log(error);
+    }
 });
 
+
 router.post("/api/labGuidelines", upload.single('pdfFile'), function (req, res) {
-  if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-  console.log(req.body);
-  res.status(200);
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+    if (!req.file) {
+        return res.status(400).send({ error: 'No file uploaded.' });
+    }
+    const file = req.file;
+    const filePath = path.join(__dirname, '..', 'uploads', 'labguidelines.pdf');
+    fs.writeFileSync(filePath, file.buffer);
+    res.status(200).send({ error: "" });
 });
 
 module.exports = router;
