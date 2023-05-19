@@ -150,13 +150,12 @@ const auth = require("../middleware/checkAuth");
 
 router.get("/api/calendar", function (req, res) {
     if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
-
     updateForm
-        .findMonth(req.query.month)
+        .findMonth(req.query.month, req.query.year)
         .then((results) => {
             console.log("update form results", results);
             if (results) {
-                res.status(200).json({ results });
+                res.status(200).send({ results });
             } else {
                 return res.status(404).send({ error: "Error finding month" });
             }
@@ -174,33 +173,13 @@ router.post("/api/calendar", function (req, res) {
         .then((results) => {
             console.log("update form results", results);
             if (results) {
-                res.status(200);
+                res.status(200).send({ error: "" });
             } else {
                 return res.status(500).send({ error: "Error updateing month" });
             }
         })
         .catch((err) => {
             return res.status(500).send({ error: err.message });
-        });
-});
-
-router.post("/api/openlab", function (req, res) {
-    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-
-    updateForm
-        .updateOpenLabDay(req.body.forms[0])
-        .then((results) => {
-            console.log("update open lab form results", results);
-            if (results) {
-                res.status(200).json({ results });
-            } else {
-                throw new Error("posting to update open lab form day", {
-                    cause: results,
-                });
-            }
-        })
-        .catch((err) => {
-            console.error("updateForm.updateOpenLabDay", err);
         });
 });
 

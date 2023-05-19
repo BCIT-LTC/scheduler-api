@@ -98,12 +98,12 @@
  *      - in: body
  *        name: description
  *        required: true
- *       responses:
+ *      responses:
  *       200:
  *         description: Announcement is edited
  *       500:
  *         description: Some server error
- * 
+ *
  */
 
 const express = require("express");
@@ -134,7 +134,11 @@ router.post("/api/announcement", async (req, res) => {
     let description = req.body.description;
     let date = req.body.date;
     try {
-        const announcement = addAnnouncement(title, description, new Date(date));
+        const announcement = addAnnouncement(
+            title,
+            description,
+            new Date(date)
+        );
         res.status(200).send(announcement);
     } catch (error) {
         res.status(500).send({ error: error.message });
@@ -165,6 +169,5 @@ router.put("/api/announcement", async (req, res) => {
         return res.status(500).send({ error: error.message });
     }
 });
-
 
 module.exports = router;
