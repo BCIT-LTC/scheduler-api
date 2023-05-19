@@ -1,9 +1,9 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express");
-const path = require("path");
-const cors = require("cors");
+const express = require('express');
+const bodyParser = require('body-parser');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const path = require('path');
+const cors = require('cors');
 const port = 8000;
 const hostname = "0.0.0.0";
 const overrideMethod = require("method-override");
@@ -19,14 +19,15 @@ const auth = require("./routes/auth");
 const calendar = require("./routes/calendar");
 const pdf = require("./routes/lab_guidelines");
 const faq = require("./routes/faq");
+const contact = require('./routes/contact'); // Import the new contact route file
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 
-app.use("/", announcements, auth, calendar, faq, pdf);
+app.use("/", announcements, auth, calendar, faq, pdf, contact);
 
 const options = {
   definition: {
-    openapi: "3.0.0",
+    openapi: '3.0.0',
     info: {
       title: "Scheduler-API",
       version: "dev",
@@ -34,11 +35,11 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:8000",
+        url: 'http://localhost:8000',
       },
     ],
   },
-  apis: ["./routes/*.js"],
+  apis: ['./routes/*.js'],
 };
 
 const specs = swaggerJsdoc(options);
