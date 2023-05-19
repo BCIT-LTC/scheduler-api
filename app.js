@@ -17,11 +17,12 @@ app.use(overrideMethod("_method"));
 const announcements = require("./routes/announcements");
 const auth = require("./routes/auth");
 const calendar = require("./routes/calendar");
+const pdf = require("./routes/lab_guidelines");
 const faq = require("./routes/faq");
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/", announcements, auth, calendar, faq);
+app.use("/", announcements, auth, calendar, faq, pdf);
 
 const options = {
   definition: {
