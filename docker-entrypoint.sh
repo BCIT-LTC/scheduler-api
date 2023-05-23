@@ -47,7 +47,7 @@ npx prisma db push --schema='/app/prisma/schema.prisma'
 
 # run tests
 >&2 echo "Running Tests..."
-# npm run test
+npm run test
 
 exec "$@"
 
