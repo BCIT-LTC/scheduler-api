@@ -158,6 +158,7 @@ router.delete("/api/announcement", async (req, res) => {
 
 //endpoint for editing announcements
 router.put("/api/announcement", async (req, res) => {
+    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
     let id = req.body.id;
     let title = req.body.title;
     let description = req.body.description;
