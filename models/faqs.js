@@ -1,13 +1,26 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-//retrieve faq for faq table
+
+/**
+ * Find all the freqently asked questions
+ * @date 2023-05-23 - 1:45:42 a.m.
+ *
+ * @async
+ * @returns {Object} list of faqs
+ */
 const getFaq = async () => {
   const faqs = await prisma.faqs.findMany();
   return faqs;
 };
 
-//add faqs to MySQL database
+/**
+ * Add a new question to the db
+ * @param {*} question
+ * @param {*} answer
+ * @param {*} id to possibly update
+ * @returns the results
+ */
 const addFaq = async (question, answer, id = -1) => {
   const faq = await prisma.faqs.upsert({
     where: { faqs_id: id },
@@ -23,7 +36,11 @@ const addFaq = async (question, answer, id = -1) => {
   return faq;
 };
 
-//delete faqs from MySQL database
+/**
+ * Delete a faq
+ * @param {*} id of faq to delete
+ * @returns  results
+ */
 const deleteFaq = async (id) => {
   const deletedFaq = await prisma.faqs.delete({
     where: { faqs_id: id },
@@ -32,7 +49,13 @@ const deleteFaq = async (id) => {
   return deletedFaq;
 };
 
-//edit faqs from MySQL database
+/**
+ * edit a faz
+ * @param {*} id to update
+ * @param {*} updatedQuestion new question
+ * @param {*} updatedAnswer new answer
+ * @returns
+ */
 const editFaq = async (id, updatedQuestion, updatedAnswer) => {
   const editedFaq = await prisma.faqs.update({
     where: { faqs_id: id },
