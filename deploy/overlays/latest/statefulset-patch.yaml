@@ -14,7 +14,6 @@ spec:
       labels:
         tier: mariadb
     spec:
-      serviceAccountName: openlab-scheduler-serviceaccount
       containers:
         - name: mariadb
           image: mariadb
