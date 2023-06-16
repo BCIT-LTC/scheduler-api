@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset
+  labels:
+    tier: mariadb
+spec:
+  serviceName: "mariadb"
+  selector:
+    matchLabels:
+      tier: mariadb
+  template:
+    metadata:
+      labels:
+        tier: mariadb
+    spec:
+      serviceAccountName: openlab-scheduler-serviceaccount
+      containers:
+        - name: mariadb
+          image: mariadb
+          envFrom:
+          - configMapRef:
+              name: elasticapm-config

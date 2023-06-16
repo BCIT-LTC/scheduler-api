@@ -1,0 +1,64 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+
+# Flux envsubst replaces variables found in `deploy-vars.env` or falls back to defaults
+#
+namespace: ${DEPLOY_NAMESPACE:=scheduler-api}
+
+resources:
+- ../../base
+
+commonLabels:
+  environment: review
+
+commonAnnotations:
+  version: ${GIT_TAG:=stable}
+
+images:
+- name: scheduler-api
+  newName: ${IMAGE_NAME:=registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api}
+  newTag: ${IMAGE_TAG:=stable}
+
+patches:
+- target:
+    kind: Ingress
+  path: ingress-patch.yaml
+- target:
+    kind: Deployment
+  path: deployment-patch.yaml
+- target:
+    kind: StatefulSet
+  path: statefulset-patch.yaml
+
+
+# # Create a .dockerconfig.json. Then uncomment this section for local cluster development.
+# #
+# - target:
+#     kind: Deployment
+#   patch: |-
+#     - op: add
+#       path: /spec/template/spec/imagePullSecrets
+#       value: [name: gitlab-registry-credentials]
+
+configMapGenerator:
+  - name: mariadb-config
+    literals:
+      - MARIADB_DATABASE=openlab-scheduler
+      - MARIADB_ROOT_HOST=db
+    behavior: merge
+
+secretGenerator:
+  - name: mariadb-credentials
+    literals:
+      - MARIADB_USER=bsnmysql
+      - MARIADB_PASSWORD=bcitbsn491
+      - SECRET_KEY=ahuaejsdb
+    behavior: merge
+
+  # # Uncomment for local cluster development
+  # #
+  # - name: gitlab-registry-credentials
+  #   type: kubernetes.io/dockerconfigjson
+  #   files:
+  #     - .dockerconfigjson=secrets/.dockerconfig.json

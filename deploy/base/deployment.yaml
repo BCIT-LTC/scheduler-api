@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler-api
+  template:
+    metadata:
+      labels:
+        app: scheduler-api
+    spec:
+      serviceAccountName: scheduler-api-serviceaccount
+      containers:
+        - name: scheduler-api
+          image: scheduler-api
+          env:
+            - name: MARIADB_ROOT_HOST
+              value: scheduler-api-mariadb-service
+          envFrom:
+            - configMapRef:
+                name: mariadb-config
+            - secretRef:
+                name: mariadb-credentials
+          # readinessProbe:
+          #   tcpSocket:
+          #     port: 8000
+          #   initialDelaySeconds: 20
+          #   periodSeconds: 30
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: 8000
+          #   initialDelaySeconds: 15
+          #   periodSeconds: 30
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          volumeMounts:
+            - name: openlab-scheduler-data
+              mountPath: /app/data
+      volumes:
+        - name: openlab-scheduler-data
+          emptyDir: {}
