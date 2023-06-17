@@ -30,3 +30,4 @@ configMapGenerator:
     literals:
       - ELASTIC_APM_SERVICE_NAME=scheduler-api-latest
       - ELASTIC_APM_SERVER_URL=https://bcit-ltc.apm.westus2.azure.elastic-cloud.com
+    behavior: merge
