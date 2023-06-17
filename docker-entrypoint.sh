@@ -41,4 +41,3 @@ npx prisma db seed
 npm run test
 
 exec "$@"
-
