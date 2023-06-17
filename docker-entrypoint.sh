@@ -27,7 +27,7 @@ echo APP_URL=$APP_URL >> .env
 
 # Initialize prisma
 >&2 echo "Running migrations..."
-npx prisma db push --schema='/app/prisma/schema.prisma'
+npx prisma db push --schema='prisma/schema.prisma'
 
 # Seed database with initial data
 >&2 echo "seeding db..."
