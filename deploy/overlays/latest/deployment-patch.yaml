@@ -23,6 +23,3 @@ spec:
     spec:
       containers:
         - name: scheduler-api
-          envFrom:
-          - configMapRef:
-              name: elasticapm-config

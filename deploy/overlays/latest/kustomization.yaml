@@ -20,9 +20,6 @@ patches:
 - target:
     kind: Deployment
   path: deployment-patch.yaml
-- target:
-    kind: StatefulSet
-  path: statefulset-patch.yaml
 # Generates elasticapm config
 #
 configMapGenerator:

@@ -24,6 +24,8 @@ spec:
                 name: mariadb-config
             - secretRef:
                 name: mariadb-credentials
+            - configMapRef:
+                name: elasticapm-config
           # readinessProbe:
           #   tcpSocket:
           #     port: 8000

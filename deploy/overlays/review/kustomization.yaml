@@ -27,9 +27,6 @@ patches:
 - target:
     kind: Deployment
   path: deployment-patch.yaml
-- target:
-    kind: StatefulSet
-  path: statefulset-patch.yaml
 
 
 # # Create a .dockerconfig.json. Then uncomment this section for local cluster development.
