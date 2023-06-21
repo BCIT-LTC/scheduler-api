@@ -18,6 +18,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nginx-service
+                name: scheduler-api-service
                 port:
                   number: 80
