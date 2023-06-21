@@ -15,19 +15,13 @@ spec:
         vault.hashicorp.com/agent-inject-secret-config: "web-apps/data/scheduler-api"
         vault.hashicorp.com/agent-inject-template-config: |
           {{ with secret "web-apps/data/scheduler-api" -}}
-          ADMIN_USERNAME="{{ .Data.data.ADMIN_USERNAME }}"
-          ADMIN_PASSWORD="{{ .Data.data.ADMIN_PASSWORD }}"
-          API_KEY="{{ .Data.data.API_KEY }}"
-          DJANGO_SECRET_KEY="{{ .Data.data.DJANGO_SECRET_KEY }}"
-          POSTGRES_PASSWORD="{{ .Data.data.POSTGRES_PASSWORD }}"
+          MARIADB_USER="{{ .Data.data.MARIADB_USER }}"
+          MARIADB_PASSWORD="{{ .Data.data.MARIADB_PASSWORD }}"
+          SECRET_KEY="{{ .Data.data.SECRET_KEY }}"
           ELASTIC_APM_SECRET_TOKEN="{{ .Data.data.ELASTIC_APM_SECRET_TOKEN }}"
           {{- end }}
     spec:
       containers:
-        - name: nginx
-          envFrom:
-          - configMapRef:
-              name: elasticapm-config
         - name: scheduler-api
           envFrom:
           - configMapRef:

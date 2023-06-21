@@ -1,9 +1,11 @@
 apiVersion: apps/v1
 kind: StatefulSet
-metadata:
+metadata: # kpt-merge: /statefulset
   name: statefulset
   labels:
     tier: mariadb
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'apps|StatefulSet|default|statefulset'
 spec:
   serviceName: "mariadb"
   selector:

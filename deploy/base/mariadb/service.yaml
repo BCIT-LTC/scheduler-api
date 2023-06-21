@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: Service
-metadata:
+metadata: # kpt-merge: /service
   name: service
   labels:
     tier: mariadb
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Service|default|service'
 spec:
   clusterIP: None
   selector:
     tier: mariadb
   ports:
     - port: 3306
-
