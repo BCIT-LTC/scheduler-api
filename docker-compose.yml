@@ -9,22 +9,17 @@ services:
       - MARIADB_USER=bsnmysql
       - MARIADB_PASSWORD=bcitbsn491
     healthcheck:
-      test: ["CMD-SHELL", "mysql $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'  || exit 1"]
-      timeout: 5s
+      test: "mariadb $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'"
+      timeout: 10s
       retries: 10
+      interval: 5s
+      start_period: 10s
     volumes:
       - api_db:/var/lib/mysql
 
   app:
-    command:
-      - /bin/sh
-      - -c
-      - |
-        (cd /app/client && npm install)
-        (cd /app/client && npm run build)
-        npm install
-        npm start
-    build: .
+    command: npm start
+    build: ./
     ports:
       - "8000:8000"
     environment:
@@ -34,12 +29,6 @@ services:
       - MARIADB_PASSWORD=bcitbsn491
       - TZ=America/Vancouver
       - SECRET_KEY=ahuaejsdb
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
     depends_on:
       db:
         condition: service_healthy
@@ -49,7 +38,7 @@ services:
   adminer:
     image: adminer
     ports:
-      - 8081:8080
+      - 8080:8080
 
 volumes:
   api_db:
