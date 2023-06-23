@@ -16,8 +16,6 @@ COPY prisma ./prisma
 COPY routes ./routes
 COPY app.js ./
 
-RUN npm install
-
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
