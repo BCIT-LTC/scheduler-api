@@ -40,13 +40,13 @@ spec:
               command:
                 - bash
                 - -c
-                - mysqladmin -u ${MARIADB_USER} -p${MARIADB_PASSWORD} ping
+                - mariadb-admin -u ${MARIADB_USER} -p${MARIADB_PASSWORD} ping
             periodSeconds: 10
           startupProbe:
             exec:
               command:
                 - bash
                 - -c
-                - mysql -u ${MARIADB_USER} -p${MARIADB_PASSWORD} -e "SELECT 1"
+                - mariadb -u ${MARIADB_USER} -p${MARIADB_PASSWORD} -e "SELECT 1"
             periodSeconds: 10
             failureThreshold: 12 # total 120s = 2min to startup and configure the database
