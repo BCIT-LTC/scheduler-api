@@ -36,17 +36,19 @@ spec:
               cpu: 300m
               memory: 256Mi
           livenessProbe:
+            initialDelaySeconds: 10
             exec:
               command:
-                - bash
+                - sh
                 - -c
                 - mariadb-admin -u ${MARIADB_USER} -p${MARIADB_PASSWORD} ping
-            periodSeconds: 10
+            periodSeconds: 5
           startupProbe:
+            initialDelaySeconds: 10
             exec:
               command:
-                - bash
+                - sh
                 - -c
                 - mariadb -u ${MARIADB_USER} -p${MARIADB_PASSWORD} -e "SELECT 1"
-            periodSeconds: 10
-            failureThreshold: 12 # total 120s = 2min to startup and configure the database
+            periodSeconds: 5
+            failureThreshold: 12 # total 60s = 1min to startup and configure the database

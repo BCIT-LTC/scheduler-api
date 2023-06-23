@@ -27,15 +27,19 @@ spec:
             - configMapRef:
                 name: elasticapm-config
           readinessProbe:
-            tcpSocket:
-              port: 8000
-            initialDelaySeconds: 15
-            periodSeconds: 20
+            httpGet:
+                path: /api
+                port: 8080
+                scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
           livenessProbe:
-            tcpSocket:
-              port: 8000
-            initialDelaySeconds: 15
-            periodSeconds: 20
+            httpGet:
+                path: /api
+                port: 8080
+                scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
           ports:
             - containerPort: 8000
               protocol: TCP
