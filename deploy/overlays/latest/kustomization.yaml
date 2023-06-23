@@ -6,11 +6,11 @@ resources:
 commonLabels:
   environment: latest
 commonAnnotations:
-  version: 1.0.10-3f7547b0--2023-06-23.1687505640 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
+  version: 1.0.10-fe29b732--2023-06-23.1687540200 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
 images:
   - name: "scheduler-api"
     newName: "registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api"
-    newTag: "1.0.10-3f7547b0--2023-06-23.1687505640" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
+    newTag: "1.0.10-fe29b732--2023-06-23.1687540200" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
 patches:
   # Adds "-latest" to ingress subdomain
   #
