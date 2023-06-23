@@ -1,7 +1,7 @@
 {
-    "name": "bsn-openlab-scheduler-server",
+    "name": "openlab-scheduler-server",
     "version": "1.0.0",
-    "description": "server for the bsn-openlab-scheduler app",
+    "description": "server for the openlab-scheduler app",
     "main": "app.js",
     "scripts": {
         "start": "nodemon app.js",
@@ -10,11 +10,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "git@issues.ltc.bcit.ca:web-apps/bsn-openlab-scheduler.git"
+        "url": "git@issues.ltc.bcit.ca:web-apps/openlab-scheduler/scheduler-api.git"
     },
     "keywords": [],
     "author": "",
-    "license": "ISC",
+    "license": "MPL 2.0",
     "dependencies": {
         "@prisma/client": "^4.16.1",
         "bcryptjs": "^2.4.3",

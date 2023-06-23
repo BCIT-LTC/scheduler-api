@@ -10,6 +10,8 @@ fi
 # Configure connection info
 export DATABASE_URL="mysql://$MARIADB_USER:$MARIADB_PASSWORD@$MARIADB_ROOT_HOST:3306/$MARIADB_DATABASE"
 
+sleep 3600
+
 # Initialize prisma
 >&2 echo "Running migrations..."
 npx prisma db push --schema='prisma/schema.prisma'
