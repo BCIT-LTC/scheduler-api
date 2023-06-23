@@ -18,7 +18,11 @@ services:
       - api_db:/var/lib/mysql
 
   app:
-    command: npm start
+    command:
+      - /bin/sh
+      - -c
+      # - npm run test
+      - npm start
     build: ./
     ports:
       - "8000:8000"

@@ -6,12 +6,17 @@ RUN apk --update add \
         mariadb-client \
         curl \
     ;
-
 COPY package.json ./
 
 RUN npm install
 
-COPY ./middleware ./models ./prisma ./routes app.js ./
+COPY middleware ./middleware
+COPY models ./models
+COPY prisma ./prisma
+COPY routes ./routes
+COPY app.js ./
+
+RUN npm install
 
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
