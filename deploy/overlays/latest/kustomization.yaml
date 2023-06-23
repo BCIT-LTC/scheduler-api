@@ -17,8 +17,8 @@ patches:
   - target:
       kind: Ingress
     path: ingress-patch.yaml
-    # Adds Vault agent annotations to deployment
-    #
+  # Adds Vault agent annotations to deployment
+  #
   - target:
       kind: Deployment
     path: deployment-patch.yaml

@@ -25,9 +25,28 @@ spec:
               name: mariadb
           env:
             - name: MARIADB_ROOT_HOST
-              value: service
-            - name: MARIADB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mariadb-credentials
-                  key: MARIADB_ROOT_PASSWORD
+              value: mariadb-service
+          envFrom:
+            - configMapRef:
+                name: mariadb-config
+            - secretRef:
+                name: mariadb-credentials
+          resources:
+            requests:
+              cpu: 300m
+              memory: 256Mi
+          livenessProbe:
+            exec:
+              command:
+                - bash
+                - -c
+                - mysqladmin -u ${MARIADB_USER} -p${MARIADB_PASSWORD} ping
+            periodSeconds: 10
+          startupProbe:
+            exec:
+              command:
+                - bash
+                - -c
+                - mysql -u ${MARIADB_USER} -p${MARIADB_PASSWORD} -e "SELECT 1"
+            periodSeconds: 10
+            failureThreshold: 12 # total 120s = 2min to startup and configure the database

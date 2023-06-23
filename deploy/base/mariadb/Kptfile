@@ -9,15 +9,15 @@ upstream:
   git:
     repo: https://issues.ltc.bcit.ca/web-apps/base-packages
     directory: /mariadb
-    ref: v0.2
+    ref: v0.3
   updateStrategy: force-delete-replace
 upstreamLock:
   type: git
   git:
     repo: https://issues.ltc.bcit.ca/web-apps/base-packages
     directory: /mariadb
-    ref: mariadb/v0.2
-    commit: f42ec2603f268b50f87b60b6f3ba50d1d173de91
+    ref: mariadb/v0.3
+    commit: f682926e511ce8ca5b2b4c456f823ca84bf93081
 info:
   emails:
     - courseproduction@bcit.ca

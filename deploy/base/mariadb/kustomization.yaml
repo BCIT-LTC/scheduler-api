@@ -9,8 +9,14 @@ resources:
   - statefulset.yaml
   - Kptfile
   - service.yaml
+namePrefix: mariadb-
+configMapGenerator:
+  - name: config
+    literals:
+      - MARIADB_DATABASE=mariadb
 secretGenerator:
   - name: credentials
     literals:
-      - MARIADB_ROOT_PASSWORD="isajrqwoihjwaor"
-namePrefix: mariadb-
+      - MARIADB_ROOT_PASSWORD=ins3cuRe!ro0Tpw
+      - MARIADB_USER=mariadb
+      - MARIADB_PASSWORD=Chang3me!
