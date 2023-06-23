@@ -4,7 +4,7 @@ kind: Kustomization
 namePrefix: scheduler-api-
 
 resources:
-  - mariadb
+  - ./mariadb
   - deployment.yaml
   - ingress.yaml
   - service.yaml
@@ -21,20 +21,22 @@ patches:
 - path: statefulset-patch.yaml
   target:
     kind: StatefulSet
-- patch: |-
-    - op: add
-      path: /spec/template/spec/containers/0/envFrom/-
-      value:
-        configMapRef:
-          name: elasticapm-config
-  target:
-    kind: StatefulSet
+# - patch: |-
+#     - op: add
+#       path: /spec/template/spec/containers/0/envFrom/-
+#       value:
+#         configMapRef:
+#           name: elasticapm-config
+#   target:
+#     kind: StatefulSet
 
 configMapGenerator:
   - name: mariadb-config
     literals:
       - MARIADB_DATABASE=openlab-scheduler
     behavior: replace
+  # Generates elasticapm config that is patched by overlays
+  #
   - name: elasticapm-config
     literals:
       - ELASTIC_APM_SERVER_URL=https://bcit-ltc.apm.westus2.azure.elastic-cloud.com

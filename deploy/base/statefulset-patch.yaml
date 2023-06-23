@@ -17,7 +17,6 @@ spec:
       serviceAccountName: scheduler-api-serviceaccount
       containers:
         - name: mariadb
-          image: mariadb
           env:
             - name: MARIADB_ROOT_HOST
               value: scheduler-api-mariadb-service
