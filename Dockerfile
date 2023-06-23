@@ -25,4 +25,4 @@ EXPOSE 8000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-CMD ["npm", "prod"]
+CMD ["npm", "run", "prod"]
