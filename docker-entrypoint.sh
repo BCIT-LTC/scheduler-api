@@ -8,17 +8,18 @@ if [ -z "$MARIADB_ROOT_HOST" ] || [ -z "$MARIADB_USER" ] || [ -z "$MARIADB_PASSW
 fi
 
 # Configure connection info
+>&2 echo "Configuring DATABASE_URL...\n"
 export DATABASE_URL="mysql://$MARIADB_USER:$MARIADB_PASSWORD@$MARIADB_ROOT_HOST:3306/$MARIADB_DATABASE"
 
 # Initialize prisma
->&2 echo "Running migrations..."
+>&2 echo "Running migrations...\n"
 npx prisma db push --schema='prisma/schema.prisma'
 
 # Seed database with initial data
->&2 echo "seeding db..."
+>&2 echo "Seeding db...\n"
 npx prisma db seed
 
 # Return to parent shell to run app
->&2 echo "Starting app..."
+>&2 echo "Starting app...\n"
 
 exec "$@"
