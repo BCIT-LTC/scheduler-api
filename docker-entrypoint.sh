@@ -8,9 +8,12 @@ if [ -f "/vault/secrets/config" ]; then export $(grep -v '^#' /vault/secrets/con
 if [ -z "$MARIADB_ROOT_HOST" ] || [ -z "$MARIADB_USER" ] || [ -z "$MARIADB_PASSWORD" ] || [ -z "$MARIADB_DATABASE" ] || [ -z "$SECRET_KEY" ]; then
     printf '\n\nEnvironment variables are not set.\n\tYou need to specify MARIADB_ROOT_HOST, MARIADB_DATABASE, MARIADB_USER, MARIADB_PASSWORD and SECRET_KEY\n\n'
     exit 1
+else
+    > .env
+    echo MARIADB_USER=$MARIADB_USER >> .env
+    echo MARIADB_PASSWORD=$MARIADB_PASSWORD >> .env
+    echo SECRET_KEY=$SECRET_KEY >> .env
 fi
-
-echo SECRET_KEY=$SECRET_KEY >> .env
 
 # Configure connection info
 >&2 echo "Configuring DATABASE_URL...\n"
