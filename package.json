@@ -42,7 +42,7 @@
     "devDependencies": {
         "jest": "^29.5.0",
         "nodemon": "^2.0.21",
-        "prisma": "^4.16.1"
+        "prisma": "^4.16.2"
     },
     "nodemonConfig": {
         "ignore": [
