@@ -6,11 +6,11 @@ resources:
 commonLabels:
   environment: stable
 commonAnnotations:
-  version: 1.0.10 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
+  version: 1.0.11 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
 images:
   - name: "scheduler-api"
     newName: "registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api"
-    newTag: "1.0.10" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
+    newTag: "1.0.11" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
 # Adds Vault agent annotations to deployment
 #
 patches:
