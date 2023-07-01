@@ -117,7 +117,9 @@ const {
 const auth = require("../middleware/checkAuth");
 
 router.get("/api/announcement", async (req, res) => {
-    if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
+    if (!auth.authenticateToken(req, false)){
+        return res.sendStatus(403);
+    }
     try {
         const announcement = await getAnnouncement();
         return res.status(200).send(announcement);

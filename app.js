@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const bodyParser = require('body-parser');
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -22,6 +23,8 @@ const faq = require("./routes/faq");
 const contact = require('./routes/contact'); // Import the new contact route file
 
 app.use(express.urlencoded({extended: true}));
+console.log("test secret")
+console.log("PRINT THIS PLEASSE BALABALABLABABABBABA" + process.env.SECRET_KEY)
 
 app.use("/", announcements, auth, calendar, faq, pdf, contact);
 

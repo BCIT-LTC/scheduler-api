@@ -41,7 +41,7 @@ spec:
               command:
                 - sh
                 - -c
-                - mariadb-admin -u ${MARIADB_USER} -p${MARIADB_PASSWORD} ping
+                - mariadb-admin -u$$MARIADB_USER -p$$MARIADB_PASSWORD ping
             periodSeconds: 5
           startupProbe:
             initialDelaySeconds: 10
@@ -49,6 +49,6 @@ spec:
               command:
                 - sh
                 - -c
-                - mariadb -u ${MARIADB_USER} -p${MARIADB_PASSWORD} -e "SELECT 1"
+                - mariadb $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'
             periodSeconds: 5
             failureThreshold: 12 # total 60s = 1min to startup and configure the database
