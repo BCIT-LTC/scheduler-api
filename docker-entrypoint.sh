@@ -28,4 +28,3 @@ npx prisma db seed
 >&2 echo "Starting app...\n"
 
 exec "$@"
-
