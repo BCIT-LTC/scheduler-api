@@ -3,6 +3,8 @@ kind: Kustomization
 namespace: openlab-scheduler
 resources:
   - ../../base
+  - secrets/auth-signing-key.yaml
+  - secrets/vault-auth.yaml
 commonLabels:
   environment: latest
 commonAnnotations:
