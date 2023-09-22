@@ -16,6 +16,7 @@ COPY models ./models
 COPY prisma ./prisma
 COPY routes ./routes
 COPY app.js ./
+COPY logger.js ./
 
 # Copy and run init script
 COPY docker-entrypoint.sh /usr/local/bin

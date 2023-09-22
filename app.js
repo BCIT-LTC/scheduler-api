@@ -10,6 +10,7 @@ const hostname = "0.0.0.0";
 const overrideMethod = require("method-override");
 
 const app = express();
+const logger = require('./logger')(module);
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -23,6 +24,27 @@ const faq = require("./routes/faq");
 const contact = require('./routes/contact'); // Import the new contact route file
 
 app.use(express.urlencoded({extended: true}));
+
+// Define an API route for viewing the logs
+app.get('/log', (req, res) => {
+  // Query the logger for the latest log entries
+  logger.query({ order: 'desc', limit: 100 },
+    (err, results) => {
+      if (err) {
+
+        // If an error occurs, send an
+        // error response
+        res.status(500).send({
+          error: 'Error retrieving logs'
+        });
+      } else {
+
+        // If successful, send the log 
+        // entries as a response
+        res.send(results);
+      }
+    });
+});
 
 app.use("/", announcements, auth, calendar, faq, pdf, contact);
 
@@ -47,7 +69,8 @@ const specs = swaggerJsdoc(options);
 app.use("/api", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
 app.listen(port, hostname, () => {
-  console.log(`Server started on port ${port}`);
+  // console.log(`Server started on port ${port}`);
+  logger.info(`scheduler-api started on port ${port}`);
 });
 
 module.exports = app;
