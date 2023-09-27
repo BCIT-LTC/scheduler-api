@@ -9,6 +9,10 @@ namespace: ${DEPLOY_NAMESPACE:=scheduler-api}
 resources:
 - ../../base
 
+# Resource names in a shared namespace must be unique
+#
+namePrefix: scheduler-api-
+
 commonLabels:
   environment: review
 
@@ -24,9 +28,9 @@ patches:
 - target:
     kind: Ingress
   path: ingress-patch.yaml
-- target:
-    kind: Deployment
-  path: deployment-patch.yaml
+# - target:
+#     kind: Deployment
+#   path: deployment-patch.yaml
 
 
 # # Create a .dockerconfig.json. Then uncomment this section for local cluster development.
@@ -39,19 +43,30 @@ patches:
 #       value: [name: gitlab-registry-credentials]
 
 configMapGenerator:
+
+  # Set database name
+  #
   - name: mariadb-config
     literals:
       - MARIADB_DATABASE=openlab-scheduler
-      - MARIADB_ROOT_HOST=db
     behavior: merge
 
 secretGenerator:
+
+  # Set app-specific credentials for review
+  #
   - name: mariadb-credentials
     literals:
       - MARIADB_USER=bsnmysql
       - MARIADB_PASSWORD=bcitbsn491
-      - SECRET_KEY=ahuaejsdb
-    behavior: merge
+
+  # Set app-specific tokens for review
+  #
+  - name: tokens
+    literals:
+      - API_KEY=2222222222222222222222222222222222222222
+      - DJANGO_SECRET_KEY=d8&z=vqy5b#lu0=an1xx9b_7n480af=-gdnqwqvtrs&d6el9=(
+      - ELASTIC_APM_SECRET_TOKEN=bcitltctest
 
   # # Uncomment for local cluster development
   # #

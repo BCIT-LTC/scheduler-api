@@ -3,6 +3,9 @@ kind: Kustomization
 namespace: openlab-scheduler
 resources:
   - ../../base
+# Resource names in a shared namespace must be unique
+#
+namePrefix: scheduler-api-
 commonLabels:
   environment: latest
 commonAnnotations:
@@ -11,14 +14,12 @@ images:
   - name: "scheduler-api"
     newName: "registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api"
     newTag: "1.0.11-ec1a5a5c--2023-07-01.1688215371" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
+# Patches ingress with "latest--" and deployment with annotations
+#
 patches:
-  # Adds "-latest" to ingress subdomain
-  #
   - target:
       kind: Ingress
     path: ingress-patch.yaml
-  # Adds Vault agent annotations to deployment
-  #
   - target:
       kind: Deployment
     path: deployment-patch.yaml
@@ -29,3 +30,5 @@ configMapGenerator:
     literals:
       - ELASTIC_APM_SERVICE_NAME=scheduler-api-latest
     behavior: merge
+components:
+  - ./vault-secrets

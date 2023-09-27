@@ -20,10 +20,12 @@ spec:
             - name: MARIADB_ROOT_HOST
               value: scheduler-api-mariadb-service
           envFrom:
-            - configMapRef:
-                name: mariadb-config
+            - secretRef:
+                name: tokens
             - secretRef:
                 name: mariadb-credentials
+            - configMapRef:
+                name: mariadb-config
             - configMapRef:
                 name: elasticapm-config
           readinessProbe:

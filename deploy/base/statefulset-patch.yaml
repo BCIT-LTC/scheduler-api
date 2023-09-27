@@ -20,3 +20,8 @@ spec:
           env:
             - name: MARIADB_ROOT_HOST
               value: scheduler-api-mariadb-service
+          envFrom:
+            - secretRef:
+                name: mariadb-credentials
+            - configMapRef:
+                name: mariadb-config

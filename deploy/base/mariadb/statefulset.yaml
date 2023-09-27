@@ -27,10 +27,10 @@ spec:
             - name: MARIADB_ROOT_HOST
               value: mariadb-service
           envFrom:
-            - configMapRef:
-                name: mariadb-config
             - secretRef:
-                name: mariadb-credentials
+                name: credentials
+            - configMapRef:
+                name: config
           resources:
             requests:
               cpu: 300m

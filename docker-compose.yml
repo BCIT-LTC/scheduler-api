@@ -25,7 +25,7 @@ services:
       - npm start
     build: ./
     ports:
-      - "8000:8000"
+      - 8000:8000
     environment:
       - MARIADB_ROOT_HOST=db
       - MARIADB_DATABASE=openlab-scheduler
@@ -42,7 +42,7 @@ services:
   adminer:
     image: adminer
     ports:
-      - 8081:8080
+      - 8080:8080
 
 volumes:
   api_db:

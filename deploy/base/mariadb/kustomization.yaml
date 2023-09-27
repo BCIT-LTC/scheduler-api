@@ -18,5 +18,4 @@ secretGenerator:
   - name: credentials
     literals:
       - MARIADB_ROOT_PASSWORD=ins3cuRe!ro0Tpw
-      - MARIADB_USER=mariadb
-      - MARIADB_PASSWORD=Chang3me!
+
