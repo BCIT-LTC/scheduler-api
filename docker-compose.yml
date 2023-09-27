@@ -32,17 +32,17 @@ services:
       - MARIADB_USER=bsnmysql
       - MARIADB_PASSWORD=bcitbsn491
       - TZ=America/Vancouver
-      - SECRET_KEY=ahuaejsdb
+      - SECRET_KEY=insecureT0kenSigningKey
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - .:/app
 
-  adminer:
-    image: adminer
-    ports:
-      - 8080:8080
+  # adminer:
+  #   image: adminer
+  #   ports:
+  #     - 8080:8080
 
 volumes:
   api_db:
