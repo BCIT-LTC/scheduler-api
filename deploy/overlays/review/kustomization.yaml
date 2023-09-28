@@ -42,14 +42,14 @@ patches:
 #       path: /spec/template/spec/imagePullSecrets
 #       value: [name: gitlab-registry-credentials]
 
-configMapGenerator:
+# configMapGenerator:
 
-  # Set database name
-  #
-  - name: mariadb-config
-    literals:
-      - MARIADB_DATABASE=openlab-scheduler
-    behavior: merge
+  # # Set database name
+  # #
+  # - name: mariadb-config
+  #   literals:
+  #     - MARIADB_DATABASE=openlab-scheduler
+  #   behavior: merge
 
 secretGenerator:
 
