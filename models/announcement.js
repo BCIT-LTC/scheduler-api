@@ -1,20 +1,32 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
+const fs = require("fs");
 
 /**
- * Retrieve a list of all the annoucements.
+ * Log an error to the console or to a file depending on the environment.
+ * @param context
+ * @param error
+ */
+function logError(context,error) {
+    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
+    if (process.env.Node_ENV === "development") {
+        fs.appendFileSync("error_log.txt", errorMessage);
+    } else {
+        console.error(error);
+    }
+}
+
+/**
+ * Retrieve a list of all the announcements.
  * @date 2023-05-17 - 10:41:51 p.m.
- *
  * @async
- * @returns {Object} list of all the a annoucements.
+ * @returns {Object} list of all the announcements.
  */
 const getAnnouncement = async () => {
     try {
-        const announcements = await prisma.announcements.findMany();
-        return announcements;
+        return await prisma.announcements.findMany();
     } catch (error) {
-        console.error("An error occurred while fetching announcements:", error);
+        logError("Fetching announcements",error);
     }
 };
 
@@ -27,27 +39,26 @@ const getAnnouncement = async () => {
  * @param {*} title - announcement title
  * @param {*} description - details about the announcement
  * @param {*} date - date the announcement was made
- * @param {number} [id=-1] id of the new announcement, if its an update
+ * @param {number} [id=-1] id of the new announcement, if it's an update
  * @returns {unknown}
  */
 const addAnnouncement = async (title, description, date, id = -1) => {
     try {
-        const announcement = await prisma.announcements.upsert({
+        return await prisma.announcements.upsert({
             where: { announcements_id: id },
             update: {
-                title: title,
-                description: description,
-                date: date,
+                title,
+                description,
+                date,
             },
             create: {
-                title: title,
-                description: description,
-                date: date,
+                title,
+                description,
+                date,
             },
-        });
-        return announcement;
+            });
     } catch (error) {
-        console.error("An error occurred while adding an announcement:", error);
+    logError("Adding an announcement",error);
     }
 };
 
@@ -68,10 +79,7 @@ const deleteAnnouncement = async (id) => {
         console.log("Deleted Announcement: ", deletedAnnouncement);
         return deletedAnnouncement;
     } catch (error) {
-        console.error(
-            "An error occurred while deleting an announcement:",
-            error
-        );
+        logError("Deleting an announcement",error);
     }
 };
 
@@ -98,10 +106,7 @@ const editAnnouncement = async (id, updatedTitle, updatedDescription) => {
         console.log("Edited Announcement: ", editedAnnouncement);
         return editedAnnouncement;
     } catch (error) {
-        console.error(
-            "An error occurred while editing an announcement:",
-            error
-        );
+        logError("Editing an announcement",error);
     }
 };
 
