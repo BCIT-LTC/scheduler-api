@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
 const fs = require('fs');
 
+/**
+ * Log an error to the console or to a file depending on the environment.
+ * @param error
+ */
 function logError(error) {
     const errorMessage = `${new Date()} - ${error}\n`;
     if (process.env.Node_ENV === 'development') {

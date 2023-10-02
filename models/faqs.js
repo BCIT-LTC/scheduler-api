@@ -19,7 +19,6 @@ const logError = (context, error) => {
 /**
  * Find all the frequently asked questions
  * @date 2023-05-23 - 1:45:42 a.m.
- *
  * @async
  * @returns {Object} list of faqs
  */
@@ -37,6 +36,7 @@ const getFaq = async () => {
  * @param {*} answer
  * @param {*} id to possibly update
  * @returns the results
+ * @async
  */
 const addFaq = async (question, answer, id = -1) => {
   try {
@@ -54,6 +54,8 @@ const addFaq = async (question, answer, id = -1) => {
  * Delete a faq
  * @param {*} id of faq to delete
  * @returns  results
+ * @async
+ * @throws {Error} if the id is invalid
  */
 const deleteFaq = async (id) => {
   try {
@@ -73,6 +75,8 @@ const deleteFaq = async (id) => {
  * @param {*} updatedQuestion new question
  * @param {*} updatedAnswer new answer
  * @returns
+ * @async
+ * @throws {Error} if the id is invalid
  */
 const editFaq = async (id, updatedQuestion, updatedAnswer) => {
   try {

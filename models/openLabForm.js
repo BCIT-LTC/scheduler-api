@@ -43,6 +43,8 @@ const dataForm = {
      * @param {*} date - Month of data to find
      * @param {*} year - Year of data to find
      * @returns {Object} Array of open lab objects from the month
+     * @throws {Error} If the date or year is invalid
+     * @async
      */
     findMonth: async (date, year) => {
         if (!validateDate(date) || !validateYear(year)) {
@@ -70,6 +72,8 @@ const dataForm = {
      * Updates the calendar with an array of open lab objects
      * @param {*} forms - Array of open lab objects to update
      * @returns results Results of update
+     * @async
+     * @throws {Error} If the date or year is invalid
      */
     updateCalendar: async (forms) => {
         try {

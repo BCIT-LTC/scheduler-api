@@ -26,7 +26,7 @@ const getAnnouncement = async () => {
     try {
         return await prisma.announcements.findMany();
     } catch (error) {
-        logError("Fetching announcements",error);
+        logError("Error while fetching announcements",error);
     }
 };
 
@@ -34,7 +34,6 @@ const getAnnouncement = async () => {
 /**
  * Add an announcement to the database.
  * @date 2023-05-17 - 10:42:41 p.m.
- *
  * @async
  * @param {*} title - announcement title
  * @param {*} description - details about the announcement
@@ -58,7 +57,7 @@ const addAnnouncement = async (title, description, date, id = -1) => {
             },
             });
     } catch (error) {
-    logError("Adding an announcement",error);
+    logError(" Error while adding an announcement",error);
     }
 };
 
@@ -66,7 +65,6 @@ const addAnnouncement = async (title, description, date, id = -1) => {
 /**
  * Delete an announcement given an id
  * @date 2023-05-17 - 10:43:52 p.m.
- *
  * @async
  * @param {*} id of the announcement to delete
  * @returns {Object} deleted announcement
@@ -79,7 +77,7 @@ const deleteAnnouncement = async (id) => {
         console.log("Deleted Announcement: ", deletedAnnouncement);
         return deletedAnnouncement;
     } catch (error) {
-        logError("Deleting an announcement",error);
+        logError("Error while deleting an announcement",error);
     }
 };
 
@@ -87,7 +85,6 @@ const deleteAnnouncement = async (id) => {
 /**
  * Update an announcement with its id
  * @date 2023-05-17 - 10:44:51 p.m.
- *
  * @async
  * @param {*} id - id of announcement to update
  * @param {*} updatedTitle - the new title
@@ -106,7 +103,7 @@ const editAnnouncement = async (id, updatedTitle, updatedDescription) => {
         console.log("Edited Announcement: ", editedAnnouncement);
         return editedAnnouncement;
     } catch (error) {
-        logError("Editing an announcement",error);
+        logError("Error while editing an announcement",error);
     }
 };
 
