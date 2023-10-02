@@ -161,6 +161,9 @@ router.get("/api/calendar", function (req, res) {
             }
         })
         .catch((err) => {
+            if (err.code === 'INVALID FORMAT') {
+                return res.status(400).send({ error: err.message });
+            }
             return res.status(500).send({ error: err.message });
         });
 });
