@@ -70,6 +70,7 @@ const userModel = {
      * @param {*} isAdmin - if the user is an admin
      * @param {*} eligibleAdmin - if the user is allowed to be an admin
      * @returns the user who was added
+     * @async
      */
     addUser: async (email, firstName, lastName, isAdmin, eligibleAdmin) => {
         try {
