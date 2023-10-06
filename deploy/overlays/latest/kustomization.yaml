@@ -13,11 +13,11 @@ nameSuffix: -latest
 configurations:
   - kustomizeconfig.yaml
 commonAnnotations:
-  version: 1.0.11-ec1a5a5c--2023-07-01.1688215371 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
+  version: 1.0.11-3a8cd284--2023-10-06.1696569740 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
 images:
   - name: "scheduler-api"
     newName: "registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api"
-    newTag: "1.0.11-ec1a5a5c--2023-07-01.1688215371" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
+    newTag: "1.0.11-3a8cd284--2023-10-06.1696569740" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
 patches:
   # Patches ingress with "latest--"
   - target:
@@ -40,7 +40,6 @@ patches:
 components:
   # Include environment-specific secrets
   - ./vault-secrets-latest
-
   # Required for VaultAuth role and serviceaccounts
   - ../../base/components/vault-auth
 # Appends service name to base elasticapm config
@@ -50,4 +49,3 @@ configMapGenerator:
     literals:
       - ELASTIC_APM_SERVICE_NAME=scheduler-api-latest
     behavior: merge
-
