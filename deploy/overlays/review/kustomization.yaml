@@ -1,76 +1,66 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+resources:
+  - ../../base
 
 # Flux envsubst replaces variables found in `deploy-vars.env` or falls back to defaults
 #
 namespace: ${DEPLOY_NAMESPACE:=scheduler-api}
 
-resources:
-- ../../base
-
-# Resource names in a shared namespace must be unique
-#
-namePrefix: scheduler-api-
-
 commonLabels:
   environment: review
+
+# Prefix/Suffix required for VaultAuth configuration
+#
+namePrefix: scheduler-api-
+nameSuffix: -review
+
+# Facilitate kustomization name updating
+#
+configurations:
+  - kustomizeconfig.yaml
 
 commonAnnotations:
   version: ${GIT_TAG:=stable}
 
 images:
-- name: scheduler-api
-  newName: ${IMAGE_NAME:=registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api}
-  newTag: ${IMAGE_TAG:=stable}
+  - name: scheduler-api
+    newName: ${IMAGE_NAME:=registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api}
+    newTag: ${IMAGE_TAG:=stable}
 
 patches:
-- target:
-    kind: Ingress
-  path: ingress-patch.yaml
-# - target:
-#     kind: Deployment
-#   path: deployment-patch.yaml
+  - target:
+      kind: Ingress
+    path: ingress-patch.yaml
 
+  # Adjusts secrets for review branches
+  - target:
+      kind: Deployment
+    path: deployment-patch.yaml
 
-# # Create a .dockerconfig.json. Then uncomment this section for local cluster development.
-# #
-# - target:
-#     kind: Deployment
-#   patch: |-
-#     - op: add
-#       path: /spec/template/spec/imagePullSecrets
-#       value: [name: gitlab-registry-credentials]
-
-# configMapGenerator:
-
-  # # Set database name
-  # #
-  # - name: mariadb-config
-  #   literals:
-  #     - MARIADB_DATABASE=openlab-scheduler
-  #   behavior: merge
-
-secretGenerator:
-
-  # Set app-specific credentials for review
+  # Incorporate vault-secrets
   #
+  # adds `-review` suffix to VaultAuth `spec.mount`
+  - target:
+      kind: VaultAuth
+    path: vault-secrets-review/vault-auth-patch.yaml
+
+components:
+  # Include environment-specific secrets
+  # - ./vault-secrets-review # - Review branch secrets generated below
+
+  # Required for VaultAuth role and serviceaccounts
+  - ../../base/components/vault-auth
+
+# Set app-specific credentials for review
+#
+secretGenerator:
+  - name: auth-signing-key
+    literals:
+      - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
+
   - name: mariadb-credentials
     literals:
       - MARIADB_USER=bsnmysql
       - MARIADB_PASSWORD=bcitbsn491
-
-  # Set app-specific tokens for review
-  #
-  - name: tokens
-    literals:
-      - API_KEY=2222222222222222222222222222222222222222
-      - DJANGO_SECRET_KEY=d8&z=vqy5b#lu0=an1xx9b_7n480af=-gdnqwqvtrs&d6el9=(
-      - ELASTIC_APM_SECRET_TOKEN=bcitltctest
-
-  # # Uncomment for local cluster development
-  # #
-  # - name: gitlab-registry-credentials
-  #   type: kubernetes.io/dockerconfigjson
-  #   files:
-  #     - .dockerconfigjson=secrets/.dockerconfig.json

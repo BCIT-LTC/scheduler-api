@@ -1,13 +1,13 @@
 apiVersion: secrets.hashicorp.com/v1beta1
 kind: VaultStaticSecret
 metadata:
-  name: mariadb-credentials
+  name: elastic-apm-token
 spec:
   type: kv-v2
   vaultAuthRef: vault-auth
   refreshAfter: 6h
-  mount: apps
-  path: scheduler-api/stable/mariadb-credentials
+  mount: ltc-infrastructure
+  path: elastic/apm/latest/secret-token
   destination:
-    name: mariadb-credentials
+    name: elastic-apm-token
     create: true

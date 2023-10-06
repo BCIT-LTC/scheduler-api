@@ -1,11 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# If workloads share a common namespace, set the `namePrefix` in the overlay
-#   `kustomization.yaml` to avoid name collisions.
-#
-# namePrefix: scheduler-api-
-
 resources:
   - ./mariadb
   - deployment.yaml
@@ -13,17 +8,22 @@ resources:
   - service.yaml
   - serviceaccount.yaml
 
+# Facilitate kustomization name updating
+#
+configurations:
+  - kustomizeconfig.yaml
+
 commonLabels:
   app: scheduler-api
   app.kubernetes.io/name: scheduler-api
 
 patches:
 
-  # Remove kustomize-generated secret from base
+  # Remove kustomize-generated secret from base; replace with Vault secret
   #
   - target:
-      name: mariadb-credentials
       kind: Secret
+      name: mariadb-credentials
     patch: |
       $patch: delete
       kind: Kustomization
@@ -48,6 +48,7 @@ configMapGenerator:
   #
   - name: mariadb-config
     literals:
-      - MARIADB_DATABASE=openlab-scheduler
+      - MARIADB_DATABASE=scheduler-api-mariadb-service
+      - TZ=America/Vancouver
     behavior: replace
 

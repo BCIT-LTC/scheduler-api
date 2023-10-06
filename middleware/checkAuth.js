@@ -13,7 +13,7 @@ module.exports = {
             return false;
         }
         let shouldReject = false;
-        jwt.verify(token, process.env.SECRET_KEY, function (err, decode) {
+        jwt.verify(token, process.env.JWT_AUTH_SIGNING_KEY, function (err, decode) {
             if (err) {
                 shouldReject = true;
             }

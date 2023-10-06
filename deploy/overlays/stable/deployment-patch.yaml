@@ -1,16 +1,20 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: deployment
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: scheduler-api
-  template:
-    metadata:
-      annotations:
-        config.linkerd.io/skip-outbound-ports: "443"
-    spec:
-      containers:
-        - name: scheduler-api
+# adds secrets to deployment
+#
+---
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    secretRef:
+      name: auth-signing-key
+
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    secretRef:
+      name: elastic-apm-token
+
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    secretRef:
+      name: mariadb-credentials

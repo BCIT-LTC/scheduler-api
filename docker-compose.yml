@@ -1,21 +1,7 @@
 version: "3.9"
 
 services:
-  db:
-    image: mariadb
-    environment:
-      - MARIADB_ROOT_PASSWORD=isajrqwoihjwaor
-      - MARIADB_DATABASE=openlab-scheduler
-      - MARIADB_USER=bsnmysql
-      - MARIADB_PASSWORD=bcitbsn491
-    healthcheck:
-      test: "mariadb $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'"
-      timeout: 10s
-      retries: 10
-      interval: 5s
-      start_period: 10s
-    volumes:
-      - api_db:/var/lib/mysql
+
 
   app:
     command:
@@ -32,17 +18,35 @@ services:
       - MARIADB_USER=bsnmysql
       - MARIADB_PASSWORD=bcitbsn491
       - TZ=America/Vancouver
-      - SECRET_KEY=insecureT0kenSigningKey
+      - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - .:/app
 
+
+  db:
+    image: mariadb
+    environment:
+      - MARIADB_ROOT_PASSWORD=isajrqwoihjwaor
+      - MARIADB_DATABASE=openlab-scheduler
+      - MARIADB_USER=bsnmysql
+      - MARIADB_PASSWORD=bcitbsn491
+    healthcheck:
+      test: "mariadb $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'"
+      timeout: 10s
+      retries: 10
+      interval: 5s
+      start_period: 10s
+    volumes:
+      - api_db:/var/lib/mysql
+
   # adminer:
   #   image: adminer
   #   ports:
   #     - 8080:8080
+
 
 volumes:
   api_db:

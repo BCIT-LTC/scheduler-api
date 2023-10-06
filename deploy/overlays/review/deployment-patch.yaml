@@ -1,18 +1,18 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: deployment
-spec:
-  selector:
-    matchLabels:
-      app: scheduler-api
-  template:
-    spec:
-      containers:
-        - name: scheduler-api
-          envFrom:
-            - configMapRef:
-                name: mariadb-config
-            - secretRef:
-                name: mariadb-credentials
+# adds secrets to deployment
+#
+---
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    secretRef:
+      name: mariadb-credentials
 
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    secretRef:
+      name: auth-signing-key
+
+# removes elastic-apm-config
+- op: remove
+  path: /spec/template/spec/containers/0/envFrom/0
