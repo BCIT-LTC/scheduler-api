@@ -16,6 +16,9 @@ spec:
       containers:
         - name: scheduler-api
           image: scheduler-api
+          env:
+            - name: MARIADB_ROOT_HOST
+              value: mariadb-service
           envFrom:
             - configMapRef:
                 name: elasticapm-config
