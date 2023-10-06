@@ -12,7 +12,6 @@ RUN apk --update add \
 COPY package.json ./
 
 RUN npm install
-RUN npm link winston
 
 COPY middleware ./middleware/
 COPY models ./models/
