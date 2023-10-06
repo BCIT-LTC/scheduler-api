@@ -6,6 +6,8 @@ nameReference:
     fieldSpecs:
       - kind: Deployment
         path: spec/template/spec/containers/envFrom/secretRef/name
+      - kind: StatefulSet
+        path: spec/template/spec/containers/envFrom/secretRef/name
       - kind: VaultStaticSecret
         path: spec/destination/name
 

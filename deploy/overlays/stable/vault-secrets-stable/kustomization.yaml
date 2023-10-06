@@ -6,4 +6,5 @@ resources:
   - auth-signing-key.yaml
   - elastic-apm-token.yaml
   - mariadb-credentials.yaml
+  - root-mariadb-password.yaml
   - star-ltc-bcit-ca.yaml
