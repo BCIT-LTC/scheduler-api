@@ -5,7 +5,7 @@
  *   description: endpoints of managing login
  * /api/login:
  *   get:
- *     summary: Creates user the the API database using JWT info (email, firstname, lastname, elidgibleAdmin)
+ *     summary: Creates user the the API database using JWT info (email, firstname, lastname, eligibleAdmin)
  *     tags: [login]
  *     responses:
  *       200:
@@ -53,51 +53,110 @@ const router = express.Router();
 const jwtDecode = require("jwt-decode");
 const userModel = require("../models/userModel").userModel;
 const auth = require("../middleware/checkAuth");
+const fs = require("fs");
 
-router.get("/api/login", async (req, res) => {
-    let jwt = req.headers.authorization.split(" ")[1];
-    if (!jwt) {
-        return;
+/**
+ * Function to log errors based on the running environment.
+ * @param {string} context - The location or function where the error occurred.
+ * @param {Error} error - The error that occurred.
+ */
+const logError = (context, error) => {
+    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
+    if (process.env.Node_ENV === "development") {
+        fs.appendFileSync("error_log.txt", errorMessage);
+    } else {
+        console.error(error);
     }
-    let user = jwtDecode(jwt);
-    await userModel.addUser(
-        user.email,
-        user.firstname,
-        user.lastname,
-        false,
-        user.eligibleAdmin
-    );
-    let details = await userModel.findOne(user.email);
-    return res.status(200).send(details.isAdmin);
+}
+
+/**
+ * POST endpoint to log a user in.
+ * JWT token is used to decode user data and then either add or update the user in the database.
+ */
+router.post("/api/login", async (req, res) => {
+    try {
+        // Extract JWT from headers and decode user information
+        let jwt = req.headers.authorization.split(" ")[1];
+        if (!jwt) {
+            return res.status(400).send({ error: "Token missing from Authorization header or is invalid." });
+        }
+        let user = jwtDecode(jwt);
+
+        // Add or update user in the database
+        await userModel.addUser(
+            user.email,
+            user.firstname,
+            user.lastname,
+            false,
+            user.eligibleAdmin
+        );
+        let details = await userModel.findOne(user.email);
+        return res.status(200).send(details.isAdmin);
+    } catch (error) {
+        logError("/api/login", error);
+        return res.status(500).send({ error: error.message });
+    }
 });
 
 //no swagger yet
+/**
+ * POST endpoint to get the logout time for a user.
+ * Currently, the actual logic behind `logoutTime` is missing in the provided code.
+ */
 router.post("/api/logouttime", async (req, res) => {
-    if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
-    const getLogoutTime = await logoutTime(req.body.email);
-    return res.status(200).send(getLogoutTime);
+    try{
+        if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
+        const getLogoutTime = await logoutTime(req.body.email);
+        return res.status(200).send(getLogoutTime);
+    } catch (error) {
+        logError("/api/logouttime", error);
+        return res.status(500).send({ error: error.message });
+    }
 });
 
+/**
+ * GET endpoint to fetch all the admins from the system.
+ */
 router.get("/api/admin", async (req, res) => {
-    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-    return res.status(200).send(await userModel.findAdmins());
+    try {
+        if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+        return res.status(200).send(userModel.findAdmins());
+    } catch (error) {
+        logError('/api/admin', error);
+        return res.status(500).send({ error: error.message });
+    }
 });
 
+/**
+ * POST endpoint to update the admin status of a user.
+ * Admin status can be either granted or revoked based on the provided data.
+ */
 router.post("/api/admin", async (req, res) => {
-    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-    let admin = req.body;
-    if (!admin.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-        return res.status(400).send({ error: "Must be a valid email" });
-    }
-    let exist = await userModel.findOne(admin.email);
-    let response = await userModel.updateAdmin(admin.email, admin.isAdmin);
-    if (response) {
-        return res.status(400).send({ error: response });
-    }
-    if (exist == null || exist.firstName === "N/A") {
-        return res.status(200).send({ error: "User has never logged in!" });
-    } else {
-        return res.status(200).send({ error: "" });
+    try {
+        if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+
+        const { email, isAdmin } = req.body;
+
+        // Validate email format
+        if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+            return res.status(400).send({ error: "Must be a valid email" });
+        }
+
+        const existingUser = await userModel.findOne(email);
+        const response = await userModel.updateAdmin(email, isAdmin);
+
+        if (response) {
+            return res.status(400).send({ error: response });
+        }
+
+        if (!existingUser || existingUser.firstName === "N/A") {
+            return res.status(200).send({ error: "User has never logged in!" });
+        } else {
+            return res.status(200).send({ error: "" });
+        }
+    } catch (error) {
+        logError('/api/admin POST', error);
+        return res.status(500).send({ error: error.message });
     }
 });
 module.exports = router;
