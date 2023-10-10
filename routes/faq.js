@@ -101,51 +101,105 @@ const express = require("express");
 const router = express.Router();
 const { getFaq, addFaq, deleteFaq, editFaq } = require("../models/faqs");
 const auth = require("../middleware/checkAuth");
+const fs = require("fs");
 
+
+/**
+ * Log the given error.
+ * Errors are written to a file in development mode and are logged to the console in other environments.
+ *
+ * @param {string} context - Context or location where the error occurred.
+ * @param {Error} error - The error that occurred.
+ */
+function logError(context, error) {
+    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
+    if (process.env.Node_ENV === "development") {
+        fs.appendFileSync("error_log.txt", errorMessage);
+    } else {
+        console.error(error);
+    }
+}
+
+// FAQ ROUTES
+
+// Endpoint to retrieve all FAQs
+/**
+ * GET /api/faq
+ * Returns a list of all FAQs in the system.
+ */
 router.get("/api/faq", async (req, res) => {
     if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
     try {
         const faq = await getFaq();
         return res.status(200).send(faq);
     } catch (error) {
+        logError("/api/faq GET", error);
         return res.status(500).send({ error: error.message });
     }
 });
 
-//endpoint for adding or editing faqs
+// Endpoint for adding or editing FAQs
+/**
+ * POST /api/faq
+ * Add a new FAQ or edit an existing one.
+ */
 router.post("/api/faq", async (req, res) => {
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-    let question = req.body.question;
-    let answer = req.body.answer;
+
+    const { question, answer } = req.body;
+
+    if (!question || !answer) {
+        return res.status(400).send({ error: "Question and answer fields are required." });
+    }
+
     try {
-        const faq = addFaq(question, answer);
+        const faq = await addFaq(question, answer);
         res.status(200).send(faq);
     } catch (error) {
+        logError("/api/faq POST", error);
         res.status(500).send({ error: error.message });
     }
 });
 
-//endpoint for deleting faqs
+// Endpoint for deleting FAQs
+/**
+ * DELETE /api/faq
+ * Delete an FAQ using its ID.
+ */
 router.delete("/api/faq", async (req, res) => {
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-    let id = req.body.id;
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).send({ error: "FAQ ID is required." });
+    }
+
     try {
         await deleteFaq(id);
         return res.status(200).send({ message: "Success" });
     } catch (error) {
+        logError("/api/faq DELETE", error)
         return res.status(500).send({ error: error.message });
     }
 });
 
-//endpoint for editing faqs
+// Endpoint for editing FAQs
+/**
+ * PUT /api/faq
+ * Edit an FAQ's question and answer using its ID.
+ */
 router.put("/api/faq", async (req, res) => {
-    let id = req.body.id;
-    let question = req.body.question;
-    let answer = req.body.answer;
+    const { id, question, answer } = req.body;
+
+    if (!id || !question || !answer) {
+        return res.status(400).send({ error: "ID, question, and answer fields are required." });
+    }
+
     try {
         await editFaq(id, question, answer);
-        return res.status(200).send({ message: "Success" });
+        return res.status(200).send({ message: "FAQ updated successfully." });
     } catch (error) {
+        logError("/api/faq PUT", error)
         return res.status(500).send({ error: error.message });
     }
 });
