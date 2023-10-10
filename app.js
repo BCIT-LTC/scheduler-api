@@ -1,21 +1,41 @@
+// Loading environment variables
 require('dotenv').config()
+
+// Dependencies
 const express = require('express');
-const bodyParser = require('body-parser');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const path = require('path');
+require('path');
 const cors = require('cors');
+const fs = require('fs');
+
+// App configurations
 const port = 8000;
 const hostname = "0.0.0.0";
-const overrideMethod = require("method-override");
-
 const app = express();
 const logger = require('./logger')(module);
 
-app.use(bodyParser.json());
-app.use(cors());
-app.use(overrideMethod("_method"));
+/**
+ * Function to log errors based on the environment.
+ * @param {String} context - Context or source of the error.
+ * @param {Error} error - The error object.
+ */
+function logError(context, error) {
+  const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
+  if (process.env.NODE_ENV === 'development') {
+    fs.appendFileSync('error_log.txt', errorMessage);
+  } else {
+    console.error(error);
+  }
+}
 
+// Middleware for parsing JSON data
+app.use(express.json());
+
+// Middleware for enabling Cross-Origin Resource Sharing (CORS)
+app.use(cors());
+
+// Routes
 const announcements = require("./routes/announcements");
 const auth = require("./routes/auth");
 const calendar = require("./routes/calendar");
@@ -23,53 +43,45 @@ const pdf = require("./routes/lab_guidelines");
 const faq = require("./routes/faq");
 const contact = require('./routes/contact'); // Import the new contact route file
 
+// Middleware for parsing URL-encoded data (extended: true allows parsing of arrays and objects)
 app.use(express.urlencoded({extended: true}));
 
-// Define an API route for viewing the logs
+// Endpoint to retrieve logs
 app.get('/log', (req, res) => {
-  // Query the logger for the latest log entries
-  logger.query({ order: 'desc', limit: 100 },
-    (err, results) => {
+  logger.query({ order: 'desc', limit: 100 }, (err, results) => {
       if (err) {
-
-        // If an error occurs, send an
-        // error response
-        res.status(500).send({
-          error: 'Error retrieving logs'
-        });
+        logError('Log Retrieval', err);
+        res.status(500).send({error: 'Error retrieving logs'});
       } else {
-
-        // If successful, send the log 
-        // entries as a response
         res.send(results);
       }
     });
 });
 
+// Using route files
 app.use("/", announcements, auth, calendar, faq, pdf, contact);
 
+// Swagger API documentation setup
 const options = {
   definition: {
-    openapi: '3.0.0',
-    info: {
-      title: "Scheduler-API",
-      version: "dev",
-      description: "Welcome to the API for the BSN Openlab Scheduler",
-    },
-    servers: [
-      {
-        url: 'http://localhost:8000',
+      openapi: '3.0.0',
+      info: {
+        title: "Scheduler-API",
+        version: "dev",
+        description: "Welcome to the API for the BSN Openlab Scheduler",
       },
-    ],
+      servers: [{url: 'http://localhost:8000'}],
   },
   apis: ['./routes/*.js'],
 };
 
 const specs = swaggerJsdoc(options);
+
+// Swagger UI setup
 app.use("/api", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
+// Starting the server
 app.listen(port, hostname, () => {
-  // console.log(`Server started on port ${port}`);
   logger.info(`scheduler-api started on port ${port}`);
 });
 

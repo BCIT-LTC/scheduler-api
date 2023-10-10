@@ -3,8 +3,11 @@ const winston = require('winston');
 const { format } = require('logform');
 const { combine, timestamp, label, json } = format;
 
-// Return the last folder name in the path and the calling
-// module's filename.
+/**
+ * Retrieve the directory name and filename of the calling module.
+ * @param {Object} callingModule - The module invoking the logger.
+ * @returns {string} - Directory and filename.
+ */
 const getLabel = function(callingModule) {
   const parts = callingModule.filename.split(path.sep);
   return path.join(parts[parts.length - 2], parts.pop());
@@ -16,6 +19,11 @@ const getLabel = function(callingModule) {
 //   }));
 // }
 
+/**
+ * Creates a custom logger instance for the calling module.
+ * @param {Object} callingModule - The module invoking the logger.
+ * @returns {Object} - Customized winston logger instance.
+ */
 module.exports = function (callingModule) {
   return new winston.createLogger({
     transports: [
