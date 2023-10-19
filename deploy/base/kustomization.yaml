@@ -1,8 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namePrefix: scheduler-api-
-
 resources:
   - ./mariadb
   - deployment.yaml
@@ -10,41 +8,47 @@ resources:
   - service.yaml
   - serviceaccount.yaml
 
+# Facilitate kustomization name updating
+#
+configurations:
+  - kustomizeconfig.yaml
+
 commonLabels:
   app: scheduler-api
   app.kubernetes.io/name: scheduler-api
 
-
-# Kustomize mariadb with app-specific settings
-#
 patches:
-- path: statefulset-patch.yaml
-  target:
-    kind: StatefulSet
-# - patch: |-
-#     - op: add
-#       path: /spec/template/spec/containers/0/envFrom/-
-#       value:
-#         configMapRef:
-#           name: elasticapm-config
-#   target:
-#     kind: StatefulSet
+
+  # Remove kustomize-generated secret from base; replace with Vault secret
+  #
+  - target:
+      kind: Secret
+      name: mariadb-credentials
+    patch: |
+      $patch: delete
+      kind: Kustomization
+      metadata:
+        name: DOES NOT MATTER
+
+  # Update statefulset to use secrets retrieved from Vault
+  #
+  - target:
+      kind: StatefulSet
+    path: statefulset-patch.yaml
 
 configMapGenerator:
-  - name: mariadb-config
-    literals:
-      - MARIADB_DATABASE=openlab-scheduler
-    behavior: replace
-  # Generates elasticapm config that is patched by overlays
+
+  # Generates elasticapm initial config
   #
   - name: elasticapm-config
     literals:
       - ELASTIC_APM_SERVER_URL=https://bcit-ltc.apm.westus2.azure.elastic-cloud.com
 
-secretGenerator:
-  - name: mariadb-credentials
+  # Sets mariadb db
+  #
+  - name: mariadb-config
     literals:
-      - MARIADB_USER=admin
-      - MARIADB_PASSWORD=Columbiabc1!
-    behavior: merge
+      - MARIADB_DATABASE=scheduler-api-mariadb-service
+      - TZ=America/Vancouver
+    behavior: replace
 

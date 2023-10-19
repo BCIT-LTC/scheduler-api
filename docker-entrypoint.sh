@@ -1,14 +1,9 @@
 #!/usr/bin/env sh
 set -e
 
-# Get secrets from Vault init container (latest/stable environments only) and set as ENV VARS
-if [ -f "/vault/secrets/config" ]; then grep -v -e '^#' -e '^[[:space:]]*$' /vault/secrets/config > .env; 
-set -o allexport && source .env && set +o allexport;fi
-
-printenv
 # Verify that the minimally required environment variables are set.
-if [ -z "$MARIADB_ROOT_HOST" ] || [ -z "$MARIADB_USER" ] || [ -z "$MARIADB_PASSWORD" ] || [ -z "$MARIADB_DATABASE" ] || [ -z "$SECRET_KEY" ]; then
-    printf '\n\nEnvironment variables are not set.\n\tYou need to specify MARIADB_ROOT_HOST, MARIADB_DATABASE, MARIADB_USER, MARIADB_PASSWORD and SECRET_KEY\n\n'
+if [ -z "$MARIADB_ROOT_HOST" ] || [ -z "$MARIADB_USER" ] || [ -z "$MARIADB_PASSWORD" ] || [ -z "$MARIADB_DATABASE" ] || [ -z "$JWT_AUTH_SIGNING_KEY" ]; then
+    printf '\n\nEnvironment variables are not set.\n\tYou need to specify MARIADB_ROOT_HOST, MARIADB_DATABASE, MARIADB_USER, MARIADB_PASSWORD and JWT_AUTH_SIGNING_KEY\n\n'
     exit 1
 fi
 

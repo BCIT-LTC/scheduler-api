@@ -17,7 +17,7 @@ spec:
           {{ with secret "web-apps/data/scheduler-api" -}}
           MARIADB_USER="{{ .Data.data.MARIADB_USER }}"
           MARIADB_PASSWORD="{{ .Data.data.MARIADB_PASSWORD }}"
-          SECRET_KEY="{{ .Data.data.SECRET_KEY }}"
+          JWT_AUTH_SIGNING_KEY="{{ .Data.data.JWT_AUTH_SIGNING_KEY }}"
           ELASTIC_APM_SECRET_TOKEN="{{ .Data.data.ELASTIC_APM_SECRET_TOKEN }}"
           {{- end }}
     spec:

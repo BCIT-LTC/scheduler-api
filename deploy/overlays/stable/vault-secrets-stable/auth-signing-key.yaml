@@ -1,0 +1,13 @@
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: auth-signing-key
+spec:
+  type: kv-v2
+  vaultAuthRef: vault-auth
+  refreshAfter: 6h
+  mount: apps
+  path: scheduler-api/stable/auth-signing-key
+  destination:
+    name: auth-signing-key
+    create: true

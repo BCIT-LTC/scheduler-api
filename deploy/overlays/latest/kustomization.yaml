@@ -1,27 +1,47 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: openlab-scheduler
 resources:
   - ../../base
 commonLabels:
   environment: latest
+# Prefix/Suffix required for VaultAuth configuration
+#
+namePrefix: scheduler-api-
+nameSuffix: -latest
+# Facilitate kustomization name updating
+#
+configurations:
+  - kustomizeconfig.yaml
 commonAnnotations:
-  version: 1.0.11-ec1a5a5c--2023-07-01.1688215371 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
+  version: 1.0.12-036bde4c--2023-10-17.1697569129 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
 images:
   - name: "scheduler-api"
     newName: "registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api"
-    newTag: "1.0.11-ec1a5a5c--2023-07-01.1688215371" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
+    newTag: "1.0.12-036bde4c--2023-10-17.1697569129" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
 patches:
-  # Adds "-latest" to ingress subdomain
-  #
+  # Patches ingress with "latest--"
   - target:
       kind: Ingress
     path: ingress-patch.yaml
-  # Adds Vault agent annotations to deployment
-  #
+  # Adds secrets to deployment
   - target:
       kind: Deployment
     path: deployment-patch.yaml
+  # Adds secrets, root password to statefulset
+  - target:
+      kind: StatefulSet
+    path: statefulset-patch.yaml
+  # Incorporate vault-secrets
+  #
+  # adds `-latest` suffix to VaultAuth `spec.mount`
+  - target:
+      kind: VaultAuth
+    path: vault-secrets-latest/vault-auth-patch.yaml
+components:
+  # Include environment-specific secrets
+  - ./vault-secrets-latest
+  # Required for VaultAuth role and serviceaccounts
+  - ../../base/components/vault-auth
 # Appends service name to base elasticapm config
 #
 configMapGenerator:

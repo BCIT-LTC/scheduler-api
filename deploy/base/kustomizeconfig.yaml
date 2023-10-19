@@ -1,0 +1,17 @@
+# This file is for teaching kustomize how to substitute names in the CRD
+#
+nameReference:
+  - kind: Service
+    fieldSpecs:
+      - path: spec/template/spec/containers/env/value
+        kind: Deployment
+
+  - kind: ServiceAccount
+    fieldSpecs:
+      - path: spec/kubernetes/serviceAccount
+        kind: VaultAuth
+
+  - kind: VaultAuth
+    fieldSpecs:
+      - path: spec/vaultAuthRef
+        kind: VaultStaticSecret

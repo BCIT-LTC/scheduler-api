@@ -1,6 +1,31 @@
 version: "3.9"
 
 services:
+
+
+  app:
+    command:
+      - /bin/sh
+      - -c
+      # - npm run test
+      - npm start
+    build: ./
+    ports:
+      - 8000:8000
+    environment:
+      - MARIADB_ROOT_HOST=db
+      - MARIADB_DATABASE=openlab-scheduler
+      - MARIADB_USER=bsnmysql
+      - MARIADB_PASSWORD=bcitbsn491
+      - TZ=America/Vancouver
+      - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+
   db:
     image: mariadb
     environment:
@@ -17,32 +42,11 @@ services:
     volumes:
       - api_db:/var/lib/mysql
 
-  app:
-    command:
-      - /bin/sh
-      - -c
-      # - npm run test
-      - npm start
-    build: ./
-    ports:
-      - "8000:8000"
-    environment:
-      - MARIADB_ROOT_HOST=db
-      - MARIADB_DATABASE=openlab-scheduler
-      - MARIADB_USER=bsnmysql
-      - MARIADB_PASSWORD=bcitbsn491
-      - TZ=America/Vancouver
-      - SECRET_KEY=ahuaejsdb
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      - .:/app
+  # adminer:
+  #   image: adminer
+  #   ports:
+  #     - 8080:8080
 
-  adminer:
-    image: adminer
-    ports:
-      - 8081:8080
 
 volumes:
   api_db:

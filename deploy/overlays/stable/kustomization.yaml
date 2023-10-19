@@ -1,22 +1,43 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: openlab-scheduler
 resources:
   - ../../base
 commonLabels:
   environment: stable
+# Prefix/Suffix required for VaultAuth configuration
+#
+namePrefix: scheduler-api-
+nameSuffix: -stable
+# Facilitate kustomization name updating
+#
+configurations:
+  - kustomizeconfig.yaml
 commonAnnotations:
-  version: 1.0.11 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
+  version: 1.0.12 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-stable:tag"}
 images:
   - name: "scheduler-api"
     newName: "registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api"
-    newTag: "1.0.11" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy:tag"}
-# Adds Vault agent annotations to deployment
-#
+    newTag: "1.0.12" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-stable:tag"}
 patches:
+  # Adds secrets to deployment
   - target:
       kind: Deployment
     path: deployment-patch.yaml
+  # Adds secrets, root password to statefulset
+  - target:
+      kind: StatefulSet
+    path: statefulset-patch.yaml
+  # Incorporate vault-secrets
+  #
+  # adds `-stable` suffix to VaultAuth `spec.mount`
+  - target:
+      kind: VaultAuth
+    path: vault-secrets-stable/vault-auth-patch.yaml
+components:
+  # Include environment-specific secrets
+  - ./vault-secrets-stable
+  # Required for VaultAuth role and serviceaccounts
+  - ../../base/components/vault-auth
 # Appends service name to base elasticapm config
 #
 configMapGenerator:
@@ -24,3 +45,7 @@ configMapGenerator:
     literals:
       - ELASTIC_APM_SERVICE_NAME=scheduler-api-stable
     behavior: merge
+# Stable overlay increases replicas
+replicas:
+  - name: deployment
+    count: 2

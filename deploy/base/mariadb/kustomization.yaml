@@ -5,18 +5,23 @@ metadata: # kpt-merge: /kustomization
   annotations:
     config.kubernetes.io/local-config: "true"
     internal.kpt.dev/upstream-identifier: 'kustomize.config.k8s.io|Kustomization|default|kustomization'
+
 resources:
   - statefulset.yaml
   - Kptfile
   - service.yaml
+
 namePrefix: mariadb-
+
 configMapGenerator:
   - name: config
     literals:
       - MARIADB_DATABASE=mariadb
+
 secretGenerator:
+
+  # root credentials rotated by Vault
   - name: credentials
     literals:
-      - MARIADB_ROOT_PASSWORD=ins3cuRe!ro0Tpw
-      - MARIADB_USER=mariadb
-      - MARIADB_PASSWORD=Chang3me!
+      - MARIADB_ROOT_PASSWORD=rootpassword
+

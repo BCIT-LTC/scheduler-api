@@ -1,26 +1,20 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: deployment
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: scheduler-api
-  template:
-    metadata:
-      annotations:
-        config.linkerd.io/skip-outbound-ports: "443"
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/role: "scheduler-api-kubeauthbot-stable"
-        vault.hashicorp.com/agent-inject-secret-config: "web-apps/data/scheduler-api"
-        vault.hashicorp.com/agent-inject-template-config: |
-          {{ with secret "web-apps/data/scheduler-api" -}}
-          MARIADB_USER="{{ .Data.data.MARIADB_USER }}"
-          MARIADB_PASSWORD="{{ .Data.data.MARIADB_PASSWORD }}"
-          SECRET_KEY="{{ .Data.data.SECRET_KEY }}"
-          ELASTIC_APM_SECRET_TOKEN="{{ .Data.data.ELASTIC_APM_SECRET_TOKEN }}"
-          {{- end }}
-    spec:
-      containers:
-        - name: scheduler-api
+# adds secrets to deployment
+#
+---
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    secretRef:
+      name: auth-signing-key
+
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    secretRef:
+      name: elastic-apm-token
+
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    secretRef:
+      name: mariadb-credentials

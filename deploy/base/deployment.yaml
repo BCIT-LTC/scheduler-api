@@ -18,14 +18,12 @@ spec:
           image: scheduler-api
           env:
             - name: MARIADB_ROOT_HOST
-              value: scheduler-api-mariadb-service
+              value: mariadb-service
           envFrom:
             - configMapRef:
-                name: mariadb-config
-            - secretRef:
-                name: mariadb-credentials
-            - configMapRef:
                 name: elasticapm-config
+            - configMapRef:
+                name: mariadb-config
           readinessProbe:
             tcpSocket:
               port: 8000
