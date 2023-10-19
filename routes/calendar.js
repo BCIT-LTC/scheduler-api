@@ -147,40 +147,71 @@ const express = require("express");
 const router = express.Router();
 const updateForm = require("../models/openLabForm");
 const auth = require("../middleware/checkAuth");
+const fs = require('fs');
 
-router.get("/api/calendar", function (req, res) {
+/**
+ * Logs the provided error based on the environment setting.
+ *
+ * @param {string} context - Context in which the error occurred.
+ * @param {Error} error - The actual error object.
+ */
+function logError(context, error) {
+    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
+    if (process.env.NODE_ENV === "development") {
+        fs.appendFileSync("error_log.txt", errorMessage);
+    } else {
+        console.error(error);
+    }
+}
+
+/**
+ * GET /api/calendar
+ * Endpoint to retrieve calendar data for a specific month.
+ *
+ * Requires authentication and returns a 403 status if authentication fails.
+ * Returns calendar data for the specified month and year.
+ */
+router.get("/api/calendar", async (req, res) => {
     if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
-    updateForm
-        .findMonth(req.query.month, req.query.year)
-        .then((results) => {
-            console.log("update form results", results);
-            if (results) {
-                res.status(200).send({ results });
-            } else {
-                return res.status(404).send({ error: "Error finding month" });
-            }
-        })
-        .catch((err) => {
-            return res.status(500).send({ error: err.message });
-        });
+
+    try {
+        const results = await updateForm.findMonth(req.query.month, req.query.year);
+        if (results) {
+            res.status(200).send({ results });
+        } else {
+            res.status(404).send({ error: "Error finding month" });
+        }
+    } catch (err) {
+        logError("GET /api/calendar", err);
+        if (err.code === 'INVALID_FORMAT') {
+            res.status(400).send({ error: err.message });
+        } else {
+            res.status(500).send({ error: err.message });
+        }
+    }
 });
 
-router.post("/api/calendar", function (req, res) {
+/**
+ * POST /api/calendar
+ * Endpoint to update or add calendar events.
+ *
+ * Requires authentication and returns a 403 status if authentication fails.
+ * Accepts a body with calendar event data and updates or adds events based on the provided data.
+ */
+router.post("/api/calendar", async (req, res) => {
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
 
-    updateForm
-        .updateCalendar(req.body.forms)
-        .then((results) => {
-            console.log("update form results", results);
-            if (results) {
-                res.status(200).send({ error: "" });
-            } else {
-                return res.status(500).send({ error: "Error updateing month" });
-            }
-        })
-        .catch((err) => {
-            return res.status(500).send({ error: err.message });
-        });
+    try {
+        const results = await updateForm.updateCalendar(req.body.forms);
+        if (results) {
+            res.status(200).send({ message: "Calendar updated successfully" });
+        } else {
+            res.status(500).send({ error: "Error updating month" });
+        }
+    } catch (err) {
+        logError("POST /api/calendar", err);
+        res.status(500).send({ error: err.message });
+    }
 });
 
 module.exports = router;

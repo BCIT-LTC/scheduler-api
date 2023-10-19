@@ -1,6 +1,15 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+function logError (context, error) {
+    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
+    if (process.env.Node_ENV === 'development') {
+        fs.appendFileSync('error_log.txt', errorMessage);
+    } else {
+        console.error(error);
+    }
+}
+
 const userModel = {
     /**
      * finds a list of all the existing admins
@@ -13,7 +22,8 @@ const userModel = {
                 where: { isAdmin: true },
             });
         } catch (error) {
-            console.error("An error occurred while fetching admins:", error);
+            logError("Error fetching admins: ${error.message}");
+            throw error;
         }
     },
     /**
@@ -28,10 +38,8 @@ const userModel = {
                 where: { email },
             });
         } catch (error) {
-            console.error(
-                `An error occurred while fetching user with email ${email}:`,
-                error
-            );
+            logError("Error fetching user with email ${email}: ${error.message}");
+            throw error;
         }
     },
 
@@ -41,19 +49,19 @@ const userModel = {
      * @async
      * @returns first/last name, email, and if the user is an admin
      */
-    findById: async (id) => {
-        try {
-            return await prisma.users.findUnique({
-                where: { id },
-            });
-        } catch (error) {
-            console.error(
-                `An error occurred while fetching user with ID ${id}:`,
-                error
-            );
-        }
-    },
-
+    // findById: async (id) => {
+    //     try {
+    //         return await prisma.users.findUnique({
+    //             where: { id },
+    //         });
+    //     } catch (error) {
+    //         console.error(
+    //             `An error occurred while fetching user with ID ${id}:`,
+    //             error
+    //         );
+    //     }
+    // },
+    // Section commented out because it is not used anywhere in the codebase.
     /**
      * Add a new user to the database
      * @param {*} email - users email
@@ -62,32 +70,32 @@ const userModel = {
      * @param {*} isAdmin - if the user is an admin
      * @param {*} eligibleAdmin - if the user is allowed to be an admin
      * @returns the user who was added
+     * @async
      */
     addUser: async (email, firstName, lastName, isAdmin, eligibleAdmin) => {
         try {
-            const current = prisma.users.findUnique({
+            const current = await prisma.users.findUnique({
                 where: { email },
             });
-            const user = await prisma.users.upsert({
+            return await prisma.users.upsert({
                 where: { email },
                 update: {
-                    firstName: firstName,
-                    lastName: lastName,
-                    eligibleAdmin: eligibleAdmin,
-                    isAdmin: eligibleAdmin && current.isAdmin,
+                    firstName,
+                    lastName,
+                    eligibleAdmin,
+                    isAdmin: eligibleAdmin && current?.isAdmin,
                 },
                 create: {
-                    email: email,
-                    firstName: firstName,
-                    lastName: lastName,
-                    isAdmin: isAdmin,
-                    eligibleAdmin: eligibleAdmin,
+                    email,
+                    firstName,
+                    lastName,
+                    isAdmin,
+                    eligibleAdmin,
                 },
             });
-            console.log("User added successfully");
-            return user;
         } catch (error) {
-            console.log("Error: " + error);
+            logError("Error adding user: ${error.message}");
+            throw error;
         }
     },
     /**
@@ -102,28 +110,25 @@ const userModel = {
             const current = await prisma.users.findUnique({
                 where: { email },
             });
-            if (
-                current != null &&
-                !current.eligibleAdmin &&
-                isAdmin &&
-                current.firstName != "N/A"
+            if ( current && !current.eligibleAdmin && isAdmin && current.firstName !== "N/A"
             ) {
-                return "Ineligible user";
+                const errorMessage = `User ${email} is not eligible to be an admin`;
+                logError(errorMessage)
+                throw new Error(errorMessage);
             }
             await prisma.users.upsert({
-                where: { email: email },
-                update: {
-                    isAdmin: isAdmin,
-                },
+                where: { email },
+                update: { isAdmin },
                 create: {
-                    email: email,
-                    isAdmin: isAdmin,
+                    email,
+                    isAdmin,
                     firstName: "N/A",
                     lastName: "N/A",
                 },
             });
         } catch (error) {
-            console.log("Error: " + error);
+            logError("Error updating admin: ${error.message}");
+            throw error;
         }
     },
 };

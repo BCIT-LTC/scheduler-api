@@ -115,10 +115,27 @@ const {
     editAnnouncement,
 } = require("../models/announcement");
 const auth = require("../middleware/checkAuth");
+const fs = require("fs");
 
+/**
+ * Logs the error based on the environment (development or production).
+ * @param {string} context - Describes where the error occurred.
+ * @param {Error} error - The error object containing details about the error.
+ */
+function logError(context, error) {
+    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
+    if (process.env.Node_ENV === "development") {
+        fs.appendFileSync("error_log.txt", errorMessage);
+    } else {
+        console.error(error);
+    }
+}
+
+/**
+ * GET endpoint to retrieve all announcements.
+ */
 router.get("/api/announcement", async (req, res) => {
-    console.log("announcement route called")
-    console.log(req.headers)
+    // Check if the user is authenticated
     if (!auth.authenticateToken(req, false)){
         return res.sendStatus(403);
     }
@@ -126,50 +143,71 @@ router.get("/api/announcement", async (req, res) => {
         const announcement = await getAnnouncement();
         return res.status(200).send(announcement);
     } catch (error) {
+        logError("Error while fetching announcements", error)
         return res.status(500).send({ error: error.message });
     }
 });
 
-//endpoint for adding or editing announcements
+/**
+ * POST endpoint to add or edit an announcement.
+ */
 router.post("/api/announcement", async (req, res) => {
+    // Check if the user is authenticated
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-    let title = req.body.title;
-    let description = req.body.description;
-    let date = req.body.date;
+
+    // Validate inputs
+    const { title, description, date } = req.body;
+    if (!title || !description || !date) {
+        return res.status(400).send({ error: "Missing required fields" });
+    }
+
     try {
-        const announcement = addAnnouncement(
-            title,
-            description,
-            new Date(date)
-        );
+        const announcement = await addAnnouncement(title, description, new Date(date));
         res.status(200).send(announcement);
     } catch (error) {
+        logError("Error while adding an announcement", error)
         res.status(500).send({ error: error.message });
     }
 });
 
-//endpoint for deleting announcements
+/**
+ * DELETE endpoint to remove an announcement based on its ID.
+ */
 router.delete("/api/announcement", async (req, res) => {
+    // Check if the user is authenticated
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-    let id = req.body.id;
+
+    // Validate inputs
+    const { id } = req.body;
+    if (!id) return res.status(400).send({ error: "ID is required for deletion" });
+
     try {
         await deleteAnnouncement(id);
         return res.status(200).send({ message: "Success" });
     } catch (error) {
+        logError("Error while deleting an announcement", error)
         return res.status(500).send({ error: error.message });
     }
 });
 
-//endpoint for editing announcements
+/**
+ * PUT endpoint to edit an announcement based on its ID.
+ */
 router.put("/api/announcement", async (req, res) => {
+    // Check if the user is authenticated
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
-    let id = req.body.id;
-    let title = req.body.title;
-    let description = req.body.description;
+
+    // Validate inputs
+    const { id, title, description } = req.body;
+    if (!id || !title || !description) {
+        return res.status(400).send({ error: "Missing required fields" });
+    }
+
     try {
         await editAnnouncement(id, title, description);
         return res.status(200).send({ message: "Success" });
     } catch (error) {
+        logError("Error while editing an announcement", error)
         return res.status(500).send({ error: error.message });
     }
 });

@@ -1,17 +1,33 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
+const fs = require("fs");
 
 /**
- * Find all the freqently asked questions
+ * Log an error to the console or to a file depending on the environment.
+ * @param context
+ * @param error
+ */
+const logError = (context, error) => {
+    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
+    if (process.env.Node_ENV === "development") {
+        fs.appendFileSync("error_log.txt", errorMessage);
+    } else {
+        console.error(error);
+    }
+}
+
+/**
+ * Find all the frequently asked questions
  * @date 2023-05-23 - 1:45:42 a.m.
- *
  * @async
  * @returns {Object} list of faqs
  */
 const getFaq = async () => {
-  const faqs = await prisma.faqs.findMany();
-  return faqs;
+  try {
+    return await prisma.faqs.findMany();
+  } catch (error) {
+    logError("Error fetching faqs", error);
+  }
 };
 
 /**
@@ -20,33 +36,37 @@ const getFaq = async () => {
  * @param {*} answer
  * @param {*} id to possibly update
  * @returns the results
+ * @async
  */
 const addFaq = async (question, answer, id = -1) => {
-  const faq = await prisma.faqs.upsert({
-    where: { faqs_id: id },
-    update: {
-      question: question,
-      answer: answer,
-    },
-    create: {
-      question: question,
-      answer: answer,
-    },
-  });
-  return faq;
+  try {
+    return await prisma.faqs.upsert({
+      where: {faqs_id: id},
+      update: { question, answer},
+      create: { question, answer},
+    });
+  } catch (error) {
+    logError("Error adding faq", error);
+  }
 };
 
 /**
  * Delete a faq
  * @param {*} id of faq to delete
  * @returns  results
+ * @async
+ * @throws {Error} if the id is invalid
  */
 const deleteFaq = async (id) => {
-  const deletedFaq = await prisma.faqs.delete({
-    where: { faqs_id: id },
-  });
-  console.log("Deleted Faq: ", deletedFaq);
-  return deletedFaq;
+  try {
+    const deletedFaq = await prisma.faqs.delete({
+      where: {faqs_id: id},
+    });
+    console.log("Deleted Faq: ", deletedFaq);
+    return deletedFaq;
+  } catch (error) {
+    logError("Error deleting faq", error);
+  }
 };
 
 /**
@@ -55,17 +75,18 @@ const deleteFaq = async (id) => {
  * @param {*} updatedQuestion new question
  * @param {*} updatedAnswer new answer
  * @returns
+ * @async
+ * @throws {Error} if the id is invalid
  */
 const editFaq = async (id, updatedQuestion, updatedAnswer) => {
-  const editedFaq = await prisma.faqs.update({
+  try {
+  return await prisma.faqs.update({
     where: { faqs_id: id },
-    data: {
-      question: updatedQuestion,
-      answer: updatedAnswer,
-    },
+    data: { question: updatedQuestion, answer: updatedAnswer },
   });
-  console.log("Edited Faq: ", editedFaq);
-  return editedFaq;
+} catch (error) {
+    logError("Error editing faq", error);
+  }
 };
 
 module.exports = {
