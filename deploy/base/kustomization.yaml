@@ -18,9 +18,7 @@ commonLabels:
   app.kubernetes.io/name: scheduler-api
 
 patches:
-
   # Remove kustomize-generated secret from base; replace with Vault secret
-  #
   - target:
       kind: Secret
       name: mariadb-credentials
@@ -37,7 +35,6 @@ patches:
     path: statefulset-patch.yaml
 
 configMapGenerator:
-
   # Generates elasticapm initial config
   #
   - name: elasticapm-config
@@ -48,7 +45,7 @@ configMapGenerator:
   #
   - name: mariadb-config
     literals:
-      - MARIADB_DATABASE=scheduler-api-mariadb-service
+      - MARIADB_DATABASE=scheduler-api
+      - MARIADB_ROOT_HOST=scheduler-api-mariadb-service
       - TZ=America/Vancouver
     behavior: replace
-

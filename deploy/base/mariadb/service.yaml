@@ -7,8 +7,9 @@ metadata: # kpt-merge: /service
   annotations:
     internal.kpt.dev/upstream-identifier: '|Service|default|service'
 spec:
-  clusterIP: None
+  ports:
+    - name: mariadb
+      port: 3306
   selector:
     tier: mariadb
-  ports:
-    - port: 3306
+  clusterIP: None

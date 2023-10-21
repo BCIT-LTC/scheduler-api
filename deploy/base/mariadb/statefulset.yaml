@@ -2,12 +2,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata: # kpt-merge: /statefulset
   name: statefulset
-  labels:
-    tier: mariadb
   annotations:
     internal.kpt.dev/upstream-identifier: 'apps|StatefulSet|default|statefulset'
 spec:
-  serviceName: "mariadb"
+  serviceName: mariadb
   selector:
     matchLabels:
       tier: mariadb
@@ -24,10 +22,10 @@ spec:
             - containerPort: 3306
               name: mariadb
           envFrom:
-            - secretRef:
-                name: credentials
             - configMapRef:
                 name: config
+            - secretRef:
+                name: credentials
           resources:
             requests:
               cpu: 300m
