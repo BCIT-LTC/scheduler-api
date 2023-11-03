@@ -22,3 +22,4 @@ With Docker:
 1. Open `http://localhost:8000/api` to see the Rest endpoints
 
 If you run into an error that says `"can't find file \r\n"`, go to the `docker-entrypoint.sh` file and change the End of Line sequence from `CRLF` to `LF` (in the bottom right)
+

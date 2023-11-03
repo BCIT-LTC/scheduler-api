@@ -73,7 +73,7 @@ const logError = (context, error) => {
  * POST endpoint to log a user in.
  * JWT token is used to decode user data and then either add or update the user in the database.
  */
-router.post("/api/login", async (req, res) => {
+router.post("/login", async (req, res) => {
     try {
         // Extract JWT from headers and decode user information
         let jwt = req.headers.authorization.split(" ")[1];
@@ -103,7 +103,7 @@ router.post("/api/login", async (req, res) => {
  * POST endpoint to get the logout time for a user.
  * Currently, the actual logic behind `logoutTime` is missing in the provided code.
  */
-router.post("/api/logouttime", async (req, res) => {
+router.post("/logouttime", async (req, res) => {
     try{
         if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
         const getLogoutTime = await logoutTime(req.body.email);
@@ -117,7 +117,7 @@ router.post("/api/logouttime", async (req, res) => {
 /**
  * GET endpoint to fetch all the admins from the system.
  */
-router.get("/api/admin", async (req, res) => {
+router.get("/admin", async (req, res) => {
     try {
         if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
         return res.status(200).send(userModel.findAdmins());
@@ -131,7 +131,7 @@ router.get("/api/admin", async (req, res) => {
  * POST endpoint to update the admin status of a user.
  * Admin status can be either granted or revoked based on the provided data.
  */
-router.post("/api/admin", async (req, res) => {
+router.post("/admin", async (req, res) => {
     try {
         if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
 
