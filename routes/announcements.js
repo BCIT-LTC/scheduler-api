@@ -134,7 +134,7 @@ function logError(context, error) {
 /**
  * GET endpoint to retrieve all announcements.
  */
-router.get("/api/announcement", async (req, res) => {
+router.get("/announcement", async (req, res) => {
     // Check if the user is authenticated
     if (!auth.authenticateToken(req, false)){
         return res.sendStatus(403);
@@ -151,7 +151,7 @@ router.get("/api/announcement", async (req, res) => {
 /**
  * POST endpoint to add or edit an announcement.
  */
-router.post("/api/announcement", async (req, res) => {
+router.post("/announcement", async (req, res) => {
     // Check if the user is authenticated
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
 
@@ -173,7 +173,7 @@ router.post("/api/announcement", async (req, res) => {
 /**
  * DELETE endpoint to remove an announcement based on its ID.
  */
-router.delete("/api/announcement", async (req, res) => {
+router.delete("/announcement", async (req, res) => {
     // Check if the user is authenticated
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
 
@@ -193,7 +193,7 @@ router.delete("/api/announcement", async (req, res) => {
 /**
  * PUT endpoint to edit an announcement based on its ID.
  */
-router.put("/api/announcement", async (req, res) => {
+router.put("/announcement", async (req, res) => {
     // Check if the user is authenticated
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
 

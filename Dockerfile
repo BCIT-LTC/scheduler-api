@@ -1,4 +1,7 @@
 FROM node:19.4.0-alpine
+LABEL maintainer courseproduction@bcit.ca
+ARG GIT_TAG
+ENV GIT_TAG=${GIT_TAG:-0.0.0}
 
 WORKDIR /app
 
