@@ -73,7 +73,7 @@ const logError = (context, error) => {
  * POST endpoint to log a user in.
  * JWT token is used to decode user data and then either add or update the user in the database.
  */
-router.post("/login", async (req, res) => {
+router.get("/authorize", async (req, res) => {
     try {
         // Extract JWT from headers and decode user information
         let jwt = req.headers.authorization.split(" ")[1];
@@ -82,18 +82,31 @@ router.post("/login", async (req, res) => {
         }
         let user = jwtDecode(jwt);
 
+        console.log(user)
+
+        let usernew =
+        {
+            email: 'admin@bcit.ca',
+            first_name: 'admin_firstname',
+            last_name: 'admin_lastname',
+            role: 'admin',
+            school: 'School of Health Sciences',
+            program: 'Bachelor of Science in Nursing',
+        }
+        
         // Add or update user in the database
-        await userModel.addUser(
-            user.email,
-            user.firstname,
-            user.lastname,
-            false,
-            user.eligibleAdmin
-        );
-        let details = await userModel.findOne(user.email);
-        return res.status(200).send(details.isAdmin);
+        // await userModel.addUser(
+        //     user.email,
+        //     user.firstname,
+        //     user.lastname,
+        //     false,
+        //     user.eligibleAdmin
+        // );
+        // let details = await userModel.findOne(user.email);
+        // return res.status(500).send(user);
+        return res.status(200).send(usernew);
     } catch (error) {
-        logError("/api/login", error);
+        logError("/api/authorize", error);
         return res.status(500).send({ error: error.message });
     }
 });
@@ -104,7 +117,7 @@ router.post("/login", async (req, res) => {
  * Currently, the actual logic behind `logoutTime` is missing in the provided code.
  */
 router.post("/logouttime", async (req, res) => {
-    try{
+    try {
         if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
         const getLogoutTime = await logoutTime(req.body.email);
         return res.status(200).send(getLogoutTime);

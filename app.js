@@ -59,7 +59,6 @@ app.get('/log', (req, res) => {
 });
 
 // Using route files
-// app.use("/api", announcements, auth, calendar, faq, pdf, contact);
 app.use("/api", announcements, auth, calendar, faq, pdf, contact);
 
 // Swagger API documentation setup
