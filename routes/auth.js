@@ -50,7 +50,6 @@
  */
 const express = require("express");
 const router = express.Router();
-const jwtDecode = require("jwt-decode");
 const userModel = require("../models/userModel").userModel;
 const auth = require("../middleware/checkAuth");
 const fs = require("fs");
@@ -75,14 +74,8 @@ const logError = (context, error) => {
  */
 router.post("/authorize", async (req, res) => {
     try {
-        // Extract JWT from headers and decode user information
-        let jwt = req.headers.authorization.split(" ")[1];
-        if (!jwt) {
-            return res.status(400).send({ error: "Token missing from Authorization header or is invalid." });
-        }
-        let user = jwtDecode(jwt);
-
-        console.log(user)
+        console.log("res.locals.user")
+        console.log(res.locals.user)
 
         // sample user data for testing
         let usernew =
