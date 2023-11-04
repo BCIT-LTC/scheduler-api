@@ -70,10 +70,10 @@ const logError = (context, error) => {
 }
 
 /**
- * POST endpoint to log a user in.
+ * POST endpoint to authorize a user
  * JWT token is used to decode user data and then either add or update the user in the database.
  */
-router.get("/authorize", async (req, res) => {
+router.post("/authorize", async (req, res) => {
     try {
         // Extract JWT from headers and decode user information
         let jwt = req.headers.authorization.split(" ")[1];
@@ -84,6 +84,7 @@ router.get("/authorize", async (req, res) => {
 
         console.log(user)
 
+        // sample user data for testing
         let usernew =
         {
             email: 'admin@bcit.ca',
