@@ -35,6 +35,7 @@ module.exports = function (callingModule) {
                 json())
             }),
             new winston.transports.Console({
+              level: 'debug',
               format: combine(
                 timestamp(),
                 label({ label: getLabel(callingModule) }),

@@ -15,6 +15,9 @@ const hostname = "0.0.0.0";
 const app = express();
 const logger = require('./logger')(module);
 
+// Middleware
+const authentication_check = require("./middleware/authentication_check");
+
 /**
  * Function to log errors based on the environment.
  * @param {String} context - Context or source of the error.
@@ -59,8 +62,7 @@ app.get('/log', (req, res) => {
 });
 
 // Using route files
-// app.use("/api", announcements, auth, calendar, faq, pdf, contact);
-app.use("/api", announcements, auth, calendar, faq, pdf, contact);
+app.use("/api", authentication_check, announcements, auth, calendar, faq, pdf, contact);
 
 // Swagger API documentation setup
 const options = {
