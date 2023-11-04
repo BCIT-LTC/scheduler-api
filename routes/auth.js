@@ -77,17 +77,27 @@ router.post("/authorize", async (req, res) => {
         console.log("res.locals.user")
         console.log(res.locals.user)
 
+        // TEMPORARY
         // sample user data for testing
-        let usernew =
-        {
-            email: 'admin@bcit.ca',
-            first_name: 'admin_firstname',
-            last_name: 'admin_lastname',
-            role: 'admin',
-            school: 'School of Health Sciences',
-            program: 'Bachelor of Science in Nursing',
+        // set all instructors to admin
+        // students accounts stay the same
+        let usernew;
+        if(res.locals.user.role == 'instructor'){
+            usernew =
+            {
+                email: 'admin@bcit.ca',
+                first_name: 'admin_firstname',
+                last_name: 'admin_lastname',
+                role: 'admin',
+                school: 'School of Health Sciences',
+                program: 'Bachelor of Science in Nursing',
+            }
+        }
+        else{
+            usernew = res.locals.user;
         }
         
+        // TODO: uncomment and modify this when we have updated the database models
         // Add or update user in the database
         // await userModel.addUser(
         //     user.email,
