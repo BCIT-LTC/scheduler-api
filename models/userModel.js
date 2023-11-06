@@ -22,7 +22,7 @@ const userModel = {
                 where: { isAdmin: true },
             });
         } catch (error) {
-            logError("Error fetching admins: ${error.message}");
+            logError(`Error fetching admins: ${error.message}`);
             throw error;
         }
     },
@@ -38,7 +38,7 @@ const userModel = {
                 where: { email },
             });
         } catch (error) {
-            logError("Error fetching user with email ${email}: ${error.message}");
+            logError(`Error fetching user with email ${email}: ${error.message}`);
             throw error;
         }
     },
@@ -94,7 +94,7 @@ const userModel = {
                 },
             });
         } catch (error) {
-            logError("Error adding user: ${error.message}");
+            logError(`Error adding user: ${error.message}`);
             throw error;
         }
     },
@@ -127,7 +127,7 @@ const userModel = {
                 },
             });
         } catch (error) {
-            logError("Error updating admin: ${error.message}");
+            logError(`Error updating admin: ${error.message}`);
             throw error;
         }
     },
