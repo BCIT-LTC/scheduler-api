@@ -5,17 +5,17 @@ const logger = createLogger(module);
 
 const userModel = {
     /**
-     * finds a list of all the existing admins
+     * finds a list of all the existing users
      * @async
-     * @returns array of users who are admins
+     * @returns array of users
      */
-    findAdmins: async () => {
+    listAllUsers: async () => {
         try {
             return await prisma.users.findMany({
-                where: { isAdmin: true },
+                where: { isActive: true },
             });
         } catch (error) {
-            logger.error({message:`Error fetching admins: ${error.message}`, error: error.stack});
+            logger.error({message:`Error fetching users: ${error.message}`, error: error.stack});
             throw error;
         }
     },

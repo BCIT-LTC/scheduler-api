@@ -28,8 +28,10 @@ model users {
   email         String    @id @db.VarChar(50)
   firstName     String    @db.VarChar(50)
   lastName      String    @db.VarChar(50)
-  isAdmin       Boolean   @default(false)
-  eligibleAdmin Boolean   @default(false)
+  role          String    @db.VarChar(50)
+  school        String    @db.VarChar(50)
+  program       String    @db.VarChar(50)
+  isActive      Boolean   @default(true)
 }
 
 model faqs {
