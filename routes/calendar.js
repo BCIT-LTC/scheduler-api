@@ -147,22 +147,9 @@ const express = require("express");
 const router = express.Router();
 const updateForm = require("../models/openLabForm");
 const auth = require("../middleware/checkAuth");
-const fs = require('fs');
+const createLogger = require('../logger'); // Ensure the path is correct
+const logger = createLogger(module);
 
-/**
- * Logs the provided error based on the environment setting.
- *
- * @param {string} context - Context in which the error occurred.
- * @param {Error} error - The actual error object.
- */
-function logError(context, error) {
-    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
-    if (process.env.NODE_ENV === "development") {
-        fs.appendFileSync("error_log.txt", errorMessage);
-    } else {
-        console.error(error);
-    }
-}
 
 /**
  * GET /api/calendar
@@ -182,7 +169,7 @@ router.get("/api/calendar", async (req, res) => {
             res.status(404).send({ error: "Error finding month" });
         }
     } catch (err) {
-        logError("GET /api/calendar", err);
+        logger.error({message:"GET /api/calendar", error: err.stack});
         if (err.code === 'INVALID_FORMAT') {
             res.status(400).send({ error: err.message });
         } else {
@@ -209,7 +196,7 @@ router.post("/api/calendar", async (req, res) => {
             res.status(500).send({ error: "Error updating month" });
         }
     } catch (err) {
-        logError("POST /api/calendar", err);
+        logger.error({message:"POST /api/calendar",error: err.stack});
         res.status(500).send({ error: err.message });
     }
 });

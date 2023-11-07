@@ -1,20 +1,8 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const fs = require("fs");
+const createLogger = require('../logger'); // Ensure the path is correct
+const logger = createLogger(module);
 
-/**
- * Log an error to the console or to a file depending on the environment.
- * @param context
- * @param error
- */
-const logError = (context, error) => {
-    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
-    if (process.env.Node_ENV === "development") {
-        fs.appendFileSync("error_log.txt", errorMessage);
-    } else {
-        console.error(error);
-    }
-}
 
 /**
  * Find all the frequently asked questions
@@ -26,7 +14,7 @@ const getFaq = async () => {
   try {
     return await prisma.faqs.findMany();
   } catch (error) {
-    logError("Error fetching faqs", error);
+    logger.error({message:"Error fetching faqs", error: error.stack});
   }
 };
 
@@ -46,7 +34,7 @@ const addFaq = async (question, answer, id = -1) => {
       create: { question, answer},
     });
   } catch (error) {
-    logError("Error adding faq", error);
+    logger.error({message:"Error adding faq", error: error.stack});
   }
 };
 
@@ -65,7 +53,7 @@ const deleteFaq = async (id) => {
     console.log("Deleted Faq: ", deletedFaq);
     return deletedFaq;
   } catch (error) {
-    logError("Error deleting faq", error);
+    logger.error({message:"Error deleting faq", error: error.stack});
   }
 };
 
@@ -85,7 +73,7 @@ const editFaq = async (id, updatedQuestion, updatedAnswer) => {
     data: { question: updatedQuestion, answer: updatedAnswer },
   });
 } catch (error) {
-    logError("Error editing faq", error);
+    logger.error({message:"Error editing faq", error: error.stack});
   }
 };
 

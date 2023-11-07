@@ -1,20 +1,8 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const fs = require('fs');
+const createLogger = require('../logger'); // Ensure the path is correct
+const logger = createLogger(module);
 
-/**
- * Log the error based on the environment.
- * @param {string} context - Context where the error occurred.
- * @param {Error} error - The error object.
- */
-function logError(context, error) {
-  const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
-  if (process.env.NODE_ENV === "development") {
-    fs.appendFileSync("error_log.txt", errorMessage);
-  } else {
-    console.error(errorMessage);
-  }
-}
 
 /**
  * Seed initial announcement data.
@@ -33,7 +21,7 @@ async function seedAnnouncements() {
       },
     });
   } catch (error) {
-    logError("seedAnnouncements", error);
+    logger.error({message:"seedAnnouncements", error: error.stack});
     throw error;
   }
 }
@@ -54,7 +42,7 @@ async function seedFaqs() {
       },
     });
   } catch (error) {
-    logError("seedFaqs", error);
+    logger.error({message:"seedFaqs", error: error.stack});
     throw error;
   }
 }
@@ -69,7 +57,7 @@ async function seedDatabase() {
     await seedFaqs();
     console.log("Seeding completed successfully.");
   } catch (error) {
-    logError("seedDatabase", error);
+    logger.error({message:"seedDatabase", error: error.stack});
   } finally {
     await prisma.$disconnect();
   }

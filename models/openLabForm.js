@@ -1,19 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
-/**
- * Log an error to the console or to a file depending on the environment.
- * @param context
- * @param error
- */
-const logError = (context, error) => {
-    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
-    if (process.env.Node_ENV === "development") {
-        fs.appendFileSync("error_log.txt", errorMessage);
-    } else {
-        console.error(error);
-    }
-}
+const createLogger = require('../logger'); // Ensure the path is correct
+const logger = createLogger(module);
 
 /**
  * Validates the date format
@@ -48,7 +36,7 @@ const dataForm = {
      */
     findMonth: async (date, year) => {
         if (!validateDate(date) || !validateYear(year)) {
-            logError("Invalid date or year format", `Date: ${date}, Year: ${year}`);
+            logger.error({message:"Invalid date or year format", error: `Date: ${date}, Year: ${year}`});
             throw new Error("Invalid date or year");
         }
         const month = (new Date(date).getMonth() + 1).toString().padStart(2, "0");
@@ -62,8 +50,8 @@ const dataForm = {
                 },
             });
         } catch (error) {
-            logError(
-                "An error occurred while getting the calendar", error);
+            logger.error(
+                {message:"An error occurred while getting the calendar", error: error.stack});
             throw error;
         }
     },
@@ -103,10 +91,7 @@ const dataForm = {
                 })
             );
         } catch (error) {
-            console.error(
-                "An error occurred while updating the calendar:",
-                error
-            );
+            logger.error({message:"An error occurred while updating the calendar", error: error.stack});
         }
     },
 };
