@@ -60,30 +60,33 @@ const userModel = {
      * @param {*} email - users email
      * @param {*} firstName - users first name
      * @param {*} lastName - users last name
-     * @param {*} isAdmin - if the user is an admin
-     * @param {*} eligibleAdmin - if the user is allowed to be an admin
+     * @param {*} role - users role
+     * @param {*} school - users school
+     * @param {*} program - users program
+     * @param {*} isActive - users active status
      * @returns the user who was added
      * @async
      */
-    addUser: async (email, firstName, lastName, isAdmin, eligibleAdmin) => {
+    addUser: async (email, firstName, lastName, role, school, program, isActive) => {
         try {
-            const current = await prisma.users.findUnique({
-                where: { email },
-            });
             return await prisma.users.upsert({
                 where: { email },
                 update: {
-                    firstName,
-                    lastName,
-                    eligibleAdmin,
-                    isAdmin: eligibleAdmin && current?.isAdmin,
+                    firstName: firstName,
+                    lastName: lastName,
+                    role: role,
+                    school: school,
+                    program: program,
+                    isActive: isActive,
                 },
                 create: {
                     email,
                     firstName,
                     lastName,
-                    isAdmin,
-                    eligibleAdmin,
+                    role,
+                    school,
+                    program,
+                    isActive,
                 },
             });
         } catch (error) {
@@ -103,10 +106,10 @@ const userModel = {
             const current = await prisma.users.findUnique({
                 where: { email },
             });
-            if ( current && !current.eligibleAdmin && isAdmin && current.firstName !== "N/A"
-            ) {
+            if (current && current.role !== "admin" && role === "admin" && current.firstName !== "N/A")
+            {
                 const errorMessage = `User ${email} is not eligible to be an admin`;
-                logger.error({error:errorMessage})
+                logger.error({message:errorMessage})
                 throw new Error(errorMessage);
             }
             await prisma.users.upsert({
