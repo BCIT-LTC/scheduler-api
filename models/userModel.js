@@ -1,14 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
-function logError (context, error) {
-    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
-    if (process.env.Node_ENV === 'development') {
-        fs.appendFileSync('error_log.txt', errorMessage);
-    } else {
-        console.error(error);
-    }
-}
+const createLogger = require('../logger'); // Ensure the path is correct
+const logger = createLogger(module);
 
 const userModel = {
     /**
@@ -22,7 +15,7 @@ const userModel = {
                 where: { isAdmin: true },
             });
         } catch (error) {
-            logError("Error fetching admins: ${error.message}");
+            logger.error({message:`Error fetching admins: ${error.message}`, error: error.stack});
             throw error;
         }
     },
@@ -38,7 +31,7 @@ const userModel = {
                 where: { email },
             });
         } catch (error) {
-            logError("Error fetching user with email ${email}: ${error.message}");
+            logger.error({message:`Error fetching user with email ${email}: ${error.message}`,error: error.stack});
             throw error;
         }
     },
@@ -94,7 +87,7 @@ const userModel = {
                 },
             });
         } catch (error) {
-            logError("Error adding user: ${error.message}");
+            logger.error({message:`Error adding user: ${error.message}`, error: error.stack});
             throw error;
         }
     },
@@ -113,7 +106,7 @@ const userModel = {
             if ( current && !current.eligibleAdmin && isAdmin && current.firstName !== "N/A"
             ) {
                 const errorMessage = `User ${email} is not eligible to be an admin`;
-                logError(errorMessage)
+                logger.error({error:errorMessage})
                 throw new Error(errorMessage);
             }
             await prisma.users.upsert({
@@ -127,7 +120,7 @@ const userModel = {
                 },
             });
         } catch (error) {
-            logError("Error updating admin: ${error.message}");
+            logger.error({message:`Error updating admin: ${error.message}`, error: error.stack});
             throw error;
         }
     },

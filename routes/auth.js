@@ -52,21 +52,9 @@ const express = require("express");
 const router = express.Router();
 const userModel = require("../models/userModel").userModel;
 const auth = require("../middleware/checkAuth");
-const fs = require("fs");
+const createLogger = require('../logger'); // Ensure the path is correct
+const logger = createLogger(module);
 
-/**
- * Function to log errors based on the running environment.
- * @param {string} context - The location or function where the error occurred.
- * @param {Error} error - The error that occurred.
- */
-const logError = (context, error) => {
-    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
-    if (process.env.Node_ENV === "development") {
-        fs.appendFileSync("error_log.txt", errorMessage);
-    } else {
-        console.error(error);
-    }
-}
 
 /**
  * POST endpoint to authorize a user
@@ -82,7 +70,7 @@ router.post("/authorize", async (req, res) => {
         // set all instructors to admin
         // students accounts stay the same
         let usernew;
-        if(res.locals.user.role == 'instructor'){
+        if(res.locals.user.role === 'instructor'){
             usernew =
             {
                 email: 'admin@bcit.ca',
@@ -110,7 +98,7 @@ router.post("/authorize", async (req, res) => {
         // return res.status(500).send(user);
         return res.status(200).send(usernew);
     } catch (error) {
-        logError("/api/authorize", error);
+        logger.error({message:"/api/authorize", error: error.stack});
         return res.status(500).send({ error: error.message });
     }
 });
@@ -126,7 +114,7 @@ router.post("/logouttime", async (req, res) => {
         const getLogoutTime = await logoutTime(req.body.email);
         return res.status(200).send(getLogoutTime);
     } catch (error) {
-        logError("/api/logouttime", error);
+        logger.error({message:"/api/logouttime", error: error.stack});
         return res.status(500).send({ error: error.message });
     }
 });
@@ -139,7 +127,7 @@ router.get("/admin", async (req, res) => {
         if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
         return res.status(200).send(userModel.findAdmins());
     } catch (error) {
-        logError('/api/admin', error);
+        logger.error({message:'/api/admin', error: error.stack});
         return res.status(500).send({ error: error.message });
     }
 });
@@ -172,7 +160,7 @@ router.post("/admin", async (req, res) => {
             return res.status(200).send({ error: "" });
         }
     } catch (error) {
-        logError('/api/admin POST', error);
+        logger.error({message:'/api/admin POST', error: error.stack});
         return res.status(500).send({ error: error.message });
     }
 });

@@ -101,24 +101,9 @@ const express = require("express");
 const router = express.Router();
 const { getFaq, addFaq, deleteFaq, editFaq } = require("../models/faqs");
 const auth = require("../middleware/checkAuth");
-const fs = require("fs");
+const createLogger = require('../logger'); // Ensure the path is correct
+const logger = createLogger(module);
 
-
-/**
- * Log the given error.
- * Errors are written to a file in development mode and are logged to the console in other environments.
- *
- * @param {string} context - Context or location where the error occurred.
- * @param {Error} error - The error that occurred.
- */
-function logError(context, error) {
-    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
-    if (process.env.Node_ENV === "development") {
-        fs.appendFileSync("error_log.txt", errorMessage);
-    } else {
-        console.error(error);
-    }
-}
 
 // FAQ ROUTES
 
@@ -133,7 +118,7 @@ router.get("/api/faq", async (req, res) => {
         const faq = await getFaq();
         return res.status(200).send(faq);
     } catch (error) {
-        logError("/api/faq GET", error);
+        logger.error({message:"/api/faq GET", error: error.stack});
         return res.status(500).send({ error: error.message });
     }
 });
@@ -156,7 +141,7 @@ router.post("/api/faq", async (req, res) => {
         const faq = await addFaq(question, answer);
         res.status(200).send(faq);
     } catch (error) {
-        logError("/api/faq POST", error);
+        logger.error({message:"/api/faq POST", error: error.stack});
         res.status(500).send({ error: error.message });
     }
 });
@@ -178,7 +163,7 @@ router.delete("/api/faq", async (req, res) => {
         await deleteFaq(id);
         return res.status(200).send({ message: "Success" });
     } catch (error) {
-        logError("/api/faq DELETE", error)
+        logger.error({message:"/api/faq DELETE", error: error.stack})
         return res.status(500).send({ error: error.message });
     }
 });
@@ -199,7 +184,7 @@ router.put("/api/faq", async (req, res) => {
         await editFaq(id, question, answer);
         return res.status(200).send({ message: "FAQ updated successfully." });
     } catch (error) {
-        logError("/api/faq PUT", error)
+        logger.error({message:"/api/faq PUT", error: error.stack})
         return res.status(500).send({ error: error.message });
     }
 });

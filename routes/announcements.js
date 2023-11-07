@@ -115,21 +115,9 @@ const {
     editAnnouncement,
 } = require("../models/announcement");
 const auth = require("../middleware/checkAuth");
-const fs = require("fs");
+const createLogger = require('../logger'); // Ensure the path is correct
+const logger = createLogger(module);
 
-/**
- * Logs the error based on the environment (development or production).
- * @param {string} context - Describes where the error occurred.
- * @param {Error} error - The error object containing details about the error.
- */
-function logError(context, error) {
-    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
-    if (process.env.Node_ENV === "development") {
-        fs.appendFileSync("error_log.txt", errorMessage);
-    } else {
-        console.error(error);
-    }
-}
 
 /**
  * GET endpoint to retrieve all announcements.
@@ -143,7 +131,7 @@ router.get("/announcement", async (req, res) => {
         const announcement = await getAnnouncement();
         return res.status(200).send(announcement);
     } catch (error) {
-        logError("Error while fetching announcements", error)
+        logger.error({message:"Error while fetching announcements", error: error.stack})
         return res.status(500).send({ error: error.message });
     }
 });
@@ -165,7 +153,7 @@ router.post("/announcement", async (req, res) => {
         const announcement = await addAnnouncement(title, description, new Date(date));
         res.status(200).send(announcement);
     } catch (error) {
-        logError("Error while adding an announcement", error)
+        logger.error({message:"Error while adding an announcement", error: error.stack})
         res.status(500).send({ error: error.message });
     }
 });
@@ -185,7 +173,7 @@ router.delete("/announcement", async (req, res) => {
         await deleteAnnouncement(id);
         return res.status(200).send({ message: "Success" });
     } catch (error) {
-        logError("Error while deleting an announcement", error)
+        logger.error({message:"Error while deleting an announcement", error: error.stack})
         return res.status(500).send({ error: error.message });
     }
 });
@@ -207,7 +195,7 @@ router.put("/announcement", async (req, res) => {
         await editAnnouncement(id, title, description);
         return res.status(200).send({ message: "Success" });
     } catch (error) {
-        logError("Error while editing an announcement", error)
+        logger.error({message:"Error while editing an announcement", error: error.stack})
         return res.status(500).send({ error: error.message });
     }
 });

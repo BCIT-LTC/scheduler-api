@@ -1,20 +1,8 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const fs = require("fs");
+const createLogger = require('../logger'); // Ensure the path is correct
+const logger = createLogger(module);
 
-/**
- * Log an error to the console or to a file depending on the environment.
- * @param context
- * @param error
- */
-function logError(context,error) {
-    const errorMessage = `${new Date()} - Error in ${context}: ${error.message}\n`;
-    if (process.env.Node_ENV === "development") {
-        fs.appendFileSync("error_log.txt", errorMessage);
-    } else {
-        console.error(error);
-    }
-}
 
 /**
  * Retrieve a list of all the announcements.
@@ -26,7 +14,7 @@ const getAnnouncement = async () => {
     try {
         return await prisma.announcements.findMany();
     } catch (error) {
-        logError("Error while fetching announcements",error);
+        logger.error({message:"Error while fetching announcements", error: error.stack});
     }
 };
 
@@ -57,7 +45,7 @@ const addAnnouncement = async (title, description, date, id = -1) => {
             },
             });
     } catch (error) {
-    logError(" Error while adding an announcement",error);
+    logger.error({ message: " Error while adding an announcement", error: error.stack });
     }
 };
 
@@ -77,7 +65,7 @@ const deleteAnnouncement = async (id) => {
         console.log("Deleted Announcement: ", deletedAnnouncement);
         return deletedAnnouncement;
     } catch (error) {
-        logError("Error while deleting an announcement",error);
+        logger.error({message:"Error while deleting an announcement",error: error.stack});
     }
 };
 
@@ -103,7 +91,7 @@ const editAnnouncement = async (id, updatedTitle, updatedDescription) => {
         console.log("Edited Announcement: ", editedAnnouncement);
         return editedAnnouncement;
     } catch (error) {
-        logError("Error while editing an announcement",error);
+        logger.error({message:"Error while editing an announcement",error: error.stack});
     }
 };
 
