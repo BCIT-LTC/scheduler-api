@@ -12,6 +12,7 @@ model announcements {
   title            String   @db.VarChar(50)
   description      String   @db.VarChar(200)
   date             DateTime @db.DateTime(0)
+  last_updated     DateTime @default(now()) @db.DateTime(0)
 }
 
 model calendar {

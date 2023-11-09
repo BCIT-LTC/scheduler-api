@@ -150,7 +150,7 @@ router.post("/announcement", async (req, res) => {
     }
 
     try {
-        const announcement = await addAnnouncement(title, description, new Date(date));
+        const announcement = await addAnnouncement(title, description, new Date(date), req.body.id);
         res.status(200).send(announcement);
     } catch (error) {
         logger.error({message:"Error while adding an announcement", error: error.stack})
@@ -192,8 +192,8 @@ router.put("/announcement", async (req, res) => {
     }
 
     try {
-        await editAnnouncement(id, title, description);
-        return res.status(200).send({ message: "Success" });
+        const updatedAnnouncement = await editAnnouncement(id, title, description);
+        res.status(200).send(updatedAnnouncement);
     } catch (error) {
         logger.error({message:"Error while editing an announcement", error: error.stack})
         return res.status(500).send({ error: error.message });
