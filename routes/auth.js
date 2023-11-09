@@ -69,36 +69,41 @@ router.post("/authorize", async (req, res) => {
         // sample user data for testing
         // set all instructors to admin
         // students accounts stay the same
-        let usernew;
-        if(res.locals.user.role === 'instructor'){
-            usernew =
-            {
+        let userToAuthorize = res.locals.user;
+
+        // If the user is an instructor, set their role to admin
+        if (userToAuthorize.role === 'instructor') {
+            userToAuthorize = {
+                ...userToAuthorize,
                 email: 'admin@bcit.ca',
                 first_name: 'admin_firstname',
                 last_name: 'admin_lastname',
                 role: 'admin',
                 school: 'School of Health Sciences',
                 program: 'Bachelor of Science in Nursing',
-            }
+                // isActive should be set based on your application's logic
+                isActive: true,
+            };
         }
-        else{
-            usernew = res.locals.user;
-        }
-        
-        // TODO: uncomment and modify this when we have updated the database models
+
         // Add or update user in the database
-        // await userModel.addUser(
-        //     user.email,
-        //     user.firstname,
-        //     user.lastname,
-        //     false,
-        //     user.eligibleAdmin
-        // );
-        // let details = await userModel.findOne(user.email);
-        // return res.status(500).send(user);
-        return res.status(200).send(usernew);
+        await userModel.addUser(
+            userToAuthorize.email,
+            userToAuthorize.first_name,
+            userToAuthorize.last_name,
+            userToAuthorize.role,
+            userToAuthorize.school,
+            userToAuthorize.program,
+            userToAuthorize.isActive,
+        );
+
+        // Retrieve the details of the authorized user
+        let userDetails = await userModel.findOne(userToAuthorize.email);
+
+        // Send back the user details
+        return res.status(200).send(userDetails);
     } catch (error) {
-        logger.error({message:"/api/authorize", error: error.stack});
+        logger.error({message:"Error in /api/authorize", error: error.stack});
         return res.status(500).send({ error: error.message });
     }
 });

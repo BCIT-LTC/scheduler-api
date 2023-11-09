@@ -60,30 +60,33 @@ const userModel = {
      * @param {*} email - users email
      * @param {*} firstName - users first name
      * @param {*} lastName - users last name
-     * @param {*} isAdmin - if the user is an admin
-     * @param {*} eligibleAdmin - if the user is allowed to be an admin
+     * @param {*} role - users role
+     * @param {*} school - users school
+     * @param {*} program - users program
+     * @param {*} isActive - users active status
      * @returns the user who was added
      * @async
      */
-    addUser: async (email, firstName, lastName, isAdmin, eligibleAdmin) => {
+    addUser: async (email, firstName, lastName, role, school, program, isActive) => {
         try {
-            const current = await prisma.users.findUnique({
-                where: { email },
-            });
             return await prisma.users.upsert({
                 where: { email },
                 update: {
-                    firstName,
-                    lastName,
-                    eligibleAdmin,
-                    isAdmin: eligibleAdmin && current?.isAdmin,
+                    firstName: firstName,
+                    lastName: lastName,
+                    role: role,
+                    school: school,
+                    program: program,
+                    isActive: isActive,
                 },
                 create: {
                     email,
                     firstName,
                     lastName,
-                    isAdmin,
-                    eligibleAdmin,
+                    role,
+                    school,
+                    program,
+                    isActive,
                 },
             });
         } catch (error) {
@@ -93,37 +96,34 @@ const userModel = {
     },
     /**
      * update an existing users admin status
-     * @param {*} email - email of user to update
-     * @param {*} isAdmin - admin status of the user
+     * @param {*} email - email of user
+     * @param {*} newRole - new role of user
      * @async
      * @returns possible error message
      */
-    updateAdmin: async (email, isAdmin) => {
+    updateUserRole: async (email, newRole) => {
         try {
-            const current = await prisma.users.findUnique({
+            const user = await prisma.users.findUnique({
                 where: { email },
             });
-            if ( current && !current.eligibleAdmin && isAdmin && current.firstName !== "N/A"
-            ) {
-                const errorMessage = `User ${email} is not eligible to be an admin`;
-                logger.error({error:errorMessage})
-                throw new Error(errorMessage);
+            if (!user) {
+                throw new Error(`User with email ${email} not found`);
             }
-            await prisma.users.upsert({
+            // Check if there is an actual role change to avoid unnecessary database operations
+            if (user.role === newRole) {
+                throw new Error(`User ${email} already has the role of ${newRole}`);
+            }
+            // Perform the update
+            return await prisma.users.update({
                 where: { email },
-                update: { isAdmin },
-                create: {
-                    email,
-                    isAdmin,
-                    firstName: "N/A",
-                    lastName: "N/A",
-                },
+                data: { role: newRole },
             });
         } catch (error) {
-            logger.error({message:`Error updating admin: ${error.message}`, error: error.stack});
+            logger.error({message:`Error updating user's role: ${error.message}`, error: error.stack});
             throw error;
         }
     },
+
 };
 
 module.exports = { prisma, userModel };

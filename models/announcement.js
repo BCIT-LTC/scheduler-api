@@ -12,9 +12,18 @@ const logger = createLogger(module);
  */
 const getAnnouncement = async () => {
     try {
-        return await prisma.announcements.findMany();
+        return await prisma.announcements.findMany({
+            select: {
+                announcements_id: true,
+                title: true,
+                description: true,
+                date: true,
+                last_updated: true,
+            }
+        });
     } catch (error) {
         logger.error({message:"Error while fetching announcements", error: error.stack});
+        throw error;
     }
 };
 
@@ -37,11 +46,13 @@ const addAnnouncement = async (title, description, date, id = -1) => {
                 title,
                 description,
                 date,
+                last_updated: new Date(),
             },
             create: {
                 title,
                 description,
                 date,
+                last_updated: new Date(),
             },
             });
     } catch (error) {
@@ -86,12 +97,14 @@ const editAnnouncement = async (id, updatedTitle, updatedDescription) => {
             data: {
                 title: updatedTitle,
                 description: updatedDescription,
+                last_updated: new Date(),
             },
         });
         console.log("Edited Announcement: ", editedAnnouncement);
         return editedAnnouncement;
     } catch (error) {
         logger.error({message:"Error while editing an announcement",error: error.stack});
+        throw error;
     }
 };
 
