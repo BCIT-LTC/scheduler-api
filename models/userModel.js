@@ -96,37 +96,34 @@ const userModel = {
     },
     /**
      * update an existing users admin status
-     * @param {*} email - email of user to update
-     * @param {*} isAdmin - admin status of the user
+     * @param {*} email - email of user
+     * @param {*} newRole - new role of user
      * @async
      * @returns possible error message
      */
-    updateAdmin: async (email, isAdmin) => {
+    updateUserRole: async (email, newRole) => {
         try {
-            const current = await prisma.users.findUnique({
+            const user = await prisma.users.findUnique({
                 where: { email },
             });
-            if (current && current.role !== "admin" && role === "admin" && current.firstName !== "N/A")
-            {
-                const errorMessage = `User ${email} is not eligible to be an admin`;
-                logger.error({message:errorMessage})
-                throw new Error(errorMessage);
+            if (!user) {
+                throw new Error(`User with email ${email} not found`);
             }
-            await prisma.users.upsert({
+            // Check if there is an actual role change to avoid unnecessary database operations
+            if (user.role === newRole) {
+                throw new Error(`User ${email} already has the role of ${newRole}`);
+            }
+            // Perform the update
+            return await prisma.users.update({
                 where: { email },
-                update: { isAdmin },
-                create: {
-                    email,
-                    isAdmin,
-                    firstName: "N/A",
-                    lastName: "N/A",
-                },
+                data: { role: newRole },
             });
         } catch (error) {
-            logger.error({message:`Error updating admin: ${error.message}`, error: error.stack});
+            logger.error({message:`Error updating user's role: ${error.message}`, error: error.stack});
             throw error;
         }
     },
+
 };
 
 module.exports = { prisma, userModel };
