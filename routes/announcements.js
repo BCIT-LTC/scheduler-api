@@ -150,7 +150,7 @@ router.post("/announcement", async (req, res) => {
     }
 
     try {
-        const announcement = await addAnnouncement(title, description, new Date(date), req.body.id);
+        const announcement = await addAnnouncement(title, description, date);
         res.status(200).send(announcement);
     } catch (error) {
         logger.error({message:"Error while adding an announcement", error: error.stack})

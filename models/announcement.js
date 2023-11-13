@@ -35,26 +35,18 @@ const getAnnouncement = async () => {
  * @param {*} title - announcement title
  * @param {*} description - details about the announcement
  * @param {*} date - date the announcement was made
- * @param {number} [id=-1] id of the new announcement, if it's an update
  * @returns {unknown}
  */
-const addAnnouncement = async (title, description, date, id = -1) => {
+const addAnnouncement = async (title, description, date) => {
     try {
-        return await prisma.announcements.upsert({
-            where: { announcements_id: id },
-            update: {
+        return await prisma.announcements.create({
+            data: {
                 title,
                 description,
                 date,
                 last_updated: new Date(),
             },
-            create: {
-                title,
-                description,
-                date,
-                last_updated: new Date(),
-            },
-            });
+        });
     } catch (error) {
     logger.error({ message: " Error while adding an announcement", error: error.stack });
     }
