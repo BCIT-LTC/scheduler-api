@@ -36,7 +36,7 @@ module.exports = {
         try {
             const decoded = jwt.verify(token, process.env.JWT_AUTH_SIGNING_KEY);
 
-            if (requireAdmin && !decoded.isAdmin) {
+            if (requireAdmin && !(decoded.role === 'admin' || decoded.role === 'instructor')) {
                 logError('Admin privileges required but not provided in the token.');
                 return false;
             }
