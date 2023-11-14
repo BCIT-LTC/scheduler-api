@@ -80,15 +80,17 @@ const deleteAnnouncement = async (id) => {
  * @param {*} id - id of announcement to update
  * @param {*} updatedTitle - the new title
  * @param {*} updatedDescription - the new description
+ * @param date
  * @returns {Object} the updated announcement
  */
-const editAnnouncement = async (id, updatedTitle, updatedDescription) => {
+const editAnnouncement = async (id, updatedTitle, updatedDescription, date) => {
     try {
         const editedAnnouncement = await prisma.announcements.update({
             where: { announcements_id: id },
             data: {
                 title: updatedTitle,
                 description: updatedDescription,
+                date: date,
                 last_updated: new Date(),
             },
         });
