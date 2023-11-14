@@ -186,13 +186,13 @@ router.put("/announcement", async (req, res) => {
     if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
 
     // Validate inputs
-    const { id, title, description } = req.body;
+    const { id, title, description, date } = req.body;
     if (!id || !title || !description) {
         return res.status(400).send({ error: "Missing required fields" });
     }
 
     try {
-        const updatedAnnouncement = await editAnnouncement(id, title, description);
+        const updatedAnnouncement = await editAnnouncement(id, title, description, date);
         res.status(200).send(updatedAnnouncement);
     } catch (error) {
         logger.error({message:"Error while editing an announcement", error: error.stack})
