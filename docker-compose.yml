@@ -42,11 +42,26 @@ services:
     volumes:
       - api_db:/var/lib/mysql
 
+
+  jsdoc_builder:
+    image: node:21-alpine
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ./node_modules/.bin/jsdoc -c ./jsdoc.conf.json -r
+    working_dir: /build
+    volumes:
+      - .:/build
+    depends_on:
+      app:
+        condition: service_started
+      
+
   # adminer:
   #   image: adminer
   #   ports:
   #     - 8080:8080
-
 
 volumes:
   api_db:
