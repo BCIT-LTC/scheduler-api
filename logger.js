@@ -5,6 +5,7 @@ const { combine, timestamp, label, json } = format;
 
 /**
  * Retrieve the directory name and filename of the calling module.
+ *
  * @param {Object} callingModule - The module invoking the logger.
  * @returns {string} - Directory and filename.
  */
@@ -21,6 +22,7 @@ const getLabel = function(callingModule) {
 
 /**
  * Creates a custom logger instance for the calling module.
+ *
  * @param {Object} callingModule - The module invoking the logger.
  * @returns {Object} - Customized winston logger instance.
  */
