@@ -3,6 +3,7 @@ const fs = require('fs');
 
 /**
  * Log an error to the console or to a file depending on the environment.
+ *
  * @param error
  */
 function logError(error) {
@@ -18,6 +19,7 @@ module.exports = {
     /**
      * Read the token from the authentication header and verify that the user is legit.
      * Based on the user role
+     *
      * @param {*} req - the request information from the auth
      * @param {*} requireAdmin - if the token should only be from an admin
      * @returns boolean of authenticity
