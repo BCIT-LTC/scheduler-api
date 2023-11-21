@@ -6,6 +6,7 @@ const logger = createLogger(module);
 const userModel = {
     /**
      * finds a list of all the existing users
+     *
      * @async
      * @returns array of users
      */
@@ -21,6 +22,7 @@ const userModel = {
     },
     /**
      * Find a specific user
+     *
      * @param {*} email
      * @async
      * @returns first/last name, email, and if the user is an admin
@@ -38,6 +40,7 @@ const userModel = {
 
     /**
      * Find a user by their id
+     *
      * @param {*} id - id of the user to find
      * @async
      * @returns first/last name, email, and if the user is an admin
@@ -57,6 +60,7 @@ const userModel = {
     // Section commented out because it is not used anywhere in the codebase.
     /**
      * Add a new user to the database
+     *
      * @param {*} email - users email
      * @param {*} firstName - users first name
      * @param {*} lastName - users last name
@@ -96,6 +100,7 @@ const userModel = {
     },
     /**
      * update an existing users admin status
+     *
      * @param {*} email - email of user
      * @param {*} newRole - new role of user
      * @async

@@ -6,6 +6,7 @@ const logger = createLogger(module);
 
 /**
  * Retrieve a list of all the announcements.
+ *
  * @date 2023-05-17 - 10:41:51 p.m.
  * @async
  * @returns {Object} list of all the announcements.
@@ -30,6 +31,7 @@ const getAnnouncement = async () => {
 
 /**
  * Add an announcement to the database.
+ *
  * @date 2023-05-17 - 10:42:41 p.m.
  * @async
  * @param {*} title - announcement title
@@ -55,6 +57,7 @@ const addAnnouncement = async (title, description, date) => {
 
 /**
  * Delete an announcement given an id
+ *
  * @date 2023-05-17 - 10:43:52 p.m.
  * @async
  * @param {*} id of the announcement to delete
@@ -75,6 +78,7 @@ const deleteAnnouncement = async (id) => {
 
 /**
  * Update an announcement with its id
+ *
  * @date 2023-05-17 - 10:44:51 p.m.
  * @async
  * @param {*} id - id of announcement to update
