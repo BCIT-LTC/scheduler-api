@@ -71,7 +71,7 @@ const specs = swaggerJsdoc(options);
 app.use('/', function (req, res, next) {
   res.setHeader('Content-Type', 'application/json');
   res.status(200)
-  res.json({ version: process.env.GIT_TAG });
+  res.json({ version: process.env.VERSION });
 })
 
 // Starting the server
