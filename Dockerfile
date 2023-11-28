@@ -11,7 +11,7 @@ WORKDIR /app
 #         curl \
 #     ;
 
-RUN apt-get install mariadb-client curl -y
+RUN apt-get update -y && apt-get install mariadb-client curl -y
 
 # Copy app
 COPY package.json ./
