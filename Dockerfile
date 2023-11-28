@@ -1,15 +1,17 @@
-FROM node:19.4.0-alpine
+FROM node:19.4.0
 LABEL maintainer courseproduction@bcit.ca
 ARG VERSION
 ENV VERSION=${VERSION:-0.0.0}
 
 WORKDIR /app
 
-# Install dependencies
-RUN apk --update add \
-        mariadb-client \
-        curl \
-    ;
+# # Install dependencies
+# RUN apk --update add \
+#         mariadb-client \
+#         curl \
+#     ;
+
+RUN apt-get install mariadb-server mariadb-client curl -y
 
 # Copy app
 COPY package.json ./
