@@ -62,8 +62,8 @@ const userModel = {
      * Add a new user to the database
      *
      * @param {*} email - users email
-     * @param {*} firstName - users first name
-     * @param {*} lastName - users last name
+     * @param {*} first_name - users first name
+     * @param {*} last_name - users last name
      * @param {*} role - users role
      * @param {*} school - users school
      * @param {*} program - users program
@@ -71,13 +71,13 @@ const userModel = {
      * @returns the user who was added
      * @async
      */
-    addUser: async (email, firstName, lastName, role, school, program, isActive) => {
+    addUser: async (email, first_name, last_name, role, school, program, isActive) => {
         try {
             return await prisma.users.upsert({
                 where: { email },
                 update: {
-                    firstName: firstName,
-                    lastName: lastName,
+                    first_name: first_name,
+                    last_name: last_name,
                     role: role,
                     school: school,
                     program: program,
@@ -85,8 +85,8 @@ const userModel = {
                 },
                 create: {
                     email,
-                    firstName,
-                    lastName,
+                    first_name,
+                    last_name,
                     role,
                     school,
                     program,

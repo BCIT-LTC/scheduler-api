@@ -5,7 +5,7 @@
  *   description: endpoints of managing login
  * /api/login:
  *   get:
- *     summary: Creates user the the API database using JWT info (email, firstname, lastname, eligibleAdmin)
+ *     summary: Creates user the the API database using JWT info (email, first_name, last_name, eligibleAdmin)
  *     tags: [login]
  *     responses:
  *       200:
@@ -71,20 +71,20 @@ router.post("/authorize", async (req, res) => {
         // students accounts stay the same
         let userToAuthorize = res.locals.user;
 
-        // If the user is an instructor, set their role to admin
-        if (userToAuthorize.role === 'instructor') {
-            userToAuthorize = {
-                ...userToAuthorize,
-                email: 'admin@bcit.ca',
-                first_name: 'admin_firstname',
-                last_name: 'admin_lastname',
-                role: 'admin',
-                school: 'School of Health Sciences',
-                program: 'Bachelor of Science in Nursing',
-                // isActive should be set based on your application's logic
-                isActive: true,
-            };
-        }
+        // // If the user is an instructor, set their role to admin
+        // if (userToAuthorize.role === 'instructor') {
+        //     userToAuthorize = {
+        //         ...userToAuthorize,
+        //         email: 'admin@bcit.ca',
+        //         first_name: 'admin_first_name',
+        //         last_name: 'admin_last_name',
+        //         role: 'admin',
+        //         school: 'School of Health Sciences',
+        //         program: 'Bachelor of Science in Nursing',
+        //         // isActive should be set based on your application's logic
+        //         isActive: true,
+        //     };
+        // }
 
         // Add or update user in the database
         await userModel.addUser(
@@ -159,7 +159,7 @@ router.post("/admin", async (req, res) => {
             return res.status(400).send({ error: response });
         }
 
-        if (!existingUser || existingUser.firstName === "N/A") {
+        if (!existingUser || existingUser.first_name === "N/A") {
             return res.status(200).send({ error: "User has never logged in!" });
         } else {
             return res.status(200).send({ error: "" });
