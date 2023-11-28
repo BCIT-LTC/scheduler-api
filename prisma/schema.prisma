@@ -27,8 +27,8 @@ model calendar {
 
 model users {
   email     String  @id @db.VarChar(50)
-  firstName String  @db.VarChar(50)
-  lastName  String  @db.VarChar(50)
+  first_name String  @db.VarChar(50)
+  last_name  String  @db.VarChar(50)
   role      String  @db.VarChar(50)
   school    String  @db.VarChar(50)
   program   String  @db.VarChar(50)
