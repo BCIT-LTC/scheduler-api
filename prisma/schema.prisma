@@ -40,3 +40,20 @@ model faqs {
   question String @db.VarChar(200)
   answer   String @db.VarChar(200)
 }
+
+model events {
+  event_id      Int      @id @default(autoincrement())
+  start         DateTime @db.DateTime(0)
+  end           DateTime @db.DateTime(0)
+  summary       String @db.VarChar(200)
+  description   String @db.VarChar(200) 
+  created       DateTime @db.DateTime(0)
+  last_modified DateTime @default(now()) @db.DateTime(0)
+  status        status @default(TENTATIVE)
+}
+
+enum status {
+  CANCELLED
+  CONFIRMED
+  TENTATIVE
+}
