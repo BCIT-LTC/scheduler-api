@@ -13,7 +13,12 @@ const getEventsByDate = async (date) => {
   try {
     return await prisma.events.findMany({
       where: {
-        date: date,
+        start_time: {
+          gte: date,
+        },
+        end_time: {
+          lte: date,
+        },
       },
     });
   } catch (error) {
