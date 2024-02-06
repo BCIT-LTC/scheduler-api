@@ -1,0 +1,48 @@
+[
+  {
+    "event_id": 1,
+    "start_time": "2024-01-02T08:30:00",
+    "end_time": "2024-01-02T14:30:00",
+    "summary": "Event 1",
+    "description": "Event 1 Description"
+  },
+  {
+    "event_id": 2,
+    "start_time": "2024-01-03T00:00:00",
+    "end_time": "2024-01-03T14:30:00",
+    "summary": "Event 2",
+    "description": "Event 2 Description",
+    "status": "CANCELLED"
+  },
+  {
+    "event_id": 3,
+    "start_time": "2024-02-19T08:30:00",
+    "end_time": "2024-02-19T14:30:00",
+    "summary": "Event 3",
+    "description": "Event 3 Description",
+    "status": "CONFIRMED"
+  },
+  {
+    "event_id": 4,
+    "start_time": "2024-02-20T08:30:00",
+    "end_time": "2024-02-20T14:30:00",
+    "summary": "Event 4",
+    "description": "Event 4 Description",
+    "status": "CONFIRMED"
+  },
+  {
+    "event_id": 5,
+    "start_time": "2024-02-26T00:00:00",
+    "end_time": "2024-02-26T14:30:00",
+    "summary": "Event 5",
+    "description": "Event 5 Description",
+    "status": "CONFIRMED"
+  },
+  {
+    "event_id": 6,
+    "start_time": "2024-03-01T00:00:00",
+    "end_time": "2024-03-01T14:30:00",
+    "summary": "Event 6",
+    "description": "Event 6 Description"
+  }
+]
