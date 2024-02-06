@@ -12,7 +12,7 @@ model announcements {
   title            String   @db.VarChar(50)
   description      String   @db.VarChar(200)
   date             DateTime @db.DateTime(0)
-  last_updated     DateTime @default(now()) @db.DateTime(0)
+  last_modified    DateTime @default(now()) @db.DateTime(0)
 }
 
 model calendar {
@@ -26,17 +26,34 @@ model calendar {
 }
 
 model users {
-  email     String  @id @db.VarChar(50)
+  email      String  @id @db.VarChar(50)
   first_name String  @db.VarChar(50)
   last_name  String  @db.VarChar(50)
-  role      String  @db.VarChar(50)
-  school    String  @db.VarChar(50)
-  program   String  @db.VarChar(50)
-  isActive  Boolean @default(true)
+  role       String  @db.VarChar(50)
+  school     String  @db.VarChar(50)
+  program    String  @db.VarChar(50)
+  isActive   Boolean @default(true)
 }
 
 model faqs {
   faqs_id  Int    @id @default(autoincrement())
   question String @db.VarChar(200)
   answer   String @db.VarChar(200)
+}
+
+model events {
+  event_id      Int       @id @default(autoincrement())
+  start_time    DateTime  @db.DateTime(0)
+  end_time      DateTime  @db.DateTime(0)
+  summary       String?   @db.VarChar(200)
+  description   String?   @db.VarChar(200)
+  created       DateTime? @db.DateTime(0)
+  last_modified DateTime? @default(now()) @db.DateTime(0)
+  status        status?   @default(TENTATIVE)
+}
+
+enum status {
+  CANCELLED
+  CONFIRMED
+  TENTATIVE
 }
