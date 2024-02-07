@@ -27,7 +27,7 @@ router.get("/api/events/day", async (req, res) => {
  * GET /api/events/month
  * Endpoint to retrieve the events for a specific month.
  */
-router.get("/api/events/month", async (req, res) => {
+router.get("/events/month", async (req, res) => {
   const date = req.query.date ? new Date(req.query.date) : new Date();
   try {
     const events = await getEventsByMonth(date);

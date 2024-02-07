@@ -37,12 +37,18 @@ const getEventsByDate = async(date) => {
  * @returns {Object} list of events
  */
 const getEventsByMonth = async (date) => {
+  let lowerBound = new Date(date);
+  lowerBound.setDate(date.getDate() - 15);
+
+  let upperBound = new Date(date);
+  upperBound.setDate(date.getDate() + 15);
+
   try {
     return await prisma.events.findMany({
       where: {
-        start: {
-          gte: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 15),
-          lt: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 15),
+        start_time: {
+          gte: lowerBound,
+          lte: upperBound,
         }
       },
     });
