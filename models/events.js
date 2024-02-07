@@ -29,3 +29,29 @@ const getEventsByDate = async(date) => {
         logger.error({ message: "Error fetching events", error: error.stack });
     }
 };
+
+/**
+ * Find all the events for a specific month
+ * @async
+ * @param {Date} date - the date to search for
+ * @returns {Object} list of events
+ */
+const getEventsByMonth = async (date) => {
+  try {
+    return await prisma.events.findMany({
+      where: {
+        start: {
+          gte: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 15),
+          lt: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 15),
+        }
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error fetching events", error: error.stack });
+  }
+};
+
+module.exports = {
+  getEventsByDate,
+  getEventsByMonth,
+};

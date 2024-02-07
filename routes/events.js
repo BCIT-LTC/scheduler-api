@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { getEventsByDate } = require("../models/events");
+const { 
+  getEventsByDate,
+  getEventsByMonth 
+} = require("../models/events");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 
@@ -8,7 +11,6 @@ const logger = createLogger(module);
  * GET /api/events/day
  * Endpoint to retrieve the events for a specific day.
  */
-//add optional date parameter
 router.get("/api/events/day", async (req, res) => {
   // optional date parameter, if one is not provided system time is used
   const date = req.query.date ? new Date(req.query.date) : new Date();
@@ -20,3 +22,20 @@ router.get("/api/events/day", async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
+
+/**
+ * GET /api/events/month
+ * Endpoint to retrieve the events for a specific month.
+ */
+router.get("/api/events/month", async (req, res) => {
+  const date = req.query.date ? new Date(req.query.date) : new Date();
+  try {
+    const events = await getEventsByMonth(date);
+    return res.status(200).send(events);
+  } catch (error) {
+    logger.error({ message: "GET /api/events/month", error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+module.exports = router;
