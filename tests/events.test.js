@@ -75,7 +75,7 @@ describe("GET all events by month", () => {
       });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toBe(testData);
+    expect(res.body).toStrictEqual(testData);
   });
 
   it("should return events from 15 days before to 15 days after the given date", async () => {
@@ -110,7 +110,7 @@ describe("GET all events by month", () => {
       });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toBe(testData);
+    expect(res.body).toStrictEqual(testData);
   });
 
   it("should return empty array if events aren't found", async () => {
@@ -122,6 +122,6 @@ describe("GET all events by month", () => {
       });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toBe([]);
+    expect(res.body).toStrictEqual([]);
   });
 });
