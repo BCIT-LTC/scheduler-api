@@ -44,5 +44,29 @@
     "end_time": "2024-03-01T14:30:00",
     "summary": "Event 6",
     "description": "Event 6 Description"
+  },
+  {
+    "event_id": 7,
+    "start_time": "2024-02-29",
+    "end_time": "2024-02-29",
+    "summary": "Event 7",
+    "description": "Event 7 Description",
+    "status": "TENTATIVE"
+  },
+  {
+    "event_id": 8,
+    "start_time": "2024-03-31",
+    "end_time": "2024-03-31",
+    "summary": "Event 8",
+    "description": "Event 8 Description",
+    "status": "CONFIRMED"
+  },
+  {
+    "event_id": 9,
+    "start_time": "2024-04-01",
+    "end_time": "2024-04-01",
+    "summary": "Event 9",
+    "description": "Event 9 Description",
+    "status": "CANCELLED"
   }
 ]

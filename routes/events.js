@@ -12,7 +12,7 @@ const logger = createLogger(module);
  * GET /api/events/day
  * Endpoint to retrieve the events for a specific day.
  */
-router.get("/api/events/day", async (req, res) => {
+router.get("/events/day", async (req, res) => {
   // optional date parameter, if one is not provided system time is used
   const date = req.query.date ? new Date(req.query.date) : new Date();
   try {
