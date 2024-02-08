@@ -62,7 +62,7 @@ const deleteFaq = async (id) => {
  * @param {*} id to update
  * @param {*} updatedQuestion new question
  * @param {*} updatedAnswer new answer
- * @returns
+ * @returns results
  * @async
  * @throws {Error} if the id is invalid
  */
