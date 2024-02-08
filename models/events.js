@@ -9,23 +9,26 @@ const logger = createLogger(module);
  * @param {Date} date - the date to search for
  * @returns {Object} list of events
  */
-const getEventsByDate = async(date) => {
+const getEventsByDate = async (date) => {
+  var nextDay = new Date(date);
+  nextDay.setDate(nextDay.getDate() + 1); // Add one day to the date
 
-    var nextDay = new Date(date);
-    nextDay.setDate(nextDay.getDate() + 1); // Add one day to the date
+  try {
+    return await prisma.events.findMany({
+      where: {
+        start_time: {
+          gte: date,
+        },
+        end_time: {
+          lt: nextDay, // Less than the next day
+        },
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error fetching events", error: error.stack });
+  }
+};
 
-    try {
-        return await prisma.events.findMany({
-            where: {
-                start_time: {
-                    gte: date,
-                },
-                end_time: {
-                    lt: nextDay, // Less than the next day
-                },
-            },
-        });
-    } catch (error) {
-        logger.error({ message: "Error fetching events", error: error.stack });
-    }
+module.exports = {
+  getEventsByDate,
 };
