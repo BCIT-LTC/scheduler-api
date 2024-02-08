@@ -64,7 +64,7 @@ enum status {
 }
 
 model locations {
-  location_id Int     @id @default(autoincrement())
-  room_number String  @db.VarChar(50)
-  event       events?
+  location_id Int      @id @default(autoincrement())
+  room_number String   @db.VarChar(50)
+  event       events[]
 }
