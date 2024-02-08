@@ -15,16 +15,6 @@ model announcements {
   last_modified    DateTime @default(now()) @db.DateTime(0)
 }
 
-model calendar {
-  calendar_id Int      @id @default(autoincrement())
-  date        DateTime @db.DateTime(0)
-  start_time  String   @map("start_time") @db.VarChar(20)
-  end_time    String   @map("end_time") @db.VarChar(20)
-  facilitator String   @db.VarChar(45)
-  room        String   @db.VarChar(20)
-  stat        Int      @db.TinyInt
-}
-
 model users {
   email      String  @id @db.VarChar(50)
   first_name String  @db.VarChar(50)
@@ -33,12 +23,6 @@ model users {
   school     String  @db.VarChar(50)
   program    String  @db.VarChar(50)
   isActive   Boolean @default(true)
-}
-
-model faqs {
-  faqs_id  Int    @id @default(autoincrement())
-  question String @db.VarChar(200)
-  answer   String @db.VarChar(200)
 }
 
 model events {
