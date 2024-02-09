@@ -41,7 +41,7 @@ router.get("/events/month", async (req, res) => {
 
 /**
  * GET /api/events/week
- * Endpoint to retrieve the events for a specific month.
+ * Endpoint to retrieve the events for a specific week.
  */
 router.get("/events/week", async (req, res) => {
     const date = req.query.date ? new Date(req.query.date + "T00:00:00") : new Date();

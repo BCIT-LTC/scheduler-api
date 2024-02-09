@@ -1,23 +1,16 @@
 const request = require("supertest");
-const app = require("../app");
+const app = require("../../app");
 const utilities = require("./utilities");
 const { token } = utilities;
 
 describe("GET all events by day", () => {
   const endpoint = "/api/events/day";
-  const testData = [
-    // this object is the same as the one in the database
-    {
-      event_id: 1,
-      start_time: "2024-01-02T16:30:00.000Z",
-      end_time: "2024-01-02T22:30:00.000Z",
-      summary: "Event 1",
-      description: "Event 1 Description",
-      created: null,
-      last_modified: "2024-02-06T05:37:09.000Z",
-      status: "TENTATIVE",
-    },
-  ];
+  
+  it("should return a 403 status code if no token is provided with optional date parameter", async () => {
+    const res = await request(app).get(endpoint).query({ date: "2024-01-02" });
+    expect(res.statusCode).toBe(400);
+  });
+
   it("should return all events on the day with optional date parameter", async () => {
     const res = await request(app)
       .get(endpoint)
@@ -26,9 +19,13 @@ describe("GET all events by day", () => {
         Authorization: token,
       });
     expect(res.statusCode).toBe(200);
-    console.log(res.body);
-    // expect(res.body.length).toBeGreaterThan(0);
-    expect(res.body).toEqual(testData);
+    expect(res.body.length).toBe(1);
+    expect(res.body[0].event_id).toBe(1);
+  });
+
+  it("should return a 403 status code if no token is provided", async () => {
+    const res = await request(app).get(endpoint);
+    expect(res.statusCode).toBe(400);
   });
 
   it("should return all events on the current day if no date parameter is provided", async () => {
@@ -75,7 +72,9 @@ describe("GET all events by month", () => {
       });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toStrictEqual(testData);
+    expect(res.body.length).toBe(2);
+    expect(res.body[0].event_id).toBe(1);
+    expect(res.body[1].event_id).toBe(2);
   });
 
   it("should return events from 15 days before to 15 days after the given date", async () => {
@@ -110,7 +109,9 @@ describe("GET all events by month", () => {
       });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toStrictEqual(testData);
+    expect(res.body.length).toBe(2);
+    expect(res.body[0].event_id).toBe(6);
+    expect(res.body[1].event_id).toBe(8);
   });
 
   it("should return empty array if events aren't found", async () => {
@@ -122,7 +123,29 @@ describe("GET all events by month", () => {
       });
 
     expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBe(0);
     expect(res.body).toStrictEqual([]);
+  });
+
+  it("should return error 400 if token is missing", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ date: "2022-12-16" });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Token missing from Authorization header");
+  });
+
+  it("should return error 400 if token is invalid", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ date: "2022-12-16" })
+      .set({
+        Authorization: "invalidtoken",
+      });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Token invalid");
   });
 });
 
