@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { getEventsByDate } = require("../models/events");
+const { 
+  getEventsByDate,
+  getEventsByMonth 
+} = require("../models/events");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 
@@ -17,6 +20,21 @@ router.get("/events/day", async (req, res) => {
   } catch (error) {
     logger.error({ message: "GET /api/events/day", error: error.stack });
     res.status(500).send({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/events/month
+ * Endpoint to retrieve the events for a specific month.
+ */
+router.get("/events/month", async (req, res) => {
+  const date = req.query.date ? new Date(req.query.date) : new Date();
+  try {
+    const events = await getEventsByMonth(date);
+    return res.status(200).send(events);
+  } catch (error) {
+    logger.error({ message: "GET /api/events/month", error: error.stack });
+    return res.status(500).send({ error: error.message });
   }
 });
 

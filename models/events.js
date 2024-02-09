@@ -29,6 +29,36 @@ const getEventsByDate = async (date) => {
   }
 };
 
+/**
+ * Find all the events for a specific month
+ * 
+ * @date 2024-02-08
+ * @async
+ * @param {Date} date - the date to search for
+ * @returns {Object} list of events
+ */
+const getEventsByMonth = async (date) => {
+  let lowerBound = new Date(date);
+  lowerBound.setDate(date.getDate() - 15);
+
+  let upperBound = new Date(date);
+  upperBound.setDate(date.getDate() + 15);
+
+  try {
+    return await prisma.events.findMany({
+      where: {
+        start_time: {
+          gte: lowerBound,
+          lte: upperBound,
+        }
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error fetching events", error: error.stack });
+  }
+};
+
 module.exports = {
   getEventsByDate,
+  getEventsByMonth,
 };
