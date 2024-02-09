@@ -67,16 +67,11 @@ const getEventsByMonth = async (date) => {
  */
 const getEventsByWeek = async (date = new Date()) => {
 
-  console.log("bsin - date: ", date.toDateString());
-
     let lowerBound = new Date(date);
     lowerBound.setDate(date.getDate() - 4);
   
     let upperBound = new Date(date);
     upperBound.setDate(date.getDate() + 5);
-
-    console.log("bsin - lb: ", lowerBound.toDateString());
-    console.log("bsin - ub: ", upperBound.toDateString());
 
     try {
       const events =  await prisma.events.findMany({
@@ -87,7 +82,6 @@ const getEventsByWeek = async (date = new Date()) => {
           }
         },
       });
-      console.log("bsin - events: ", events);
 
       return events;
     } catch (error) {
