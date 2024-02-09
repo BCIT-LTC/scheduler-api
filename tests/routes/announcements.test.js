@@ -1,11 +1,7 @@
-const request = require('supertest');
-const app = require('../app');
-const utilities = require('./utilities')
-const {
-  localAdmin,
-  admin,
-  student
-} = utilities;
+const request = require("supertest");
+const app = require("../../app");
+const utilities = require("./utilities");
+const { localAdmin, admin, student } = utilities;
 const endpoint1 = "/api/announcement";
 
 describe("GET all announcements", () => {
@@ -16,11 +12,10 @@ describe("GET all announcements", () => {
 
     // with token
     const res2 = await request(app).get(endpoint1).set({
-      'Authorization': localAdmin
+      Authorization: localAdmin,
     });
     expect(res2.statusCode).toBe(200);
     expect(res2.body.length).toBeGreaterThan(0);
-
   });
 });
 
@@ -30,19 +25,19 @@ describe("create a new announcement", () => {
       id: 2,
       title: "create announcement test",
       description: "create announcement test",
-      date: new Date(Date.now()).toISOString().slice(0,19).replace("T"," ")
+      date: new Date(Date.now()).toISOString().slice(0, 19).replace("T", " "),
     };
     const body2 = {
       id: 3,
       title: "create announcement test",
       description: "create announcement test",
-      date: new Date(Date.now()).toISOString().slice(0, 19).replace("T", " ")
+      date: new Date(Date.now()).toISOString().slice(0, 19).replace("T", " "),
     };
     const body3 = {
       id: 4,
       title: "create announcement test",
       description: "create announcement test",
-      date: new Date(Date.now()).toISOString().slice(0, 19).replace("T", " ")
+      date: new Date(Date.now()).toISOString().slice(0, 19).replace("T", " "),
     };
     // w/o token
     const res1 = await request(app).post(endpoint1).send(body1);
@@ -52,22 +47,25 @@ describe("create a new announcement", () => {
     const res2 = await request(app)
       .post(endpoint1)
       .set({
-        'Authorization': localAdmin
-      }).send(body1);
+        Authorization: localAdmin,
+      })
+      .send(body1);
     expect(res2.statusCode).toBe(200);
 
     // seed db with test data for later test cases
     await request(app)
       .post(endpoint1)
       .set({
-        'Authorization': localAdmin
-      }).send(body2);
+        Authorization: localAdmin,
+      })
+      .send(body2);
 
     await request(app)
       .post(endpoint1)
       .set({
-        'Authorization': localAdmin
-      }).send(body3);
+        Authorization: localAdmin,
+      })
+      .send(body3);
 
     // with admin token and existing ID
     // const res3 = await request(app)
@@ -81,20 +79,18 @@ describe("create a new announcement", () => {
     const res4 = await request(app)
       .post(endpoint1)
       .set({
-        'Authorization': student
-      }).send(body1);
+        Authorization: student,
+      })
+      .send(body1);
     expect(res4.statusCode).toBe(403);
-
   });
 });
 
 describe("delete announcement", () => {
   test("delete the existing announcement from db", async () => {
     // w/o token
-    const res1 = await request(app)
-      .delete(endpoint1)
-      .send({
-      id: 2
+    const res1 = await request(app).delete(endpoint1).send({
+      id: 2,
     });
     expect(res1.statusCode).toBe(403);
 
@@ -102,8 +98,9 @@ describe("delete announcement", () => {
     const res2 = await request(app)
       .delete(endpoint1)
       .set({
-      'Authorization': localAdmin
-    }).send({ id:2 });
+        Authorization: localAdmin,
+      })
+      .send({ id: 2 });
     expect(res2.statusCode).toBe(200);
 
     // delete announcement that does not exist
@@ -115,7 +112,6 @@ describe("delete announcement", () => {
     //     id: 1000
     //   });
     // expect(res3.statusCode).toBe(500);
-
   });
 });
 
@@ -134,8 +130,9 @@ describe("modify announcement", () => {
     const res2 = await request(app)
       .put(endpoint1)
       .set({
-      'Authorization': localAdmin
-    }).send(body);
+        Authorization: localAdmin,
+      })
+      .send(body);
     expect(res2.statusCode).toBe(200);
 
     // announcemnt does not exist
@@ -149,6 +146,5 @@ describe("modify announcement", () => {
     //     title: "should return 500",
     //   });
     // expect(res3.statusCode).toBe(500);
-
   });
 });
