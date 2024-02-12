@@ -148,3 +148,48 @@ describe("GET all events by month", () => {
     expect(res.body.error).toBe("Token invalid");
   });
 });
+
+describe("GET all events by week", () => {
+  const endpoint = "/api/events/week";
+  it("should return all events on the week +/-4 days withing the optional date parameter", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ date: "2024-01-02" })
+      .set({
+        Authorization: token,
+      });
+    expect(res.statusCode).toBe(200);
+    console.log(res.body);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it("should return all events on the current day if no date parameter is provided", async () => {
+    const res = await request(app).get(endpoint).set({
+      Authorization: token,
+    });
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it("should return error 400 if token is missing", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ date: "2022-12-16" });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Token missing from Authorization header");
+  });
+
+  it("should return error 400 if token is invalid", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ date: "2022-12-16" })
+      .set({
+        Authorization: "invalidtoken",
+      });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Token invalid");
+  });
+
+});

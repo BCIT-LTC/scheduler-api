@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { 
   getEventsByDate,
-  getEventsByMonth 
+  getEventsByMonth,
+  getEventsByWeek, 
 } = require("../models/events");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
@@ -37,5 +38,20 @@ router.get("/events/month", async (req, res) => {
     return res.status(500).send({ error: error.message });
   }
 });
+
+/**
+ * GET /api/events/week
+ * Endpoint to retrieve the events for a specific week.
+ */
+router.get("/events/week", async (req, res) => {
+    const date = req.query.date ? new Date(req.query.date + "T00:00:00") : new Date();
+    try {
+      const events = await getEventsByWeek(date);
+      return res.status(200).send(events);
+    } catch (error) {
+      logger.error({ message: "GET /api/events/week", error: error.stack });
+      return res.status(500).send({ error: error.message });
+    }
+  });
 
 module.exports = router;
