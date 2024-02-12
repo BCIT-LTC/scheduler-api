@@ -71,7 +71,7 @@ async function seedEvents() {
  */
 async function seedDatabase() {
     try {
-        await seedAnnouncements();
+        // await seedAnnouncements();
         await seedEvents();
         console.log("Seeding completed successfully.");
     } catch (error) {

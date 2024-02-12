@@ -8,11 +8,13 @@ datasource db {
 }
 
 model announcements {
-  announcements_id Int      @id @default(autoincrement())
-  title            String   @db.VarChar(50)
-  description      String   @db.VarChar(200)
-  date             DateTime @db.DateTime(0)
-  last_modified    DateTime @default(now()) @db.DateTime(0)
+  announcement_id Int      @id @default(autoincrement())
+  title           String?  @db.VarChar(50)
+  description     String?  @db.VarChar(200)
+  posted_date     DateTime @db.DateTime(0)
+  last_modified   DateTime @default(now()) @db.DateTime(0)
+  event           events   @relation(fields: [event_id], references: [event_id])
+  event_id        Int      @unique
 }
 
 model users {
@@ -26,18 +28,27 @@ model users {
 }
 
 model events {
-  event_id      Int       @id @default(autoincrement())
-  start_time    DateTime  @db.DateTime(0)
-  end_time      DateTime  @db.DateTime(0)
-  summary       String?   @db.VarChar(200)
-  description   String?   @db.VarChar(200)
-  created       DateTime? @db.DateTime(0)
-  last_modified DateTime? @default(now()) @db.DateTime(0)
-  status        status?   @default(TENTATIVE)
+  event_id      Int            @id @default(autoincrement())
+  announcement  announcements?
+  location      locations      @relation(fields: [location_id], references: [location_id])
+  location_id   Int            @unique
+  start_time    DateTime       @db.DateTime(0)
+  end_time      DateTime       @db.DateTime(0)
+  summary       String?        @db.VarChar(200)
+  description   String?        @db.VarChar(200)
+  created       DateTime?      @db.DateTime(0)
+  last_modified DateTime?      @default(now()) @db.DateTime(0)
+  status        status?        @default(TENTATIVE)
 }
 
 enum status {
   CANCELLED
   CONFIRMED
   TENTATIVE
+}
+
+model locations {
+  location_id Int      @id @default(autoincrement())
+  room_number String   @db.VarChar(50)
+  event       events[]
 }

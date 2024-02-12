@@ -1,0 +1,11 @@
+module.exports = {
+  localAdmin:
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluIiwiZmlyc3RuYW1lIjoiYWRtaW4iLCJsYXN0bmFtZSI6ImFkbWluIiwiaXNBZG1pbiI6dHJ1ZSwiaXNMb2NhbCI6dHJ1ZSwiaWF0IjoxNjg0MzU1OTAxfQ.Gyh5mzUiB57otbgrIOyumd_ZHCI-G6uJlY4qtFPKfY0",
+  admin:
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGJjaXQuY2EiLCJmaXJzdG5hbWUiOiJmaXJzdGFkbWluIGZpcnN0bmFtZSIsImxhc3RuYW1lIjoiZmlyc3RhZG1pbiBsYXN0bmFtZSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTY4NDM1NTk4Mn0.EvhHE-YDl3-mxOEnEFfpV_Px7j2-ERNzBHmHP4f17lA",
+  student:
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0dWRlbnQxQGJjaXQuY2EiLCJmaXJzdG5hbWUiOiJzdHVkZW50MSBmaXJzdG5hbWUiLCJsYXN0bmFtZSI6InN0dWRlbnQxIGxhc3RuYW1lIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTY4NDM1NjAzNH0.ZgjtnZfDEGCCl-6U9AFwiwMBdh-VLzAFFctYJpYp_8U",
+  prefix: "api",
+  token:
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.3KXyQxUHeZCWw7L4Knz0rRrJAFrsugYyMU0zD11oQ2w",
+};
