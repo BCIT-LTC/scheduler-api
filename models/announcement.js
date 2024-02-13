@@ -11,7 +11,7 @@ const logger = createLogger(module);
  * @async
  * @returns {Object} list of all the announcements.
  */
-const getAnnouncement = async () => {
+const getAnnouncement = async() => {
     try {
         return await prisma.announcements.findMany({
             select: {
@@ -19,11 +19,11 @@ const getAnnouncement = async () => {
                 title: true,
                 description: true,
                 date: true,
-                last_updated: true,
+                last_modified: true,
             }
         });
     } catch (error) {
-        logger.error({message:"Error while fetching announcements", error: error.stack});
+        logger.error({ message: "Error while fetching announcements", error: error.stack });
         throw error;
     }
 };
@@ -39,7 +39,7 @@ const getAnnouncement = async () => {
  * @param {*} date - date the announcement was made
  * @returns {unknown}
  */
-const addAnnouncement = async (title, description, date) => {
+const addAnnouncement = async(title, description, date) => {
     try {
         return await prisma.announcements.create({
             data: {
@@ -50,7 +50,7 @@ const addAnnouncement = async (title, description, date) => {
             },
         });
     } catch (error) {
-    logger.error({ message: " Error while adding an announcement", error: error.stack });
+        logger.error({ message: " Error while adding an announcement", error: error.stack });
     }
 };
 
@@ -63,7 +63,7 @@ const addAnnouncement = async (title, description, date) => {
  * @param {*} id of the announcement to delete
  * @returns {Object} deleted announcement
  */
-const deleteAnnouncement = async (id) => {
+const deleteAnnouncement = async(id) => {
     try {
         const deletedAnnouncement = await prisma.announcements.delete({
             where: { announcements_id: id },
@@ -71,7 +71,7 @@ const deleteAnnouncement = async (id) => {
         console.log("Deleted Announcement: ", deletedAnnouncement);
         return deletedAnnouncement;
     } catch (error) {
-        logger.error({message:"Error while deleting an announcement",error: error.stack});
+        logger.error({ message: "Error while deleting an announcement", error: error.stack });
     }
 };
 
@@ -87,7 +87,7 @@ const deleteAnnouncement = async (id) => {
  * @param date
  * @returns {Object} the updated announcement
  */
-const editAnnouncement = async (id, updatedTitle, updatedDescription, date) => {
+const editAnnouncement = async(id, updatedTitle, updatedDescription, date) => {
     try {
         const editedAnnouncement = await prisma.announcements.update({
             where: { announcements_id: id },
@@ -101,7 +101,7 @@ const editAnnouncement = async (id, updatedTitle, updatedDescription, date) => {
         console.log("Edited Announcement: ", editedAnnouncement);
         return editedAnnouncement;
     } catch (error) {
-        logger.error({message:"Error while editing an announcement",error: error.stack});
+        logger.error({ message: "Error while editing an announcement", error: error.stack });
         throw error;
     }
 };
