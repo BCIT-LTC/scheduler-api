@@ -1,8 +1,19 @@
+import { parseArgs } from 'node:util'
+
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 const fs = require("fs");
+const environment = process.env.NODE_ENV;
+
+
+/**
+ * CLI options for the seed script.
+ */
+const options = {
+    environment: { type: 'string' },
+}
 
 /**
  * Seed initial announcement data.
@@ -70,10 +81,26 @@ async function seedEvents() {
  * @async
  */
 async function seedDatabase() {
+
+    const {
+        values: { environment },
+    } = parseArgs({ options })
+
     try {
-        // await seedAnnouncements();
-        await seedEvents();
-        console.log("Seeding completed successfully.");
+        switch (environment) {
+            case "development":
+                // TODO: add development seed data
+                //seedAnnouncements();
+                seedEvents();
+                break;
+            case "test":
+                // TODO: add test seed data
+                break;
+            default:
+                // TODO: add production seed data (defaults to production if no environment is specified)
+                //seedLocations();
+                break;
+        }
     } catch (error) {
         logger.error({ message: "seedDatabase", error: error.stack });
     } finally {

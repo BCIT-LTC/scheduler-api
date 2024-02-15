@@ -19,6 +19,9 @@ services:
       - MARIADB_PASSWORD=bcitbsn491
       - TZ=America/Vancouver
       - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
+      - NODE_ENV=development
+      - NODE_ENV=test
+      - NODE_ENV=production
     depends_on:
       db:
         condition: service_healthy
