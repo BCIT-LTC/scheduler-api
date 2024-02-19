@@ -89,18 +89,18 @@ async function seedDatabase() {
     try {
         switch (environment) {
             case "development":
-                // TODO: add development AND production seed data
-                //seedAnnouncements();
-                //seedLocations();
+                // add development AND production seed data
+                seedAnnouncements();
+                seedLocations();
                 seedEvents();
                 break;
             case "test":
-                // TODO: add test seed data, running all test scripts at once
+                // add test seed data, running all test scripts at once
 
                 break;
             default:
-                // TODO: add production seed data (defaults to production if no environment is specified)
-                //seedLocations();
+                // add production seed data (defaults to production if no environment is specified)
+                seedLocations();
                 break;
         }
     } catch (error) {
