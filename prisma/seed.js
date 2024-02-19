@@ -105,17 +105,6 @@ async function seedLocations() {
         update: {},
         create: {
           room_number: locations[i].room_number,
-          // event: {
-          //   create: [
-          //     {
-          //       start_time: new Date(events[0].start_time),
-          //       end_time: new Date(events[0].end_time),
-          //       summary: events[0].summary,
-          //       description: events[0].description,
-          //       status: events[0].status,
-          //     },
-          //   ],
-          // },
         },
       });
     }
