@@ -11,9 +11,13 @@ fi
 >&2 echo "Configuring DATABASE_URL...\n"
 export DATABASE_URL="mysql://$MARIADB_USER:$MARIADB_PASSWORD@$MARIADB_ROOT_HOST:3306/$MARIADB_DATABASE"
 
+# update the prisma schema
+>&2 echo "Updating prisma schema...\n"
+npx prisma generate
+
 # Initialize prisma
 >&2 echo "Running migrations...\n"
-npx prisma db push --schema='prisma/schema.prisma'
+npx prisma db push --accept-data-loss --schema='prisma/schema.prisma'
 
 # Seed database with initial data
 >&2 echo "Seeding db...\n"
