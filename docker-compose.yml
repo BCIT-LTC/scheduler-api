@@ -28,8 +28,8 @@ services:
     environment:
       - MARIADB_ROOT_PASSWORD=isajrqwoihjwaor
       - MARIADB_DATABASE=openlab-scheduler
-      - MARIADB_USER=root
-      - MARIADB_PASSWORD=isajrqwoihjwaor
+      - MARIADB_USER=bsnmysql
+      - MARIADB_PASSWORD=bcitbsn491
 
     healthcheck:
       test: "mariadb $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'"
