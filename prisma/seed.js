@@ -42,53 +42,49 @@ async function seedAnnouncements() {
  * @return {Array} of seeded event data
  */
 async function seedEvents() {
-  const seedPath = "./prisma/seedData/events.json";
   try {
-    fs.readFile(seedPath, "utf8", async (err, data) => {
-      if (err) {
-        console.error("Error reading the file:", err);
-        return;
-      }
+    const eventArrayHalf = Math.floor(events.length / 2);
+    console.log(eventArrayHalf);
+    console.log(events.length);
 
-      // 'data' is the content of the file as a string
-      const eventData = JSON.parse(data);
-
-      // Insert data into the database
-      for (let i = 0; i < eventData.length; i++) {
-        const event = eventData[i];
-        await prisma.events.upsert({
-          where: { event_id: event.event_id },
-          update: {},
-          create: {
-            start_time: new Date(event.start_time),
-            end_time: new Date(event.end_time),
-            summary: event.summary,
-            description: event.description,
-            status: event.status,
-            location: {
-              connect: { location: locations[0] },
-            },
+    // Half of the events will have the 1st location
+    for (let i = 0; i < eventArrayHalf; i++) {
+      const event = events[i];
+      await prisma.events.upsert({
+        where: { event_id: event.event_id },
+        update: {},
+        create: {
+          start_time: new Date(event.start_time),
+          end_time: new Date(event.end_time),
+          summary: event.summary,
+          description: event.description,
+          created: new Date(),
+          status: event.status,
+          location: {
+            connect: { location_id: locations[0].location_id },
           },
-        });
-      }
-      // for (const event of eventData) {
-      //   await prisma.events.upsert({
-      //     where: { event_id: event.event_id },
-      //     update: {},
-      //     create: {
-      //       start_time: new Date(event.start_time),
-      //       end_time: new Date(event.end_time),
-      //       summary: event.summary,
-      //       description: event.description,
-      //       status: event.status,
-      //       location_id: locations[event].location_id,
-      //       location: {
-      //         connect: { location_id: locations[event].location_id },
-      //       },
-      //     },
-      //   });
-      // }
-    });
+        },
+      });
+    }
+
+    // Half of the events will have the 2nd location
+    for (let i = eventArrayHalf + 1; i < events.length; i++) {
+      const event = events[i];
+      await prisma.events.upsert({
+        where: { event_id: event.event_id },
+        update: {},
+        create: {
+          start_time: new Date(event.start_time),
+          end_time: new Date(event.end_time),
+          summary: event.summary,
+          description: event.description,
+          status: event.status,
+          location: {
+            connect: { location_id: locations[1].location_id },
+          },
+        },
+      });
+    }
   } catch (error) {
     logger.error({ message: "seedEvents", error: error.stack });
     throw error;
@@ -102,25 +98,27 @@ async function seedEvents() {
  */
 async function seedLocations() {
   try {
-    // Insert data into the database
-    return await prisma.locations.upsert({
-      where: { location_id: locations[0].location_id },
-      update: {},
-      create: {
-        room_number: locations[0].room_number,
-        event: {
-          create: [
-            {
-              start_time: new Date(events[0].start_time),
-              end_time: new Date(events[0].end_time),
-              summary: events[0].summary,
-              description: events[0].description,
-              status: events[0].status,
-            },
-          ],
+    // Insert locations from seedData/locations.json into the database
+    for (let i = 0; i < locations.length; i++) {
+      await prisma.locations.upsert({
+        where: { location_id: locations[i].location_id },
+        update: {},
+        create: {
+          room_number: locations[i].room_number,
+          // event: {
+          //   create: [
+          //     {
+          //       start_time: new Date(events[0].start_time),
+          //       end_time: new Date(events[0].end_time),
+          //       summary: events[0].summary,
+          //       description: events[0].description,
+          //       status: events[0].status,
+          //     },
+          //   ],
+          // },
         },
-      },
-    });
+      });
+    }
   } catch (error) {
     logger.error({ message: "seedLocations", error: error.stack });
     throw error;
@@ -135,7 +133,7 @@ async function seedDatabase() {
   try {
     await seedLocations();
     // await seedAnnouncements();
-    // await seedEvents();
+    await seedEvents();
     console.log("Seeding completed successfully.");
   } catch (error) {
     logger.error({ message: "seedDatabase", error: error.stack });

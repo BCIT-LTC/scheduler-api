@@ -31,13 +31,13 @@ model events {
   event_id      Int            @id @default(autoincrement())
   announcement  announcements?
   location      locations      @relation(fields: [location_id], references: [location_id])
-  location_id   Int            @unique
+  location_id   Int
   start_time    DateTime       @db.DateTime(0)
   end_time      DateTime       @db.DateTime(0)
   summary       String?        @db.VarChar(200)
   description   String?        @db.VarChar(200)
-  created       DateTime?      @db.DateTime(0)
-  last_modified DateTime?      @default(now()) @db.DateTime(0)
+  created       DateTime?      @default(now()) @db.DateTime(0)
+  last_modified DateTime?      @updatedAt @db.DateTime(0)
   status        status?        @default(TENTATIVE)
 }
 
