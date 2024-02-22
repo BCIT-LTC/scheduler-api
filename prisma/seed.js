@@ -16,14 +16,14 @@ const options = {
 }
 
 /**
- * Initial location data from seedData/locations.json
+ * Initial location data from seedData/locations.js
  */
-const locations = require("./seedData/locations.json");
+const locations = require("./seedData/locations");
 
 /**
- * Initial event data from seedData/events.json
+ * Initial event data from seedData/events.js
  */
-var events = require("./seedData/events.json");
+const events = require("./seedData/events");
 
 /**
  * Seed initial announcement data.
@@ -56,8 +56,6 @@ async function seedAnnouncements() {
 async function seedEvents() {
     try {
         const eventArrayHalf = Math.floor(events.length / 2);
-        console.log(eventArrayHalf);
-        console.log(events.length);
 
         // Half of the events will have the 1st location
         for (let i = 0; i < eventArrayHalf; i++) {
