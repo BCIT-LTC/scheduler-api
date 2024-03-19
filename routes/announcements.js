@@ -109,95 +109,112 @@
 const express = require("express");
 const router = express.Router();
 const {
-    getAnnouncement,
-    addAnnouncement,
-    deleteAnnouncement,
-    editAnnouncement,
+  getAnnouncement,
+  addAnnouncement,
+  deleteAnnouncement,
+  editAnnouncement,
 } = require("../models/announcement");
-const auth = require("../middleware/checkAuth");
-const createLogger = require('../logger'); // Ensure the path is correct
+const auth = require("../middleware/authentication_check");
+const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
-
 
 /**
  * GET endpoint to retrieve all announcements.
  */
 router.get("/announcement", async (req, res) => {
-    // Check if the user is authenticated
-    if (!auth.authenticateToken(req, false)){
-        return res.sendStatus(403);
-    }
-    try {
-        const announcement = await getAnnouncement();
-        return res.status(200).send(announcement);
-    } catch (error) {
-        logger.error({message:"Error while fetching announcements", error: error.stack})
-        return res.status(500).send({ error: error.message });
-    }
+  // Check if the user is authenticated
+  if (!auth.authentication_check(req, false)) {
+    return res.sendStatus(403);
+  }
+  try {
+    const announcement = await getAnnouncement();
+    return res.status(200).send(announcement);
+  } catch (error) {
+    logger.error({
+      message: "Error while fetching announcements",
+      error: error.stack,
+    });
+    return res.status(500).send({ error: error.message });
+  }
 });
 
 /**
  * POST endpoint to add or edit an announcement.
  */
 router.post("/announcement", async (req, res) => {
-    // Check if the user is authenticated
-    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+  // Check if the user is authenticated
+  if (!auth.authentication_check(req, true)) return res.sendStatus(403);
 
-    // Validate inputs
-    const { title, description, date } = req.body;
-    if (!title || !description || !date) {
-        return res.status(400).send({ error: "Missing required fields" });
-    }
+  // Validate inputs
+  const { title, description, date } = req.body;
+  if (!title || !description || !date) {
+    return res.status(400).send({ error: "Missing required fields" });
+  }
 
-    try {
-        const announcement = await addAnnouncement(title, description, date);
-        res.status(200).send(announcement);
-    } catch (error) {
-        logger.error({message:"Error while adding an announcement", error: error.stack})
-        res.status(500).send({ error: error.message });
-    }
+  try {
+    const announcement = await addAnnouncement(title, description, date);
+    res.status(200).send(announcement);
+  } catch (error) {
+    logger.error({
+      message: "Error while adding an announcement",
+      error: error.stack,
+    });
+    res.status(500).send({ error: error.message });
+  }
 });
 
 /**
  * DELETE endpoint to remove an announcement based on its ID.
  */
 router.delete("/announcement", async (req, res) => {
-    // Check if the user is authenticated
-    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+  // Check if the user is authenticated
+  if (!auth.authentication_check(req, true)) return res.sendStatus(403);
 
-    // Validate inputs
-    const { id } = req.body;
-    if (!id) return res.status(400).send({ error: "ID is required for deletion" });
+  // Validate inputs
+  const { id } = req.body;
+  if (!id)
+    return res.status(400).send({ error: "ID is required for deletion" });
 
-    try {
-        await deleteAnnouncement(id);
-        return res.status(200).send({ message: "Success" });
-    } catch (error) {
-        logger.error({message:"Error while deleting an announcement", error: error.stack})
-        return res.status(500).send({ error: error.message });
-    }
+  try {
+    await deleteAnnouncement(id);
+    return res.status(200).send({ message: "Success" });
+  } catch (error) {
+    logger.error({
+      message: "Error while deleting an announcement",
+      error: error.stack,
+    });
+    return res.status(500).send({ error: error.message });
+  }
 });
 
 /**
  * PUT endpoint to edit an announcement based on its ID.
  */
 router.put("/announcement", async (req, res) => {
-    // Check if the user is authenticated
-    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+  // Check if the user is authenticated
+  if (!auth.authentication_check(req, true)) return res.sendStatus(403);
 
-    // Validate inputs
-    const { id, title, description, date } = req.body;
-    if (!id || !title || !description) {
-        return res.status(400).send({ error: "Missing required fields" });
-    }
+  // Validate inputs
+  const { id, title, description, date } = req.body;
+  if (!id || !title || !description) {
+    return res.status(400).send({ error: "Missing required fields" });
+  }
 
-    try {
-        const updatedAnnouncement = await editAnnouncement(id, title, description, date);
-        res.status(200).send(updatedAnnouncement);
-    } catch (error) {
-        logger.error({message:"Error while editing an announcement", error: error.stack})
-        return res.status(500).send({ error: error.message });
-    }
+  try {
+    const updatedAnnouncement = await editAnnouncement(
+      id,
+      title,
+      description,
+      date
+    );
+    res.status(200).send(updatedAnnouncement);
+  } catch (error) {
+    logger.error({
+      message: "Error while editing an announcement",
+      error: error.stack,
+    });
+    return res.status(500).send({ error: error.message });
+  }
 });
 
 module.exports = router;

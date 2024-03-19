@@ -51,7 +51,7 @@
 const express = require("express");
 const router = express.Router();
 const userModel = require("../models/userModel").userModel;
-const auth = require("../middleware/checkAuth");
+const auth = require("../middleware/authentication_check");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 
@@ -128,7 +128,7 @@ router.post("/authorize", async (req, res) => {
  */
 router.post("/logouttime", async (req, res) => {
   try {
-    if (!auth.authenticateToken(req, false)) return res.sendStatus(403);
+    if (!auth.authentication_check(req, false)) return res.sendStatus(403);
     const getLogoutTime = await logoutTime(req.body.email);
     return res.status(200).send(getLogoutTime);
   } catch (error) {
@@ -142,7 +142,7 @@ router.post("/logouttime", async (req, res) => {
  */
 router.get("/admin", async (req, res) => {
   try {
-    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+    if (!auth.authentication_check(req, true)) return res.sendStatus(403);
     return res.status(200).send(userModel.findAdmins());
   } catch (error) {
     logger.error({ message: "/api/admin", error: error.stack });
@@ -156,7 +156,7 @@ router.get("/admin", async (req, res) => {
  */
 router.post("/admin", async (req, res) => {
   try {
-    if (!auth.authenticateToken(req, true)) return res.sendStatus(403);
+    if (!auth.authentication_check(req, true)) return res.sendStatus(403);
 
     const { email, isAdmin } = req.body;
 
