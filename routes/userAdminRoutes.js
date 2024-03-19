@@ -1,10 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { userModel } = require('../models/userModel');
-const auth = require("../middleware/checkAuth");
-const createLogger = require('../logger'); // Ensure the path is correct
+const { userModel } = require("../models/userModel");
+const auth = require("../middleware/authentication_check");
+const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
-
 
 /**
  * Route for updating a user's admin status.
@@ -18,37 +17,38 @@ const logger = createLogger(module);
  * @returns {object} - A message indicating whether the update was successful.
  * @async
  */
-router.patch('/updateRole/:email', async (req, res) => {
-    if (!auth.authenticateToken(req, true)){
-        return res.sendStatus(403);
+router.patch("/updateRole/:email", async (req, res) => {
+  if (!auth.authentication_check(req, true)) {
+    return res.sendStatus(403);
+  }
+  try {
+    const { email } = req.params;
+    const { role } = req.body; // The request's body will contain the new role
+
+    // Validate the desired role
+    if (role !== "admin" && role !== "user") {
+      // Add any other roles your system has
+      return res.status(400).json({ message: "Invalid role specified." });
     }
-    try {
-        const { email } = req.params;
-        const { role } = req.body; // The request's body will contain the new role
 
-        // Validate the desired role
-        if (role !== 'admin' && role !== 'user') { // Add any other roles your system has
-            return res.status(400).json({ message: 'Invalid role specified.' });
-        }
-
-        // Check if the requesting user is an admin
-        // This shouldn't be necessary if only admins can access this endpoint
-        // Still in place just in case
-        const requesterEmail = req.user.email; // Assuming the email is stored in req.user
-        const requester = await userModel.findOne(requesterEmail);
-        if (requester.role !== 'admin') {
-            return res.status(403).json({ message: 'Only admins can update roles.' });
-        }
-
-        // Update the user's role
-        await userModel.updateUserRole(email, role);
-        res.status(200).json({ message: `User's role updated to ${role} successfully.` });
-    } catch (error) {
-        logger.error({message:'Error updating user role', error: error.stack});
-        res.status(500).json({ message: error.message });
+    // Check if the requesting user is an admin
+    // This shouldn't be necessary if only admins can access this endpoint
+    // Still in place just in case
+    const requesterEmail = req.user.email; // Assuming the email is stored in req.user
+    const requester = await userModel.findOne(requesterEmail);
+    if (requester.role !== "admin") {
+      return res.status(403).json({ message: "Only admins can update roles." });
     }
+
+    // Update the user's role
+    await userModel.updateUserRole(email, role);
+    res
+      .status(200)
+      .json({ message: `User's role updated to ${role} successfully.` });
+  } catch (error) {
+    logger.error({ message: "Error updating user role", error: error.stack });
+    res.status(500).json({ message: error.message });
+  }
 });
-
-
 
 module.exports = router;
