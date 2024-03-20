@@ -45,6 +45,32 @@ async function seedAnnouncements() {
 }
 
 /**
+ * Seed initial superuser data.
+ * @async
+ * @returns {Object} seeded superuser data
+ */
+async function seedSuperuser() {
+  try {
+    return await prisma.users.upsert({
+      where: { email: process.env.SUPERUSER },
+      update: {},
+      create: {
+        first_name: "",
+        last_name: "",
+        saml_role: "",
+        app_role: "admin",
+        school: "",
+        program: "",
+        isActive: true,
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "seedSuperuser", error: error.stack });
+    throw error;
+  }
+}
+
+/**
  * Seed initial event data.
  * Multiple events included to test get by day, week, and month
  * @async
@@ -135,6 +161,7 @@ async function seedDatabase() {
       case "development":
         // add development AND production seed data
         // seedAnnouncements();
+        seedSuperuser();
         seedLocations();
         seedEvents();
         break;

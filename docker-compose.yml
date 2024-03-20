@@ -20,6 +20,7 @@ services:
       - NODE_ENV=development
       - NODE_ENV=test
       - NODE_ENV=production
+      - SUPERUSER=admin@bcit.ca
     depends_on:
       db:
         condition: service_healthy
