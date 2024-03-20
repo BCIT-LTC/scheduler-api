@@ -1,16 +1,8 @@
-const { parseArgs } = require("node:util");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 const environment = process.env.NODE_ENV;
-
-/**
- * CLI options for the seed script.
- */
-const options = {
-  environment: { type: "string" },
-};
 
 /**
  * Initial location data from seedData/locations.js
@@ -51,10 +43,11 @@ async function seedAnnouncements() {
  */
 async function seedSuperuser() {
   try {
-    return await prisma.users.upsert({
+    await prisma.users.upsert({
       where: { email: process.env.SUPERUSER },
       update: {},
       create: {
+        email: process.env.SUPERUSER,
         first_name: "",
         last_name: "",
         saml_role: "",
@@ -152,18 +145,14 @@ async function seedLocations() {
  * @async
  */
 async function seedDatabase() {
-  const {
-    values: { environment },
-  } = parseArgs({ options });
-
   try {
     switch (environment) {
       case "development":
         // add development AND production seed data
         // seedAnnouncements();
-        seedSuperuser();
         seedLocations();
         seedEvents();
+        seedSuperuser();
         break;
       case "test":
         // add test seed data, running all test scripts at once
