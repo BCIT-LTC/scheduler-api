@@ -4,6 +4,7 @@ const {
   getEventsByDate,
   getEventsByMonth,
   getEventsByWeek, 
+  getEventsByRange
 } = require("../models/events");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
@@ -52,6 +53,25 @@ router.get("/events/week", async (req, res) => {
       logger.error({ message: "GET /api/events/week", error: error.stack });
       return res.status(500).send({ error: error.message });
     }
-  });
+});
+
+/**
+ * GET /api/events
+ * Endpoint to retrieve the events for the current FullCalendar view.
+ */
+router.get("/events", async (req, res) => {
+  console.log(req.query.start);
+  console.log(req.query.end);
+  const start = req.query.start
+  const end = req.query.end;
+  
+  try {
+    const events = await getEventsByRange(start, end);
+    return res.status(200).send(events);
+  } catch (error) {
+    logger.error({ message: "GET /api/events", error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
 
 module.exports = router;

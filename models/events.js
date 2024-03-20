@@ -66,31 +66,54 @@ const getEventsByMonth = async (date) => {
  * @returns {Object} list of events
  */
 const getEventsByWeek = async (date = new Date()) => {
+  let lowerBound = new Date(date);
+  lowerBound.setDate(date.getDate() - 4);
 
-    let lowerBound = new Date(date);
-    lowerBound.setDate(date.getDate() - 4);
-  
-    let upperBound = new Date(date);
-    upperBound.setDate(date.getDate() + 5);
+  let upperBound = new Date(date);
+  upperBound.setDate(date.getDate() + 5);
 
-    try {
-      const events =  await prisma.events.findMany({
-        where: {
-          start_time: {
-            gte: lowerBound,
-            lte: upperBound,
-          }
+  try {
+    const events =  await prisma.events.findMany({
+      where: {
+        start_time: {
+          gte: lowerBound,
+          lte: upperBound,
+        }
+      },
+    });
+
+    return events;
+  } catch (error) {
+    logger.error({ message: "Error fetching events", error: error.stack });
+  }
+};
+
+  /**
+   * Find all events for a speciic start and end range
+   * @param {Date} start 
+   * @param {Date} end 
+   * @returns {Object} list of events
+   */
+const getEventsByRange = async (start, end) => {
+  try {
+    return await prisma.events.findMany({
+      where: {
+        start_time: {
+          gte: start,
         },
-      });
-
-      return events;
-    } catch (error) {
-      logger.error({ message: "Error fetching events", error: error.stack });
-    }
-  };
+        end_time: {
+          lt: end,
+        },
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error fetching events", error: error.stack });
+  }
+};
 
 module.exports = {
   getEventsByDate,
   getEventsByMonth,
   getEventsByWeek,
+  getEventsByRange
 };
