@@ -124,6 +124,7 @@ async function seedEvents() {
  */
 async function seedLocations() {
   try {
+    console.log("number of locations", locations.length);
     // Insert locations from seedData/locations.json into the database
     for (let i = 0; i < locations.length; i++) {
       await prisma.locations.upsert({
@@ -150,9 +151,9 @@ async function seedDatabase() {
       case "development":
         // add development AND production seed data
         // seedAnnouncements();
-        seedLocations();
-        seedEvents();
-        seedSuperuser();
+        await seedLocations();
+        await seedEvents();
+        await seedSuperuser();
         break;
       case "test":
         // add test seed data, running all test scripts at once

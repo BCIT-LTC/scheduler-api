@@ -1,4 +1,4 @@
-let locations = [
+const locations = [
   {
     location_id: 1,
     room_number: "3086",
@@ -8,3 +8,5 @@ let locations = [
     room_number: "3087",
   },
 ];
+
+module.exports = locations;
