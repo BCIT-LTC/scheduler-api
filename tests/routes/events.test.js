@@ -193,3 +193,140 @@ describe("GET all events by week", () => {
   });
 
 });
+
+describe("GET all events by range", () => {
+  const endpoint = "/api/events";
+  const testData = [
+    {
+      event_id: 3,
+      location_id: 1,
+      start_time: "2024-02-19T16:30:00.000Z",
+      end_time: "2024-02-19T22:30:00.000Z",
+      summary: "Event 3",
+      description: "Event 3 Description",
+      created: "2024-03-21T06:17:28.000Z",
+      last_modified: "2024-03-21T06:17:28.000Z",
+      status: "CONFIRMED"
+  },
+  {
+      event_id: 4,
+      location_id: 1,
+      start_time: "2024-02-20T16:30:00.000Z",
+      end_time: "2024-02-20T22:30:00.000Z",
+      summary: "Event 4",
+      description: "Event 4 Description",
+      created: "2024-03-21T06:17:28.000Z",
+      last_modified: "2024-03-21T06:17:28.000Z",
+      status: "CONFIRMED"
+  },
+  {
+      event_id: 5,
+      location_id: 1,
+      start_time: "2024-02-26T08:00:00.000Z",
+      end_time: "2024-02-26T22:30:00.000Z",
+      summary: "Event 5",
+      description: "Event 5 Description",
+      created: "2024-03-21T06:17:28.000Z",
+      last_modified: "2024-03-21T06:17:28.000Z",
+      status: "CONFIRMED"
+  }
+  ];
+
+  it("should return all events within the given range", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ start: "2024-02-01", end: "2024-02-29" })
+      .set({
+        Authorization: token,
+      });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBe(3);
+    expect(res.body[0].event_id).toBe(3);
+    expect(res.body[1].event_id).toBe(4);
+    expect(res.body[2].event_id).toBe(5);
+  });
+
+  it("should return all events within the given range with timestamp", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ start: "2024-02-01T08:30:00", end: "2024-02-27T17:00:00" })
+      .set({
+        Authorization: token,
+      });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBe(3);
+    expect(res.body[0].event_id).toBe(3);
+    expect(res.body[1].event_id).toBe(4);
+    expect(res.body[2].event_id).toBe(5);
+  });
+
+  it("should return all events within the given range", async () => {
+    const startDate = new Date("2024-02-01");
+    const endDate = new Date("2024-02-29");
+    const res = await request(app)
+      .get(endpoint)
+      .query({ start: startDate, end: endDate })
+      .set({
+        Authorization: token,
+      });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBe(3);
+    expect(res.body[0].event_id).toBe(3);
+    expect(res.body[1].event_id).toBe(4);
+    expect(res.body[2].event_id).toBe(5);
+  });
+
+  it ("should return empty array if no events are found", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ start: "2024-07-01", end: "2024-07-30" })
+      .set({
+        Authorization: token,
+      });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBe(0);
+    expect(res.body).toStrictEqual([]);
+  });
+
+  it ("should return error 500 if date is not parsable", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ start: "nota date", end: "notadate" })
+      .set({
+        Authorization: token,
+      });
+    expect(res.statusCode).toBe(500);
+    expect(res.body.error).toBe("Invalid date format");
+  });
+
+  it ("should return error 500 if query parameters are missing", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .set({
+        Authorization: token,
+      });
+    expect(res.statusCode).toBe(500);
+    expect(res.body.error).toBe("Invalid date format");
+  });
+
+  it("should return error 400 if token is missing", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ start: "2024-01-01", end: "2024-01-03" });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Token missing from Authorization header");
+  });
+
+  it("should return error 400 if token is invalid", async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .query({ start: "2024-01-01", end: "2024-01-03" })
+      .set({
+        Authorization: "invalidtoken",
+      });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Token invalid");
+  });
+});

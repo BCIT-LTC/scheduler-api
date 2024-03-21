@@ -74,7 +74,7 @@ async function seedEvents() {
     const eventArrayHalf = Math.floor(events.length / 2);
 
     // Half of the events will have the 1st location
-    for (let i = 0; i < eventArrayHalf; i++) {
+    for (let i = 0; i <= eventArrayHalf; i++) {
       const event = events[i];
       await prisma.events.upsert({
         where: { event_id: event.event_id },

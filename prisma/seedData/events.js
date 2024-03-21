@@ -44,6 +44,7 @@ const events = [
     end_time: "2024-03-01T14:30:00",
     summary: "Event 6",
     description: "Event 6 Description",
+    status: "CONFIRMED",
   },
   {
     event_id: 7,
