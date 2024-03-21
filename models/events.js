@@ -95,6 +95,16 @@ const getEventsByWeek = async (date = new Date()) => {
    * @returns {Object} list of events
    */
 const getEventsByRange = async (start, end) => {
+  if (isNaN(Date.parse(start)) || isNaN(Date.parse(end))) {
+    logger.error({ message: "Invalid date format" });
+    throw new Error("Invalid date format");
+  }
+  if (!(start instanceof Date)) {
+    start = new Date(start);
+  }
+  if (!(end instanceof Date)) {
+    end = new Date(end);
+  }
   try {
     return await prisma.events.findMany({
       where: {

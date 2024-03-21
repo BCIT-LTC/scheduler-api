@@ -60,8 +60,6 @@ router.get("/events/week", async (req, res) => {
  * Endpoint to retrieve the events for the current FullCalendar view.
  */
 router.get("/events", async (req, res) => {
-  console.log(req.query.start);
-  console.log(req.query.end);
   const start = req.query.start
   const end = req.query.end;
   
