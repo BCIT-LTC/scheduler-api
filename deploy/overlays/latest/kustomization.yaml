@@ -13,11 +13,11 @@ nameSuffix: -latest
 configurations:
   - kustomizeconfig.yaml
 commonAnnotations:
-  version: 1.1.0-2e500276--2024-03-19.1710883889 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
+  version: 1.1.0-a181e211--2024-03-21.1711039894 # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
 images:
   - name: "scheduler-api"
     newName: "registry.ltc.bcit.ca/web-apps/openlab-scheduler/scheduler-api"
-    newTag: "1.1.0-2e500276--2024-03-19.1710883889" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
+    newTag: "1.1.0-a181e211--2024-03-21.1711039894" # {"$imagepolicy": "openlab-scheduler:scheduler-api-image-policy-latest:tag"}
 patches:
   # Patches ingress with "latest--"
   - target:
