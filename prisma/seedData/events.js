@@ -1,4 +1,4 @@
-let events = [
+const events = [
   {
     event_id: 1,
     start_time: "2024-01-02T08:30:00",
@@ -70,3 +70,5 @@ let events = [
     status: "CANCELLED",
   },
 ];
+
+module.exports = events;

@@ -1,16 +1,8 @@
-const { parseArgs } = require("node:util");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 const environment = process.env.NODE_ENV;
-
-/**
- * CLI options for the seed script.
- */
-const options = {
-  environment: { type: "string" },
-};
 
 /**
  * Initial location data from seedData/locations.js
@@ -40,6 +32,33 @@ async function seedAnnouncements() {
     });
   } catch (error) {
     logger.error({ message: "seedAnnouncements", error: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * Seed initial superuser data.
+ * @async
+ * @returns {Object} seeded superuser data
+ */
+async function seedSuperuser() {
+  try {
+    await prisma.users.upsert({
+      where: { email: process.env.SUPERUSER },
+      update: {},
+      create: {
+        email: process.env.SUPERUSER,
+        first_name: "",
+        last_name: "",
+        saml_role: "",
+        app_role: "admin",
+        school: "",
+        program: "",
+        isActive: true,
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "seedSuperuser", error: error.stack });
     throw error;
   }
 }
@@ -105,6 +124,7 @@ async function seedEvents() {
  */
 async function seedLocations() {
   try {
+    console.log("number of locations", locations.length);
     // Insert locations from seedData/locations.json into the database
     for (let i = 0; i < locations.length; i++) {
       await prisma.locations.upsert({
@@ -126,17 +146,14 @@ async function seedLocations() {
  * @async
  */
 async function seedDatabase() {
-  const {
-    values: { environment },
-  } = parseArgs({ options });
-
   try {
     switch (environment) {
       case "development":
         // add development AND production seed data
         // seedAnnouncements();
-        seedLocations();
-        seedEvents();
+        await seedLocations();
+        await seedEvents();
+        await seedSuperuser();
         break;
       case "test":
         // add test seed data, running all test scripts at once
