@@ -121,9 +121,36 @@ const getEventsByRange = async (start, end) => {
   }
 };
 
+const createEvent = async (event) => {
+  // // Presently, location is a string from the event created form. If this is the correct implementation, we will have to look up the location id.
+  // var location = await prisma.locations.findUnique({
+  //   where: {
+  //     room_number: event.location,
+  //   },
+  // });
+  // var locationId = location ? location.location_id : null;
+
+  // event.location_id = locationId;
+
+  try {
+    return await prisma.events.create({
+      data: {
+        location_id: event.location_id,
+        start_time: event.start_time,
+        end_time: event.end_time,
+        summary: event.event_name,
+        description: event.description,
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error creating event", error: error.stack });
+  }
+};  
+
 module.exports = {
   getEventsByDate,
   getEventsByMonth,
   getEventsByWeek,
-  getEventsByRange
+  getEventsByRange,
+  createEvent
 };

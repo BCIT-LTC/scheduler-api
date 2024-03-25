@@ -4,7 +4,8 @@ const {
   getEventsByDate,
   getEventsByMonth,
   getEventsByWeek, 
-  getEventsByRange
+  getEventsByRange,
+  createEvent
 } = require("../models/events");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
@@ -68,6 +69,17 @@ router.get("/events", async (req, res) => {
     return res.status(200).send(events);
   } catch (error) {
     logger.error({ message: "GET /api/events", error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+router.post("/events", async (req, res) => {
+  // Create a new event
+  try {
+    const newEvent = await createEvent(req.body);
+    return res.status(201).send(newEvent);
+  } catch (error) {
+    logger.error({ message: "POST /api/events", error: error.stack });
     return res.status(500).send({ error: error.message });
   }
 });
