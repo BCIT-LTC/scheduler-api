@@ -4,7 +4,9 @@ const {
   getEventsByDate,
   getEventsByMonth,
   getEventsByWeek, 
-  getEventsByRange
+  getEventsByRange,
+  createEvent,
+  deleteEvent
 } = require("../models/events");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
@@ -68,6 +70,36 @@ router.get("/events", async (req, res) => {
     return res.status(200).send(events);
   } catch (error) {
     logger.error({ message: "GET /api/events", error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/events
+ * Endpoint to create a new event.
+ */
+router.post("/events", async (req, res) => {
+  try {
+    const newEvent = await createEvent(req.body);
+    return res.status(201).send(newEvent);
+  } catch (error) {
+    logger.error({ message: "POST /api/events", error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/events/:id
+ * Endpoint to delete an event by ID.
+ * Note: so far only used to delete test events in unit tests
+ */
+router.delete('/events/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    await deleteEvent(id);
+    return res.status(200).send({ message: 'Event deleted successfully' });
+  } catch (error) {
+    logger.error({ message: `DELETE /api/events/${id}`, error: error.stack });
     return res.status(500).send({ error: error.message });
   }
 });

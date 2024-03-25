@@ -121,9 +121,73 @@ const getEventsByRange = async (start, end) => {
   }
 };
 
+/**
+ * Creates an event and persists it to the database
+ * @param {Object} event - event payload from the request
+ * @returns {Promise<Object>} promise that resolves to the created event object
+ */
+const createEvent = async (event) => {
+  // // Presently, location is a string from the event created form. If this is the correct implementation, we will have to look up the location id.
+  // var location = await prisma.locations.findUnique({
+  //   where: {
+  //     room_number: event.location,
+  //   },
+  // });
+  // var locationId = location ? location.location_id : null;
+
+  // event.location_id = locationId;
+  if (!event) {
+    throw new Error('Event is null or undefined');
+  }
+
+  const requiredProperties = ['location_id', 'start_time', 'end_time'];
+
+  for (const property of requiredProperties) {
+    if (!event[property]) {
+      throw new Error(`Required property ${property} is null or undefined`);
+    }
+  }
+
+  try {
+    return await prisma.events.create({
+      data: {
+        location_id: event.location_id,
+        start_time: event.start_time,
+        end_time: event.end_time,
+        summary: event.event_name,
+        description: event.description,
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error creating event", error: error.stack });
+  }
+};  
+
+/**
+ * Asynchronously deletes an event from the database.
+ *
+ * @param {number|string} event_id -id of event to delete
+ * @returns {Promise<object>} a promise that resolves to the result of the delete operation
+ */
+const deleteEvent = async (event_id) => {
+  try {
+    var id = parseInt(event_id);
+
+    return await prisma.events.delete({
+      where: {
+        event_id: id,
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error deleting event", error: error.stack });
+  }
+}
+
 module.exports = {
   getEventsByDate,
   getEventsByMonth,
   getEventsByWeek,
-  getEventsByRange
+  getEventsByRange,
+  createEvent,
+  deleteEvent
 };

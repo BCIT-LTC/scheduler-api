@@ -330,3 +330,100 @@ describe("GET all events by range", () => {
     expect(res.body.error).toBe("Token invalid");
   });
 });
+
+describe("POST create event", () => {
+  const endpoint = "/api/events";
+  it("should return a 201 status code if the event is created successfully", async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .send({
+        location_id: 1,
+        start_time: "2024-03-01T08:00:00.000Z",
+        end_time: "2024-03-01T22:30:00.000Z",
+        summary: "Event 10",
+        description: "Event 10 Description",
+      })
+      .set({
+        Authorization: token,
+      });
+    expect(res.statusCode).toBe(201);
+
+    //Clean up
+    await request(app)
+      .delete(`/api/events/${res.body.event_id}`)
+      .set({
+        Authorization: token,
+      });``
+  });
+
+  it("should return a 500 status code if the location_id is missing", async () => {
+    const res = await request(app)
+    .post(endpoint)
+    .send({
+      start_time: "2023-08-01T08:00:00.000Z",
+      end_time: "2023-08-01T15:00:00.000Z",
+      event_name: 'Test Event',
+      description: 'Test Description'
+    })
+    .set({
+      Authorization: token,
+    });
+    expect(res.statusCode).toBe(500);
+    expect(res.body.error).toBe("Required property location_id is null or undefined");
+  });
+  
+  it("should return a 500 status code if the start_time is missing", async () => {
+    const res = await request(app)
+    .post(endpoint)
+    .send({
+      location_id: 1,
+      end_time: "2023-08-01T15:00:00.000Z",
+      event_name: 'Test Event',
+      description: 'Test Description'
+    })
+    .set({
+      Authorization: token,
+    });
+    expect(res.statusCode).toBe(500);
+    expect(res.body.error).toBe("Required property start_time is null or undefined");
+  });
+
+  it("should return a 500 status code if the end_time is missing", async () => {
+    const res = await request(app)
+    .post(endpoint)
+    .send({
+      location_id: 1,
+      start_time: "2023-08-01T08:00:00.000Z",
+      event_name: 'Test Event',
+      description: 'Test Description',
+    })
+    .set({
+      Authorization: token,
+    });
+    expect(res.statusCode).toBe(500);
+    expect(res.body.error).toBe("Required property end_time is null or undefined");
+  });
+
+  it("should return a 400 status code if token is invalid", async () => {
+    const res = await request(app)
+    .post(endpoint)
+    .send({
+      location_id: 1,
+      start_time: "2024-03-01T08:00:00.000Z",
+      end_time: "2024-03-01T22:30:00.000Z",
+      summary: "Event 10",
+      description: "Event 10 Description",
+    })
+    .set({
+      Authorization: "invalid",
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Token invalid");
+  });
+
+  it("should return a 400 status code if no token is provided", async () => {
+    const res = await request(app).post("/api/events");
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Token missing from Authorization header");
+  });
+});
