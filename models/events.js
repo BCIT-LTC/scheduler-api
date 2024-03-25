@@ -121,6 +121,11 @@ const getEventsByRange = async (start, end) => {
   }
 };
 
+/**
+ * Creates an event and persists it to the database
+ * @param {Object} event - event payload from the request
+ * @returns {Promise<Object>} promise that resolves to the created event object
+ */
 const createEvent = async (event) => {
   // // Presently, location is a string from the event created form. If this is the correct implementation, we will have to look up the location id.
   // var location = await prisma.locations.findUnique({
@@ -158,10 +163,31 @@ const createEvent = async (event) => {
   }
 };  
 
+/**
+ * Asynchronously deletes an event from the database.
+ *
+ * @param {number|string} event_id -id of event to delete
+ * @returns {Promise<object>} a promise that resolves to the result of the delete operation
+ */
+const deleteEvent = async (event_id) => {
+  try {
+    var id = parseInt(event_id);
+
+    return await prisma.events.delete({
+      where: {
+        event_id: id,
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error deleting event", error: error.stack });
+  }
+}
+
 module.exports = {
   getEventsByDate,
   getEventsByMonth,
   getEventsByWeek,
   getEventsByRange,
-  createEvent
+  createEvent,
+  deleteEvent
 };
