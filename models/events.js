@@ -131,6 +131,17 @@ const createEvent = async (event) => {
   // var locationId = location ? location.location_id : null;
 
   // event.location_id = locationId;
+  if (!event) {
+    throw new Error('Event is null or undefined');
+  }
+
+  const requiredProperties = ['location_id', 'start_time', 'end_time'];
+
+  for (const property of requiredProperties) {
+    if (!event[property]) {
+      throw new Error(`Required property ${property} is null or undefined`);
+    }
+  }
 
   try {
     return await prisma.events.create({
