@@ -39,6 +39,8 @@ model events {
   description   String?        @db.VarChar(200)
   created       DateTime?      @default(now()) @db.DateTime(0)
   last_modified DateTime?      @updatedAt @db.DateTime(0)
+  series_id     Int            @unique
+  series        series?        @relation(fields: [series_id], references: [series_id])
   status        status?        @default(TENTATIVE)
 }
 
@@ -46,6 +48,20 @@ enum status {
   CANCELLED
   CONFIRMED
   TENTATIVE
+}
+
+model series {
+  series_id                  Int       @id @default(autoincrement())
+  series_title               String    @db.VarChar(50)
+  start_time                 DateTime  @db.Time()
+  end_time                   DateTime  @db.Time()
+  start_date                 DateTime  @db.Date()
+  end_date                   DateTime  @db.Date()
+  recurrence_frequency_weeks Int
+  created                    DateTime? @default(now()) @db.DateTime(0)
+  last_modified              DateTime? @updatedAt @db.DateTime(0)
+  status                     status?   @default(TENTATIVE)
+  events                     events[]
 }
 
 model locations {
