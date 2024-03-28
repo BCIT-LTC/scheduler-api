@@ -68,7 +68,7 @@ router.post("/authorize", async (req, res) => {
 
     let user = await userModel.findOne(userToAuthorize.email);
     if (user !== null) {
-      if (userToAuthorize.app_role !== "admin") {
+      if (user.app_role !== "admin") {
         userToAuthorize.app_role = user.saml_role;
 
         // synchronize all SAML fields on db with received info: email, first_name, last_name, saml_role, school, program
@@ -77,22 +77,37 @@ router.post("/authorize", async (req, res) => {
           user.first_name !== userToAuthorize.first_name ||
           user.last_name !== userToAuthorize.last_name ||
           user.saml_role !== userToAuthorize.saml_role ||
+          user.app_role !== userToAuthorize.saml_role ||
           user.school !== userToAuthorize.school ||
           user.program !== userToAuthorize.program
         ) {
-          // the addUser method upserts users (ie adds them if they don't exist, updates them if they do)
+          // the addUser method upserts users (updates them here)
           await userModel.addUser(
             userToAuthorize.email,
             userToAuthorize.first_name,
             userToAuthorize.last_name,
+            userToAuthorize.saml_role,
             userToAuthorize.saml_role,
             userToAuthorize.school,
             userToAuthorize.program
           );
         }
       }
+      // need condition to update user if they are an admin
+      else {
+        // if user is an admin, update the admin user with recieved saml fields in the database
+        await userModel.addUser(
+          user.email,
+          userToAuthorize.first_name,
+          userToAuthorize.last_name,
+          userToAuthorize.saml_role,
+          user.app_role,
+          userToAuthorize.school,
+          userToAuthorize.program
+        );
+      }
     } else {
-      // Add user in the database
+      // Add non-admin user to the database
       await userModel.addUser(
         userToAuthorize.email,
         userToAuthorize.first_name,
@@ -111,10 +126,11 @@ router.post("/authorize", async (req, res) => {
     let userDetails = await userModel.findOne(userToAuthorize.email);
 
     if (userDetails !== null) {
+      // Send back the user details
+      return res.status(200).json(userDetails);
+    } else {
+      return res.status(400).send({ error: "Unidentifiable user" });
     }
-
-    // Send back the user details
-    return res.status(200).send(userDetails);
   } catch (error) {
     logger.error({ message: "Error in /api/authorize", error: error.stack });
     return res.status(500).send({ error: error.message });
