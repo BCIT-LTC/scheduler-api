@@ -124,7 +124,6 @@ async function seedEvents() {
  */
 async function seedLocations() {
   try {
-    console.log("number of locations", locations.length);
     // Insert locations from seedData/locations.json into the database
     for (let i = 0; i < locations.length; i++) {
       await prisma.locations.upsert({
