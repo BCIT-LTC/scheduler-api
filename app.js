@@ -27,6 +27,7 @@ const announcements = require("./routes/announcements");
 const auth = require("./routes/auth");
 const userAdminRoutes = require("./routes/userAdminRoutes");
 const events = require("./routes/events");
+const locations = require("./routes/locations");
 
 // Middleware for parsing URL-encoded data (extended: true allows parsing of arrays and objects)
 app.use(express.urlencoded({ extended: true }));
@@ -44,7 +45,7 @@ app.get("/log", (req, res) => {
 });
 
 // Using route files
-app.use("/api", authentication_check, announcements, auth, events);
+app.use("/api", authentication_check, announcements, auth, events, locations);
 app.use("/api", userAdminRoutes);
 // Swagger API documentation setup
 const options = {
