@@ -70,6 +70,14 @@ const events = [
     description: "Event 9 Description",
     status: "CANCELLED",
   },
+  {
+    event_id: 10,
+    start_time: "2024-03-01T13:00:00",
+    end_time: "2024-03-01T14:30:00",
+    summary: "Event 10",
+    description: "Event 10 Description",
+    status: "CONFIRMED",
+  },
 ];
 
 module.exports = events;

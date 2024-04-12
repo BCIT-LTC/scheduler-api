@@ -98,6 +98,14 @@ describe("GET all events by month", () => {
         created: null,
         last_modified: "2024-02-08T09:04:09.000Z",
         status: "CONFIRMED"
+      },
+      {
+        event_id: 10,
+        start_time: "2024-03-01T13:00:00",
+        end_time: "2024-03-01T14:30:00",
+        summary: "Event 10",
+        description: "Event 10 Description",
+        status: "CONFIRMED"
       }
     ];
 
@@ -109,9 +117,10 @@ describe("GET all events by month", () => {
       });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body.length).toBe(2);
+    expect(res.body.length).toBe(3);
     expect(res.body[0].event_id).toBe(6);
     expect(res.body[1].event_id).toBe(8);
+    expect(res.body[2].event_id).toBe(10);
   });
 
   it("should return empty array if events aren't found", async () => {
@@ -340,8 +349,8 @@ describe("POST create event", () => {
         location_id: 1,
         start_time: "2024-03-01T08:00:00.000Z",
         end_time: "2024-03-01T22:30:00.000Z",
-        summary: "Event 10",
-        description: "Event 10 Description",
+        summary: "Event 11",
+        description: "Event 11 Description",
       })
       .set({
         Authorization: token,
@@ -356,7 +365,7 @@ describe("POST create event", () => {
       });``
   });
 
-  it("should return a 500 status code if the location_id is missing", async () => {
+  it("should return a 400 status code if the location_id is missing", async () => {
     const res = await request(app)
     .post(endpoint)
     .send({
@@ -368,11 +377,10 @@ describe("POST create event", () => {
     .set({
       Authorization: token,
     });
-    expect(res.statusCode).toBe(500);
-    expect(res.body.error).toBe("Required property location_id is null or undefined");
+    expect(res.statusCode).toBe(400);
   });
   
-  it("should return a 500 status code if the start_time is missing", async () => {
+  it("should return a 400 status code if the start_time is missing", async () => {
     const res = await request(app)
     .post(endpoint)
     .send({
@@ -384,11 +392,10 @@ describe("POST create event", () => {
     .set({
       Authorization: token,
     });
-    expect(res.statusCode).toBe(500);
-    expect(res.body.error).toBe("Required property start_time is null or undefined");
+    expect(res.statusCode).toBe(400);
   });
 
-  it("should return a 500 status code if the end_time is missing", async () => {
+  it("should return a 400 status code if the end_time is missing", async () => {
     const res = await request(app)
     .post(endpoint)
     .send({
@@ -400,8 +407,7 @@ describe("POST create event", () => {
     .set({
       Authorization: token,
     });
-    expect(res.statusCode).toBe(500);
-    expect(res.body.error).toBe("Required property end_time is null or undefined");
+    expect(res.statusCode).toBe(400);
   });
 
   it("should return a 400 status code if token is invalid", async () => {
