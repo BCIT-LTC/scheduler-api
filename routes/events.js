@@ -14,7 +14,6 @@ const logger = createLogger(module);
 
 // Define validation rules for creating event. Optional fields are not included based on prisma model.
 const eventValidation = [
-  body("event_id").isInt(),
   body("location_id").isInt(),
   body("start_time").isISO8601().toDate(), // Convert to date
   body("end_time").isISO8601().toDate(), // Convert to date
