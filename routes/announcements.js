@@ -123,9 +123,6 @@ const logger = createLogger(module);
  */
 router.get("/announcement", async (req, res) => {
   // Check if the user is authenticated
-  if (!auth.authentication_check(req, false)) {
-    return res.sendStatus(403);
-  }
   try {
     const announcement = await getAnnouncement();
     return res.status(200).send(announcement);
