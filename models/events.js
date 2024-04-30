@@ -156,6 +156,7 @@ const createEvent = async (event) => {
         end_time: event.end_time,
         summary: event.event_name,
         description: event.description,
+        facilitator: event.facilitator,
       },
     });
   } catch (error) {

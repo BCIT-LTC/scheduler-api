@@ -84,6 +84,7 @@ async function seedEvents() {
           end_time: new Date(event.end_time),
           summary: event.summary,
           description: event.description,
+          facilitator: event.facilitator,
           created: new Date(),
           status: event.status,
           location: {
@@ -104,6 +105,7 @@ async function seedEvents() {
           end_time: new Date(event.end_time),
           summary: event.summary,
           description: event.description,
+          facilitator: event.facilitator,
           status: event.status,
           location: {
             connect: { location_id: locations[1].location_id },

@@ -37,6 +37,7 @@ model events {
   end_time      DateTime       @db.DateTime(0)
   summary       String?        @db.VarChar(200)
   description   String?        @db.VarChar(200)
+  facilitator   String?        @db.VarChar(200)
   created       DateTime?      @default(now()) @db.DateTime(0)
   last_modified DateTime?      @updatedAt @db.DateTime(0)
   status        status?        @default(TENTATIVE)
