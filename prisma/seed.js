@@ -21,15 +21,32 @@ const events = require("./seedData/events");
  */
 async function seedAnnouncements() {
   try {
-    return await prisma.announcements.upsert({
-      where: { announcements_id: 1 },
-      update: {},
-      create: {
-        title: "Welcome!",
-        description: "Welcome to the BSN OpenLab Scheduler!",
-        date: new Date(),
+    return await prisma.announcement.upsert(
+      {
+        where: { announcement_id: 1 },
+        update: {},
+        create: {
+          title: 'Website Maintenance',
+          description: 'OpenLab Scheduler website will be down for maintenance on Sunday, May 26th, 2024 from 00:00 to 06:00 PST.',
+          // created_by: 'Jasica Munday',
+          created_at: new Date('2024-04-27T08:14:55'),
+          // modified_by: 'Jasica Munday',
+          last_modified: new Date('2024-05-01T08:20:31')
+        },
       },
-    });
+      {
+        where: { announcement_id: 2 },
+        update: {},
+        create: {
+          title: 'Statutory Holiday: Victoria Day',
+          description: 'BCIT will be closed on May 20th, 2024 for Statutory Holiday: Victoria Day.',
+          // created_by: 'Jasica Munday',
+          created_at: new Date('2024-04-24T09:32:12'),
+          // modified_by: 'Jasica Munday',
+          last_modified: new Date('2024-04-24T09:32:12')
+        },
+      }
+    );
   } catch (error) {
     logger.error({ message: "seedAnnouncements", error: error.stack });
     throw error;
@@ -43,7 +60,7 @@ async function seedAnnouncements() {
  */
 async function seedSuperuser() {
   try {
-    await prisma.users.upsert({
+    await prisma.user.upsert({
       where: { email: process.env.SUPERUSER },
       update: {},
       create: {
@@ -51,10 +68,9 @@ async function seedSuperuser() {
         first_name: "",
         last_name: "",
         saml_role: "",
-        app_role: "admin",
-        school: "",
-        program: "",
-        isActive: true,
+        app_roles: "admin",
+        department: "",
+        is_active: true,
       },
     });
   } catch (error) {
@@ -76,7 +92,7 @@ async function seedEvents() {
     // Half of the events will have the 1st location
     for (let i = 0; i <= eventArrayHalf; i++) {
       const event = events[i];
-      await prisma.events.upsert({
+      await prisma.event.upsert({
         where: { event_id: event.event_id },
         update: {},
         create: {
@@ -85,7 +101,8 @@ async function seedEvents() {
           summary: event.summary,
           description: event.description,
           facilitator: event.facilitator,
-          created: new Date(),
+          created_at: new Date(),
+          last_modified: new Date(),
           status: event.status,
           location: {
             connect: { location_id: locations[0].location_id },
@@ -97,7 +114,7 @@ async function seedEvents() {
     // Half of the events will have the 2nd location
     for (let i = eventArrayHalf + 1; i < events.length; i++) {
       const event = events[i];
-      await prisma.events.upsert({
+      await prisma.event.upsert({
         where: { event_id: event.event_id },
         update: {},
         create: {
@@ -128,11 +145,11 @@ async function seedLocations() {
   try {
     // Insert locations from seedData/locations.json into the database
     for (let i = 0; i < locations.length; i++) {
-      await prisma.locations.upsert({
+      await prisma.location.upsert({
         where: { location_id: locations[i].location_id },
         update: {},
         create: {
-          room_number: locations[i].room_number,
+          room_location: locations[i].room_location,
         },
       });
     }
@@ -151,7 +168,7 @@ async function seedDatabase() {
     switch (environment) {
       case "development":
         // add development AND production seed data
-        // seedAnnouncements();
+        await seedAnnouncements();
         await seedLocations();
         await seedEvents();
         await seedSuperuser();

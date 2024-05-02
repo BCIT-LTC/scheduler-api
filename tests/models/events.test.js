@@ -24,7 +24,7 @@ describe('createEvent', () => {
             description: 'Test Description',
         };
         const mockCreatedEvent = { ...mockEvent, event_id: 1 };
-        prisma.events.create.mockResolvedValue(mockCreatedEvent);
+        prisma.event.create.mockResolvedValue(mockCreatedEvent);
 
         const result = await createEvent(mockEvent);
 
@@ -74,7 +74,7 @@ describe('createEvent', () => {
     });
 
     it("throws an error if the event is null or undefined", async () => {
-        prisma.events.create.mockResolvedValue(null);
+        prisma.event.create.mockResolvedValue(null);
 
         await expect(createEvent(null)).rejects.toThrow();
         await expect(createEvent(undefined)).rejects.toThrow();

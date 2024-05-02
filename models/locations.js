@@ -10,7 +10,7 @@ const logger = createLogger(module);
  */
 const getLocations = async () => {
     try {
-        return await prisma.locations.findMany();
+        return await prisma.location.findMany();
     } catch (error) {
         logger.error({ message: "Error fetching locations", error: error.stack });
     }

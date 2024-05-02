@@ -14,7 +14,7 @@ const getEventsByDate = async (date) => {
   nextDay.setDate(nextDay.getDate() + 1); // Add one day to the date
 
   try {
-    return await prisma.events.findMany({
+    return await prisma.event.findMany({
       where: {
         start_time: {
           gte: date,
@@ -46,7 +46,7 @@ const getEventsByMonth = async (date) => {
   upperBound.setDate(date.getDate() + 15);
 
   try {
-    return await prisma.events.findMany({
+    return await prisma.event.findMany({
       where: {
         start_time: {
           gte: lowerBound,
@@ -73,7 +73,7 @@ const getEventsByWeek = async (date = new Date()) => {
   upperBound.setDate(date.getDate() + 5);
 
   try {
-    const events =  await prisma.events.findMany({
+    const events =  await prisma.event.findMany({
       where: {
         start_time: {
           gte: lowerBound,
@@ -106,7 +106,7 @@ const getEventsByRange = async (start, end) => {
     end = new Date(end);
   }
   try {
-    return await prisma.events.findMany({
+    return await prisma.event.findMany({
       where: {
         start_time: {
           gte: start,
@@ -128,9 +128,9 @@ const getEventsByRange = async (start, end) => {
  */
 const createEvent = async (event) => {
   // // Presently, location is a string from the event created form. If this is the correct implementation, we will have to look up the location id.
-  // var location = await prisma.locations.findUnique({
+  // var location = await prisma.location.findUnique({
   //   where: {
-  //     room_number: event.location,
+  //     room_location: event.location,
   //   },
   // });
   // var locationId = location ? location.location_id : null;
@@ -149,7 +149,7 @@ const createEvent = async (event) => {
   }
 
   try {
-    return await prisma.events.create({
+    return await prisma.event.create({
       data: {
         location_id: event.location_id,
         start_time: event.start_time,
@@ -174,7 +174,7 @@ const deleteEvent = async (event_id) => {
   try {
     var id = parseInt(event_id);
 
-    return await prisma.events.delete({
+    return await prisma.event.delete({
       where: {
         event_id: id,
       },

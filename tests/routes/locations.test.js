@@ -13,9 +13,9 @@ describe("GET /locations", () => {
         });
         expect(res.statusCode).toBe(200);
         expect(res.body[0]).toHaveProperty("location_id");
-        expect(res.body[0]).toHaveProperty("room_number");
-        expect(res.body[0].room_number).toBe("3086");
-        expect(res.body[1].room_number).toBe("3087");
+        expect(res.body[0]).toHaveProperty("room_location");
+        expect(res.body[0].room_location).toBe("NW4-3086");
+        expect(res.body[1].room_location).toBe("NW4-3087");
     });
 
     it("should return a 400 status code if no token is provided", async () => {

@@ -118,7 +118,7 @@ router.post("/authorize", async (req, res) => {
         userToAuthorize.saml_role,
         userToAuthorize.school,
         userToAuthorize.program,
-        true // isActive
+        true // is_active
       );
     }
 

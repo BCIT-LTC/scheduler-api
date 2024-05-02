@@ -5,12 +5,12 @@
  *     announcements:
  *       type: object
  *       required:
- *         - announcements_id
+ *         - announcement_id
  *         - title
  *         - description
  *         - date
  *       properties:
- *         announcements_id:
+ *         announcement_id:
  *           type: integer
  *           description: The auto-generated id of the announcement
  *         title:
@@ -24,7 +24,7 @@
  *           format: date
  *           description: The date the announcement was last modified
  *       example:
- *         announcements_id: 1
+ *         announcement_id: 1
  *         title: Welcome!
  *         description: Welcome to the BSN OpenLab Scheduler!
  *         date: 2023-04-28T10:05:16.000Z
