@@ -48,7 +48,7 @@ describe("GET all events by month", () => {
         end_time: "2024-01-02T22:30:00.000Z",
         summary: "Event 1",
         description: "Event 1 Description",
-        created: null,
+        created_at: null,
         last_modified: "2024-02-08T09:04:08.000Z",
         status: "TENTATIVE"
       },
@@ -58,7 +58,7 @@ describe("GET all events by month", () => {
         end_time: "2024-01-03T22:30:00.000Z",
         summary: "Event 2",
         description: "Event 2 Description",
-        created: null,
+        created_at: null,
         last_modified: "2024-02-08T09:04:08.000Z",
         status: "CANCELLED"
       }
@@ -85,7 +85,7 @@ describe("GET all events by month", () => {
         end_time: "2024-03-01T22:30:00.000Z",
         summary: "Event 6",
         description: "Event 6 Description",
-        created: null,
+        created_at: null,
         last_modified: "2024-02-08T09:04:09.000Z",
         status: "TENTATIVE"
       },
@@ -95,7 +95,7 @@ describe("GET all events by month", () => {
         end_time: "2024-03-31T00:00:00.000Z",
         summary: "Event 8",
         description: "Event 8 Description",
-        created: null,
+        created_at: null,
         last_modified: "2024-02-08T09:04:09.000Z",
         status: "CONFIRMED"
       },
@@ -213,7 +213,7 @@ describe("GET all events by range", () => {
       end_time: "2024-02-19T22:30:00.000Z",
       summary: "Event 3",
       description: "Event 3 Description",
-      created: "2024-03-21T06:17:28.000Z",
+      created_at: "2024-03-21T06:17:28.000Z",
       last_modified: "2024-03-21T06:17:28.000Z",
       status: "CONFIRMED"
   },
@@ -224,7 +224,7 @@ describe("GET all events by range", () => {
       end_time: "2024-02-20T22:30:00.000Z",
       summary: "Event 4",
       description: "Event 4 Description",
-      created: "2024-03-21T06:17:28.000Z",
+      created_at: "2024-03-21T06:17:28.000Z",
       last_modified: "2024-03-21T06:17:28.000Z",
       status: "CONFIRMED"
   },
@@ -235,7 +235,7 @@ describe("GET all events by range", () => {
       end_time: "2024-02-26T22:30:00.000Z",
       summary: "Event 5",
       description: "Event 5 Description",
-      created: "2024-03-21T06:17:28.000Z",
+      created_at: "2024-03-21T06:17:28.000Z",
       last_modified: "2024-03-21T06:17:28.000Z",
       status: "CONFIRMED"
   }

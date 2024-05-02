@@ -13,15 +13,7 @@ const logger = createLogger(module);
  */
 const getAnnouncement = async() => {
     try {
-        return await prisma.announcements.findMany({
-            select: {
-                announcements_id: true,
-                title: true,
-                description: true,
-                date: true,
-                last_modified: true,
-            }
-        });
+        return await prisma.announcement.findMany();
     } catch (error) {
         logger.error({ message: "Error while fetching announcements", error: error.stack });
         throw error;
@@ -41,11 +33,11 @@ const getAnnouncement = async() => {
  */
 const addAnnouncement = async(title, description, date) => {
     try {
-        return await prisma.announcements.create({
+        return await prisma.announcement.create({
             data: {
                 title,
                 description,
-                date,
+                created_at,
                 last_updated: new Date(),
             },
         });
@@ -65,8 +57,8 @@ const addAnnouncement = async(title, description, date) => {
  */
 const deleteAnnouncement = async(id) => {
     try {
-        const deletedAnnouncement = await prisma.announcements.delete({
-            where: { announcements_id: id },
+        const deletedAnnouncement = await prisma.announcement.delete({
+            where: { announcement_id: id },
         });
         console.log("Deleted Announcement: ", deletedAnnouncement);
         return deletedAnnouncement;
@@ -89,8 +81,8 @@ const deleteAnnouncement = async(id) => {
  */
 const editAnnouncement = async(id, updatedTitle, updatedDescription, date) => {
     try {
-        const editedAnnouncement = await prisma.announcements.update({
-            where: { announcements_id: id },
+        const editedAnnouncement = await prisma.announcement.update({
+            where: { announcement_id: id },
             data: {
                 title: updatedTitle,
                 description: updatedDescription,

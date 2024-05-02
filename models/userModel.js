@@ -12,8 +12,8 @@ const userModel = {
    */
   listAllUsers: async () => {
     try {
-      return await prisma.users.findMany({
-        where: { isActive: true },
+      return await prisma.user.findMany({
+        where: { is_active: true },
       });
     } catch (error) {
       logger.error({
@@ -32,7 +32,7 @@ const userModel = {
    */
   findOne: async (email) => {
     try {
-      return await prisma.users.findUnique({
+      return await prisma.user.findUnique({
         where: { email },
       });
     } catch (error) {
@@ -53,7 +53,7 @@ const userModel = {
    */
   // findById: async (id) => {
   //     try {
-  //         return await prisma.users.findUnique({
+  //         return await prisma.user.findUnique({
   //             where: { id },
   //         });
   //     } catch (error) {
@@ -71,10 +71,9 @@ const userModel = {
    * @param {*} first_name - users first name
    * @param {*} last_name - users last name
    * @param {*} saml_role - users saml role
-   * @param {*} app_role - users app role
-   * @param {*} school - users school
-   * @param {*} program - users program
-   * @param {*} isActive - users active status
+   * @param {*} app_roles - users app roles
+   * @param {*} department - users department
+   * @param {*} is_active - users active status
    * @returns the user who was added
    * @async
    */
@@ -83,32 +82,29 @@ const userModel = {
     first_name,
     last_name,
     saml_role,
-    app_role,
-    school,
-    program,
-    isActive
+    app_roles,
+    department,
+    is_active
   ) => {
     try {
-      return await prisma.users.upsert({
+      return await prisma.user.upsert({
         where: { email },
         update: {
           first_name: first_name,
           last_name: last_name,
           saml_role: saml_role,
-          app_role: app_role,
-          school: school,
-          program: program,
-          isActive: isActive,
+          app_roles: app_roles,
+          department: department,
+          is_active: is_active,
         },
         create: {
           email,
           first_name,
           last_name,
           saml_role,
-          app_role,
-          school,
-          program,
-          isActive,
+          app_roles,
+          department,
+          is_active,
         },
       });
     } catch (error) {
@@ -129,7 +125,7 @@ const userModel = {
    */
   updateUserRole: async (email, newRole) => {
     try {
-      const user = await prisma.users.findUnique({
+      const user = await prisma.user.findUnique({
         where: { email },
       });
       if (!user) {
@@ -140,7 +136,7 @@ const userModel = {
         throw new Error(`User ${email} already has the role of ${newRole}`);
       }
       // Perform the update
-      return await prisma.users.update({
+      return await prisma.user.update({
         where: { email },
         data: { role: newRole },
       });

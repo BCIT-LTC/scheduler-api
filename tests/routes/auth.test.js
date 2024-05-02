@@ -15,7 +15,7 @@ describe("Test suite for the auth routes", () => {
         saml_role: "student",
         school: "Test School",
         program: "Test Program",
-        isActive: true,
+        is_active: true,
       });
     expect(response.statusCode).toBe(200);
   });
@@ -28,7 +28,7 @@ describe("Test suite for the auth routes", () => {
       saml_role: "student",
       school: "Test School",
       program: "Test Program",
-      isActive: true,
+      is_active: true,
     });
     expect(response.statusCode).toBe(200);
   });
