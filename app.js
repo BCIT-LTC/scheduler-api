@@ -25,7 +25,6 @@ app.use(cors());
 // Routes
 const announcements = require("./routes/announcements");
 const auth = require("./routes/auth");
-const userAdminRoutes = require("./routes/userAdminRoutes");
 const events = require("./routes/events");
 const locations = require("./routes/locations");
 
@@ -46,31 +45,39 @@ app.get("/log", (req, res) => {
 
 // Using route files
 app.use("/api", authentication_check, announcements, auth, events, locations);
-app.use("/api", userAdminRoutes);
+
 // Swagger API documentation setup
 const options = {
     definition: {
-        openapi: "3.0.0",
+        openapi: "3.0.1",
         info: {
             title: "Scheduler-API",
             version: "dev",
             description: "Welcome to the API for the BSN Openlab Scheduler",
         },
         servers: [{ url: "http://localhost:8000" }],
+        components: {
+            securitySchemes: {
+              bearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+              }
+            }
+          },
+          security: [{
+            bearerAuth: []
+          }]
     },
     apis: ["./routes/*.js"],
 };
 
 const specs = swaggerJsdoc(options);
 
+app.use('/documentation', express.static('documentation'));
 // Swagger UI setup
-// app.use("/", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
+app.use("/", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
-app.use("/", function(req, res, next) {
-    res.setHeader("Content-Type", "application/json");
-    res.status(200);
-    res.json({ version: process.env.GIT_TAG });
-});
 
 // Starting the server
 app.listen(port, hostname, () => {
