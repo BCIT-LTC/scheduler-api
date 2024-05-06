@@ -40,26 +40,17 @@ services:
     volumes:  
       - api_db:/var/lib/postgresql/data 
 
-  # db:
-  #   image: mariadb
-  #   environment:
-  #     - MARIADB_ROOT_PASSWORD=isajrqwoihjwaor
-  #     - MARIADB_DATABASE=openlab-scheduler
-  #     - MARIADB_USER=bsnmysql
-  #     - MARIADB_PASSWORD=bcitbsn491
-
-  #   healthcheck:
-  #     test: "mariadb $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'"
-  #     timeout: 10s
-  #     retries: 10
-  #     interval: 5s
-  #     start_period: 10s
-  #   volumes:
-  #     - api_db:/var/lib/mysql
-
-
-
-
+  jsdocs:
+    image: node:21-alpine
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ./node_modules/.bin/jsdoc -c ./jsdoc.conf.json -r
+    working_dir: /build
+    volumes:
+      - .:/build
+        
   # adminer:
   #   image: adminer
   #   ports:

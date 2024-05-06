@@ -34,7 +34,7 @@
  * @swagger
  * tags:
  *   name: announcements
- *   description: The announcements managing API
+ *   description: The announcements managing API, JWT authentication is required to access this endpoint.
  * /api/announcement:
  *   get:
  *     summary: Retrieve the announcements

@@ -53,3 +53,10 @@ The JWT has to be signed with a `JWT_AUTH_SIGNING_KEY` which can be found in the
 The resulting `Bearer token` needs to be added to each request.
 
 *Also note: The JWT payload is where the user context is added (`Admin`, `Student`, `Instructor`).*
+
+
+### Documentation
+
+documentation can be found in the `documentation` folder after running `docker compose up`
+
+documentation files will be served locally at localhost:9000/documentation
