@@ -57,6 +57,6 @@ The resulting `Bearer token` needs to be added to each request.
 
 ### Documentation
 
-documentation can be found in the `documentation` folder after running `docker compose up`
+The code comments are collected and can be found in the `js_documentation` folder after running `docker compose up`
 
-documentation files will be served locally at localhost:9000/documentation
+code comments are served as jsdocs format locally at localhost:9000/documentation
