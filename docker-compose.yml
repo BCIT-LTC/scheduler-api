@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   app:
     command:
@@ -11,10 +9,10 @@ services:
     ports:
       - 8000:8000
     environment:
-      - MARIADB_ROOT_HOST=db
-      - MARIADB_DATABASE=openlab-scheduler
-      - MARIADB_USER=bsnmysql
-      - MARIADB_PASSWORD=bcitbsn491
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=openlab-scheduler
+      - POSTGRES_USER=bsnmysql
+      - POSTGRES_PASSWORD=bcitbsn491
       - TZ=America/Vancouver
       - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
       - NODE_ENV=development
@@ -22,27 +20,45 @@ services:
       # - NODE_ENV=production
       - SUPERUSER=admin@bcit.ca
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
     volumes:
       - .:/app
 
-  db:
-    image: mariadb
+  postgres:
+    image: postgres
     environment:
-      - MARIADB_ROOT_PASSWORD=isajrqwoihjwaor
-      - MARIADB_DATABASE=openlab-scheduler
-      - MARIADB_USER=bsnmysql
-      - MARIADB_PASSWORD=bcitbsn491
-
+      POSTGRES_USER: bsnmysql
+      POSTGRES_PASSWORD: bcitbsn491
+      POSTGRES_DB: openlab-scheduler
     healthcheck:
-      test: "mariadb $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'"
+      test: "pg_isready -U bsnmysql -d openlab-scheduler"
       timeout: 10s
       retries: 10
       interval: 5s
       start_period: 10s
-    volumes:
-      - api_db:/var/lib/mysql
+    volumes:  
+      - api_db:/var/lib/postgresql/data 
+
+  # db:
+  #   image: mariadb
+  #   environment:
+  #     - MARIADB_ROOT_PASSWORD=isajrqwoihjwaor
+  #     - MARIADB_DATABASE=openlab-scheduler
+  #     - MARIADB_USER=bsnmysql
+  #     - MARIADB_PASSWORD=bcitbsn491
+
+  #   healthcheck:
+  #     test: "mariadb $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'"
+  #     timeout: 10s
+  #     retries: 10
+  #     interval: 5s
+  #     start_period: 10s
+  #   volumes:
+  #     - api_db:/var/lib/mysql
+
+
+
 
   # adminer:
   #   image: adminer
