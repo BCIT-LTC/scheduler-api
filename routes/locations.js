@@ -50,15 +50,32 @@
  *
  */
 
+/**
+ * Express router for handling API requests.
+ * @typedef {import('express').Router} ExpressRouter
+ */
+
+/**
+ * @type {ExpressRouter}
+ * @namespace locationsRouter
+ * @description Router for handling locations requests.
+ */
+
 const express = require("express");
 const router = express.Router();
 const { getLocations } = require("../models/locations");
 const createLogger = require("../logger");
 const logger = createLogger(module);
 
+
 /**
- * GET /api/locations
- * Endpoint to retrieve all locations
+ * Middleware for handling get location requests.
+ * @name apiRouter.get
+ * @function
+ * @memberof locationsRouter
+ * @param {import('express').Request} req - The Express request object.
+ * @param {import('express').Response} res - The Express response object.
+ * @returns {Promise<any>} - The response data from the locations call.
  */
 router.get("/locations", async (req, res) => {
     try {

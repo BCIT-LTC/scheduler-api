@@ -74,7 +74,7 @@ const options = {
 
 const specs = swaggerJsdoc(options);
 
-app.use('/documentation', express.static('documentation'));
+app.use('/documentation', express.static('js_documentation'));
 // Swagger UI setup
 app.use("/", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 

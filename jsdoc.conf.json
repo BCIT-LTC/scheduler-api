@@ -4,7 +4,7 @@
         "exclude": [ "node_modules/" ]
     },
     "opts": {
-        "destination": "./documentation/",
+        "destination": "./js_documentation/",
         "recurse": true
     }
 }
