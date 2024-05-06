@@ -7,7 +7,6 @@ WORKDIR /app
 
 # Install dependencies
 RUN apk --update add \
-        mariadb-client \
         curl \
     ;
 
