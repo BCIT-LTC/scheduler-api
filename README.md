@@ -30,16 +30,16 @@ If you run into an error that says `"can't find file \r\n"`, go to the `docker-e
 Calls to `scheduler-api` require a `Bearer token` to be added to the request. To create the `Bearer token` you have to generate a JWT token. You can use any JWT tool, but a simple, standard one can be created on [`jwt.io`](https://jwt.io). The current JWT structure looks like the following:
 
 ```javascript
-let jwtToken = jwt.sign({
- email,
- first_name,
- last_name,
- role,
- school,
- program,
- authorization_checked: true,
- is_logged_in: true,
-}, process.env.JWT_AUTH_SIGNING_KEY);
+    {
+    "email" : "test@bcit.ca",
+    "first_name" : "first_name",
+    "last_name" : "last_name",
+    "saml_role" : "student", // or "instructor" or "employee"
+    "app_roles" : [ "admin", "instructor" ], // <-- can be different roles combined 
+    "department" : "School of Health Sciences", // not used at the moment, it's here for future use
+    "authorization_checked": false, // this is a flag to track if the user's authorization has been checked on the backend
+    "is_logged_in": true, // this is a flag to track if the user is logged in
+    }
 ```
 
 > This structure might change to match or integrate with the BCIT SAML.
