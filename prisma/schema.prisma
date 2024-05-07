@@ -14,7 +14,7 @@ model User {
   first_name            String         @db.VarChar(50)
   last_name             String         @db.VarChar(50)
   saml_role             String         @db.VarChar(50)
-  app_roles             String         @db.VarChar(50)
+  app_roles             Role[]         @default([user])
   department            String         @db.VarChar(50)
   is_active             Boolean        @default(true)
   created_at            DateTime       @default(now())
@@ -26,6 +26,13 @@ model User {
   location_modified     Location[]     @relation("LocationModifier")
   series_created        Series[]       @relation("SeriesCreator")
   series_modified       Series[]       @relation("SeriesModifier")
+}
+
+enum Role {
+  user
+  admin
+  student
+  employee
 }
 
 model Location {

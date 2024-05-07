@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const userModel = require("../models/userModel").userModel;
-const auth = require("../middleware/authentication_check");
+const { Role } = require("@prisma/client");
+
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 
@@ -17,69 +18,52 @@ router.post("/authorize", async (req, res) => {
     let userToAuthorize = res.locals.user;
 
     let user = await userModel.findOne(userToAuthorize.email);
-    if (user !== null) {
-      if (user.app_role !== "admin") {
-        userToAuthorize.app_role = user.saml_role;
 
-        // synchronize all SAML fields on db with received info: email, first_name, last_name, saml_role, school, program
-        if (
-          user.email !== userToAuthorize.email ||
-          user.first_name !== userToAuthorize.first_name ||
-          user.last_name !== userToAuthorize.last_name ||
-          user.saml_role !== userToAuthorize.saml_role ||
-          user.app_role !== userToAuthorize.saml_role ||
-          user.school !== userToAuthorize.school ||
-          user.program !== userToAuthorize.program
-        ) {
-          // the addUser method upserts users (updates them here)
-          await userModel.addUser(
-            userToAuthorize.email,
-            userToAuthorize.first_name,
-            userToAuthorize.last_name,
-            userToAuthorize.saml_role,
-            userToAuthorize.saml_role,
-            userToAuthorize.school,
-            userToAuthorize.program
-          );
-        }
+    if (user !== null) {
+      let saml_role = Role[userToAuthorize.saml_role]
+
+      if(saml_role === undefined){
+        return res.status(400).send({ error: "Unknown user role" });
       }
-      // need condition to update user if they are an admin
-      else {
-        // if user is an admin, update the admin user with recieved saml fields in the database
-        await userModel.addUser(
-          user.email,
-          userToAuthorize.first_name,
-          userToAuthorize.last_name,
-          userToAuthorize.saml_role,
-          user.app_role,
-          userToAuthorize.school,
-          userToAuthorize.program
-        );
+      
+      let app_roles_array = user.app_roles
+      if (!user.app_roles.includes(saml_role)) {
+        app_roles_array.push(saml_role);
       }
-    } else {
-      // Add non-admin user to the database
+      
+      // the addUser method upserts users (updates them here)
       await userModel.addUser(
         userToAuthorize.email,
         userToAuthorize.first_name,
         userToAuthorize.last_name,
         userToAuthorize.saml_role,
+        app_roles_array,
+        userToAuthorize.department
+      );
 
-        // the saml_role below is used to set app_role = saml_role
+    }
+    else {
+      // Add new user to DB
+      await userModel.addUser(
+        userToAuthorize.email,
+        userToAuthorize.first_name,
+        userToAuthorize.last_name,
         userToAuthorize.saml_role,
-        userToAuthorize.school,
-        userToAuthorize.program,
-        true // is_active
+        [userToAuthorize.saml_role], //copy saml_role to the app_roles array
+        userToAuthorize.department
       );
     }
 
     // Retrieve the details of the authorized user
     let userDetails = await userModel.findOne(userToAuthorize.email);
+    console.log("userDetails");
+    console.log(userDetails);
 
     if (userDetails !== null) {
       // Send back the user details
       return res.status(200).json(userDetails);
     } else {
-      return res.status(400).send({ error: "Unidentifiable user" });
+      return res.status(400).send({ error: "Unknown user role" });
     }
   } catch (error) {
     logger.error({ message: "Error in /api/authorize", error: error.stack });

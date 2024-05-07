@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient, Role } = require("@prisma/client");
 const prisma = new PrismaClient();
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
@@ -68,7 +68,7 @@ async function seedSuperuser() {
         first_name: "",
         last_name: "",
         saml_role: "",
-        app_roles: "admin",
+        app_roles: [Role.admin],
         department: "",
         is_active: true,
       },
