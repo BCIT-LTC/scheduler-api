@@ -31,18 +31,22 @@ const getAnnouncement = async() => {
  * @param {*} date - date the announcement was made
  * @returns {unknown}
  */
-const addAnnouncement = async(title, description, date) => {
+const addAnnouncement = async(title, description, created_date) => {
     try {
         return await prisma.announcement.create({
             data: {
-                title,
-                description,
-                created_at,
-                last_updated: new Date(),
+                title: title,
+                description: description,
+                created_at: created_date,
+                created_by: null,
+                last_modified: new Date(),
+                modified_by: null,
+                event_id: null,
             },
         });
     } catch (error) {
-        logger.error({ message: " Error while adding an announcement", error: error.stack });
+        logger.error({ message: "Error while adding an announcement", error: error.stack });
+        throw error;
     }
 };
 
@@ -64,6 +68,7 @@ const deleteAnnouncement = async(id) => {
         return deletedAnnouncement;
     } catch (error) {
         logger.error({ message: "Error while deleting an announcement", error: error.stack });
+        throw error;
     }
 };
 
@@ -79,15 +84,14 @@ const deleteAnnouncement = async(id) => {
  * @param date
  * @returns {Object} the updated announcement
  */
-const editAnnouncement = async(id, updatedTitle, updatedDescription, date) => {
+const editAnnouncement = async(id, updatedTitle, updatedDescription, last_modified) => {
     try {
         const editedAnnouncement = await prisma.announcement.update({
             where: { announcement_id: id },
             data: {
                 title: updatedTitle,
                 description: updatedDescription,
-                date: date,
-                last_updated: new Date(),
+                last_modified: last_modified,
             },
         });
         console.log("Edited Announcement: ", editedAnnouncement);
