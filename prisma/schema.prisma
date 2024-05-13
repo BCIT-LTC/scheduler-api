@@ -82,6 +82,7 @@ model Series {
   end_date                   DateTime  @db.Date()
   status                     status?   @default(TENTATIVE)
   recurrence_frequency_weeks Int
+  recurrence_frequency_days  Int[]
   created_at                 DateTime  @default(now())
   creator                    User?     @relation("SeriesCreator", fields: [created_by], references: [email], onDelete: NoAction)
   created_by                 String?   @db.VarChar(50)
