@@ -4,6 +4,25 @@ const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 
 /**
+ * Find an event by its id
+ * @async
+ * @param {number} id - the id of the event
+ * @returns {Object} the event object
+ */
+const getEventById = async (id) => {
+  try {
+    var eventId = parseInt(id);
+    return await prisma.event.findUnique({
+      where: {
+        event_id: eventId,
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error fetching event", error: error.stack });
+  }
+}
+
+/**
  *  Find all the events for a specific day
  * @async
  * @param {Date} date - the date to search for
@@ -185,6 +204,7 @@ const deleteEvent = async (event_id) => {
 }
 
 module.exports = {
+  getEventById,
   getEventsByDate,
   getEventsByMonth,
   getEventsByWeek,

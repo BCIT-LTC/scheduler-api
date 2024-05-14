@@ -20,6 +20,24 @@ const eventValidation = [
 ];
 
 /**
+ * GET /api/events/:id
+ * Endpoint to retrieve an event by ID.
+ */
+router.get("/events/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const event = await getEventById(id);
+    if (!event) {
+      return res.status(404).send({ error: "Event not found" });
+    }
+    return res.status(200).send(event);
+  } catch (error) {
+    logger.error({ message: `GET /api/events/${id}`, error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+/**
 * GET /api/events/day
 * Endpoint to retrieve the events for a specific day.
 */
@@ -110,20 +128,18 @@ router.post("/events", eventValidation, async (req, res) => {
 * Note: so far only used to delete test events in unit tests
 */
 router.delete("/events/:id", async (req, res) => {
- try {
-   const id = req.params.id;
-   // Consider creating getEventById function in /models/events.js
-    // Check if the event exists by getting the event with prisma
-   // const event = prisma.event.findUnique({ where: { id: id } });
-   // if (!event) {
-   //   return res.status(404).send({ error: "Event not found" });
-   // }
-   await deleteEvent(id);
-   return res.status(200).send({ message: "Event deleted successfully" });
- } catch (error) {
-   logger.error({ message: `DELETE /api/events/${id}`, error: error.stack });
-   return res.status(500).send({ error: error.message });
- }
+  try {
+    const id = req.params.id;
+    const event = await getEventById(id);
+    if (!event) {
+      return res.status(404).send({ error: "Event not found" });
+    }
+    await deleteEvent(id);
+    return res.status(200).send({ message: "Event deleted successfully" });
+  } catch (error) {
+    logger.error({ message: `DELETE /api/events/${id}`, error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
 });
 
 module.exports = router;
