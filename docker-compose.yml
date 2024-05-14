@@ -9,16 +9,10 @@ services:
     ports:
       - 8000:8000
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DB=openlab-scheduler
-      - POSTGRES_USER=bsnmysql
-      - POSTGRES_PASSWORD=bcitbsn491
-      - TZ=America/Vancouver
-      - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
       - NODE_ENV=development
       # - NODE_ENV=test
       # - NODE_ENV=production
-      - SUPERUSER=admin@bcit.ca
+
     depends_on:
       postgres:
         condition: service_healthy
@@ -27,10 +21,6 @@ services:
 
   postgres:
     image: postgres
-    environment:
-      POSTGRES_USER: bsnmysql
-      POSTGRES_PASSWORD: bcitbsn491
-      POSTGRES_DB: openlab-scheduler
     healthcheck:
       test: "pg_isready -U bsnmysql -d openlab-scheduler"
       timeout: 10s
@@ -55,6 +45,25 @@ services:
   #   image: adminer
   #   ports:
   #     - 8080:8080
+
+  testing:
+    image: node:21-alpine
+    command:
+      - /bin/sh
+      - -c
+      - |
+        npm run test --detectOpenHandles
+    working_dir: /test
+    environment:
+      # - NODE_ENV=development
+      - NODE_ENV=test
+      # - NODE_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/test
+
 
 volumes:
   api_db:
