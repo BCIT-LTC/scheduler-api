@@ -1,15 +1,6 @@
 #!/bin/sh
 set -e
 
-# Set the default environment variables
-POSTGRES_HOST=postgres
-POSTGRES_DB=openlab-scheduler
-POSTGRES_USER=bsnmysql
-POSTGRES_PASSWORD=bcitbsn491
-TZ=America/Vancouver
-JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
-SUPERUSER=admin@bcit.ca
-
 # Verify that the minimally required environment variables are set.
 if [ -z "$POSTGRES_HOST" ] || [ -z "$POSTGRES_USER" ] || [ -z "$POSTGRES_PASSWORD" ] || [ -z "$POSTGRES_DB" ] || [ -z "$JWT_AUTH_SIGNING_KEY" ]; then
     printf '\n\nEnvironment variables are not set.\n\tYou need to specify POSTGRES_HOST, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB and JWT_AUTH_SIGNING_KEY\n\n'
