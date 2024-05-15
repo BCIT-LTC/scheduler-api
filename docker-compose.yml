@@ -12,7 +12,13 @@ services:
       - NODE_ENV=development
       # - NODE_ENV=test
       # - NODE_ENV=production
-
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=openlab-scheduler
+      - POSTGRES_USER=bsnmysql
+      - POSTGRES_PASSWORD=bcitbsn491
+      - TZ=America/Vancouver
+      - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
+      - SUPERUSER=admin@bcit.ca
     depends_on:
       postgres:
         condition: service_healthy
@@ -21,6 +27,10 @@ services:
 
   postgres:
     image: postgres
+    environment:
+        POSTGRES_USER: bsnmysql
+        POSTGRES_PASSWORD: bcitbsn491
+        POSTGRES_DB: openlab-scheduler
     healthcheck:
       test: "pg_isready -U bsnmysql -d openlab-scheduler"
       timeout: 10s
@@ -32,6 +42,10 @@ services:
 
   jsdocs:
     image: node:21-alpine
+    environment:
+      POSTGRES_USER: bsnmysql
+      POSTGRES_PASSWORD: bcitbsn491
+      POSTGRES_DB: openlab-scheduler
     command:
       - /bin/sh
       - -c
@@ -58,6 +72,7 @@ services:
       # - NODE_ENV=development
       - NODE_ENV=test
       # - NODE_ENV=production
+      - DATABASE_URL=postgres://bsnmysql:bcitbsn491@postgres:5432/openlab-scheduler
     depends_on:
       postgres:
         condition: service_healthy
