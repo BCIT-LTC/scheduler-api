@@ -2,12 +2,13 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const router = express.Router();
 const {
- getEventsByDate,
- getEventsByMonth,
- getEventsByWeek,
- getEventsByRange,
- createEvent,
- deleteEvent,
+  getEventsByDate,
+  getEventsByMonth,
+  getEventsByWeek,
+  getEventsByRange,
+  createEvent,
+  deleteEvent,
+  updateEvent,
 } = require("../models/events");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
@@ -138,6 +139,25 @@ router.delete("/events/:id", async (req, res) => {
     return res.status(200).send({ message: "Event deleted successfully" });
   } catch (error) {
     logger.error({ message: `DELETE /api/events/${id}`, error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/events/:id
+ * Endpoint to update an event by ID.
+ */
+router.put("/events/:id", eventValidation, async (req, res) => {
+  const id = req.params.id;
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const updatedEvent = await updateEvent(req.body);
+    return res.status(200).send(updatedEvent);
+  } catch (error) {
+    logger.error({ message: `PUT /api/events/${id}`, error: error.stack });
     return res.status(500).send({ error: error.message });
   }
 });
