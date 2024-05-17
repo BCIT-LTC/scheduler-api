@@ -92,7 +92,7 @@ const getEventsByWeek = async (date = new Date()) => {
   upperBound.setDate(date.getDate() + 5);
 
   try {
-    const events =  await prisma.event.findMany({
+    const events = await prisma.event.findMany({
       where: {
         start_time: {
           gte: lowerBound,
@@ -107,12 +107,12 @@ const getEventsByWeek = async (date = new Date()) => {
   }
 };
 
-  /**
-   * Find all events for a speciic start and end range
-   * @param {Date} start 
-   * @param {Date} end 
-   * @returns {Object} list of events
-   */
+/**
+ * Find all events for a speciic start and end range
+ * @param {Date} start 
+ * @param {Date} end 
+ * @returns {Object} list of events
+ */
 const getEventsByRange = async (start, end) => {
   if (isNaN(Date.parse(start)) || isNaN(Date.parse(end))) {
     logger.error({ message: "Invalid date format" });
@@ -168,20 +168,27 @@ const createEvent = async (event) => {
   }
 
   try {
-    return await prisma.event.create({
+    const createdEvent = await prisma.event.create({
       data: {
         location_id: event.location_id,
         start_time: event.start_time,
         end_time: event.end_time,
-        summary: event.event_name,
+        summary: event.summary,
         description: event.description,
         facilitator: event.facilitator,
-      },
+        status: event.status,
+        created_by: event.created_by,
+        modified_by: event.modified_by,
+        series_id: event.series_id
+      }
     });
+
+    return createdEvent;
   } catch (error) {
     logger.error({ message: "Error creating event", error: error.stack });
+    throw error;
   }
-};  
+};
 
 /**
  * Asynchronously deletes an event from the database.
@@ -203,6 +210,44 @@ const deleteEvent = async (event_id) => {
   }
 }
 
+/**
+ * Update an existing event
+ *
+ * @param {Object} event - event to update
+ * @returns {Promise<Object>} promise that resolves to the updated event object
+ */
+const updateEvent = async (event) => {
+  try {
+    const e = await prisma.event.findUnique({
+      where: { event_id: event.event_id }
+    })
+    if (!e) {
+      throw new Error(`Event with id ${event.event_id} not found`);
+    }
+    const updatedEvent = await prisma.event.update({
+      where: { event_id: e.event_id },
+      data: {
+        location: { connect: { location_id: event.location_id } },
+        start_time: event.start_time,
+        end_time: event.end_time,
+        summary: event.summary,
+        description: event.description,
+        facilitator: event.facilitator,
+        modifier: { connect: { email: event.modified_by } },
+
+      }
+    });
+    return updatedEvent;
+  } catch (error) {
+    logger.error({
+      message: `Error updating event: ${error.message}`,
+      error: error.stack,
+    });
+    throw error;
+  }
+}
+
+
 module.exports = {
   getEventById,
   getEventsByDate,
@@ -210,5 +255,7 @@ module.exports = {
   getEventsByWeek,
   getEventsByRange,
   createEvent,
-  deleteEvent
+  deleteEvent,
+  updateEvent
 };
+

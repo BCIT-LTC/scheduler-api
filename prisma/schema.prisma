@@ -44,15 +44,14 @@ model Location {
   last_modified        DateTime @updatedAt
   modifier             User?    @relation("LocationModifier", fields: [modified_by], references: [email], onDelete: NoAction)
   modified_by          String?  @db.VarChar(50)
-  event_location_id    Event[]  @relation("EventLocationId")
   events_with_location Event[]  @relation("EventLocation")
 }
 
 model Event {
   event_id            Int            @id @default(autoincrement())
-  location_id         Location?      @relation("EventLocationId", fields: [event_location_id], references: [location_id], onDelete: NoAction)
+  location_id         Int?      
   event_location_id   Int?
-  location            Location?      @relation("EventLocation", fields: [event_location], references: [room_location], onDelete: NoAction)
+  location            Location?      @relation("EventLocation", fields: [location_id], references: [location_id], onDelete: NoAction)
   event_location      String?        @db.VarChar(50)
   start_time          DateTime       
   end_time            DateTime       
