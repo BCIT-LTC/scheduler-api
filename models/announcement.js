@@ -11,13 +11,13 @@ const logger = createLogger(module);
  * @async
  * @returns {Object} list of all the announcements.
  */
-const getAnnouncement = async() => {
-    try {
-        return await prisma.announcement.findMany();
-    } catch (error) {
-        logger.error({ message: "Error while fetching announcements", error: error.stack });
-        throw error;
-    }
+const getAnnouncement = async () => {
+  try {
+    return await prisma.announcement.findMany();
+  } catch (error) {
+    logger.error({ message: "Error while fetching announcements", error: error.stack });
+    throw error;
+  }
 };
 
 
@@ -26,28 +26,22 @@ const getAnnouncement = async() => {
  *
  * @date 2023-05-17 - 10:42:41 p.m.
  * @async
- * @param {*} title - announcement title
- * @param {*} description - details about the announcement
- * @param {*} date - date the announcement was made
+ * @param {Announcement} announcement - the announcement to add with title, description, email of the user who created it, and event_id
  * @returns {unknown}
  */
-const addAnnouncement = async(title, description, created_date) => {
-    try {
-        return await prisma.announcement.create({
-            data: {
-                title: title,
-                description: description,
-                created_at: created_date,
-                created_by: null,
-                last_modified: new Date(),
-                modified_by: null,
-                event_id: null,
-            },
-        });
-    } catch (error) {
-        logger.error({ message: "Error while adding an announcement", error: error.stack });
-        throw error;
-    }
+const addAnnouncement = async (announcement) => {
+  try {
+    return await prisma.announcement.create({
+      data: {
+        title: announcement.title,
+        description: announcement.description,
+        created_by: announcement.created_by,
+        event_id: announcement.event_id,
+      },
+    });
+  } catch (error) {
+    logger.error({ message: " Error while adding an announcement", error: error.stack });
+  }
 };
 
 
@@ -81,17 +75,17 @@ const deleteAnnouncement = async(id) => {
  * @param {*} id - id of announcement to update
  * @param {*} updatedTitle - the new title
  * @param {*} updatedDescription - the new description
- * @param date
  * @returns {Object} the updated announcement
  */
-const editAnnouncement = async(id, updatedTitle, updatedDescription, last_modified) => {
+const editAnnouncement = async(id, updatedTitle, updatedDescription, date) => {
     try {
         const editedAnnouncement = await prisma.announcement.update({
             where: { announcement_id: id },
             data: {
                 title: updatedTitle,
                 description: updatedDescription,
-                last_modified: last_modified,
+                date: date,
+                last_updated: new Date(),
             },
         });
         console.log("Edited Announcement: ", editedAnnouncement);
@@ -103,8 +97,8 @@ const editAnnouncement = async(id, updatedTitle, updatedDescription, last_modifi
 };
 
 module.exports = {
-    getAnnouncement,
-    addAnnouncement,
-    deleteAnnouncement,
-    editAnnouncement,
+  getAnnouncement,
+  addAnnouncement,
+  deleteAnnouncement,
+  editAnnouncement,
 };
