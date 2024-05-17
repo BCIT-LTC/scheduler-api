@@ -1,5 +1,3 @@
-
-
 /**
  * @swagger
  * components:
@@ -27,7 +25,6 @@
  *         last_modified: 2024-05-06T07:35:25.000Z
  *         modified_by: Alice
  */
-
 
 /**
  * @swagger
@@ -62,11 +59,14 @@
  */
 
 const express = require("express");
+const { validationResult } = require("express-validator");
 const router = express.Router();
-const { getLocations } = require("../models/locations");
+const {
+    getLocations,
+    updateLocation
+} = require("../models/locations");
 const createLogger = require("../logger");
 const logger = createLogger(module);
-
 
 /**
  * Middleware for handling get location requests.
@@ -78,13 +78,37 @@ const logger = createLogger(module);
  * @returns {Promise<any>} - The response data from the locations call.
  */
 router.get("/locations", async (req, res) => {
-    try {
-        const locations = await getLocations();
-        res.status(200).send(locations);
-    } catch (error) {
-        logger.error({ message: "GET /api/locations", error: error.stack });
-        res.status(500).send({ error: error.message });
+  try {
+    const locations = await getLocations();
+    res.status(200).send(locations);
+  } catch (error) {
+    logger.error({ message: "GET /api/locations", error: error.stack });
+    res.status(500).send({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/location/:id
+ * Endpoint to update an location by ID.
+ */
+router.put("/location/:id", async (req, res) => {
+  // Convert the ID from string to a base 10 integer
+  const id = parseInt(req.params.id, 10);
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
+
+    // Add ID to req.body
+    req.body.location_id = id;
+
+    const updatedLocation = await updateLocation(req.body);
+    return res.status(200).send(updatedLocation);
+  } catch (error) {
+    logger.error({ message: `PUT /api/location/${id}`, error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
 });
 
 module.exports = router;
