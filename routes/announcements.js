@@ -19,10 +19,6 @@
  *         description:
  *           type: string
  *           description: The description of the announcement
- *         date:
- *           type: string
- *           format: date
- *           description: The date the announcement was last modified
  *       example:
  *         announcement_id: 1
  *         title: Welcome!
@@ -117,12 +113,28 @@ const {
 const auth = require("../middleware/authentication_check");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
+const { body, validationResult } = require('express-validator');
+const validateAnnouncement = [
+  body('title').notEmpty().withMessage('Title is required'),
+  body('description').notEmpty().withMessage('Description is required'),
+  body('created_by').notEmpty().withMessage('Created by is required'),
+  body('created_by').isEmail().withMessage('Created by must be an email'),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  }
+];
+
 
 /**
  * GET endpoint to retrieve all announcements.
  */
 router.get("/announcement", async (req, res) => {
   // Check if the user is authenticated
+  if (!auth.authentication_check(req, true)) return res.sendStatus(403);
   try {
     const announcement = await getAnnouncement();
     return res.status(200).send(announcement);
@@ -138,19 +150,13 @@ router.get("/announcement", async (req, res) => {
 /**
  * POST endpoint to add or edit an announcement.
  */
-router.post("/announcement", async (req, res) => {
-  // Check if the user is authenticated
-  if (!auth.authentication_check(req, true)) return res.sendStatus(403);
-
-  // Validate inputs
-  const { title, description, date } = req.body;
-  if (!title || !description || !date) {
-    return res.status(400).send({ error: "Missing required fields" });
-  }
+router.post("/announcement", validateAnnouncement, async (req, res) => {
+  // if (!auth.authentication_check(req, true)) return res.sendStatus(403);
 
   try {
-    const announcement = await addAnnouncement(title, description, date);
-    res.status(200).send(announcement);
+    const announcement = await addAnnouncement(req.body);
+    return res.status(200).send(announcement);
+
   } catch (error) {
     logger.error({
       message: "Error while adding an announcement",
@@ -187,22 +193,17 @@ router.delete("/announcement", async (req, res) => {
 /**
  * PUT endpoint to edit an announcement based on its ID.
  */
-router.put("/announcement", async (req, res) => {
+router.put("/announcement", validateAnnouncement, async (req, res) => {
   // Check if the user is authenticated
   if (!auth.authentication_check(req, true)) return res.sendStatus(403);
 
-  // Validate inputs
-  const { id, title, description, date } = req.body;
-  if (!id || !title || !description) {
-    return res.status(400).send({ error: "Missing required fields" });
-  }
+  const { id, title, description } = req.body;
 
   try {
     const updatedAnnouncement = await editAnnouncement(
       id,
       title,
       description,
-      date
     );
     res.status(200).send(updatedAnnouncement);
   } catch (error) {
