@@ -16,14 +16,14 @@
  *           type: string
  *           description: The title of the announcement
  *         modified_by:
- *           type: string
+ *           type: string (User.email)
  *           description: the user who last modified the location
  *       example:
  *         location_id: 1
  *         room_location: NW4-3087
  *         created_at: 2024-05-06T07:35:25.000Z
  *         last_modified: 2024-05-06T07:35:25.000Z
- *         modified_by: Alice
+ *         modified_by: admin@bcit.ca
  */
 
 /**
@@ -44,12 +44,39 @@
  *               $ref: '#/components/schemas/locations'
  *       500:
  *         description: Some server error
+ *   post:
+ *     summary: Update or add locations
+ *     tags: [locations]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               room_location:
+ *                 type: string
+ *                 description: The location of the room
+ *                 example: "NW4-3591"
+ *               created_by:
+ *                 type: string
+ *                 description: The email of the user who modified the location
+ *                 example: "admin@bcit.ca"
+ *             required:
+ *               - room_location
+ *               - created_by
+ *     responses:
+ *       200:
+ *         description: Location that was added
+ *       500:
+ *         description: Some server error
+ * 
  *
  */
 
 /**
  * Express router for handling API requests.
- * @typedef {import('express').Router} ExpressRouter
+ * @typedef {express.Router} ExpressRouter
  */
 
 /**
@@ -59,22 +86,26 @@
  */
 
 const express = require("express");
-const { validationResult } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const router = express.Router();
 const {
+    
     getLocations,
-    updateLocation
+    createLocation,
+    updateLocation,
 } = require("../models/locations");
 const createLogger = require("../logger");
 const logger = createLogger(module);
+const locationValidation = [ body("room_location") ];
+
 
 /**
  * Middleware for handling get location requests.
  * @name apiRouter.get
  * @function
  * @memberof locationsRouter
- * @param {import('express').Request} req - The Express request object.
- * @param {import('express').Response} res - The Express response object.
+ * @param {express.Request} req - The Express request object.
+ * @param {express.Response} res - The Express response object.
  * @returns {Promise<any>} - The response data from the locations call.
  */
 router.get("/locations", async (req, res) => {
@@ -85,6 +116,35 @@ router.get("/locations", async (req, res) => {
     logger.error({ message: "GET /api/locations", error: error.stack });
     res.status(500).send({ error: error.message });
   }
+});
+
+/**
+ * Middleware for handling and API Endpoint to create a location.
+ * @name apiRouter.post
+ * @function
+ * @memberof locationsRouter
+ * @param {express.Request} req - The Express request object.
+ * @param {express.Response} res - The Express response object.
+ * @returns {Promise<any>} - The response data from the locations call.
+ */
+router.post("/locations", locationValidation, async (req, res) => {
+    // Validate inputs if they are missing
+    try {
+        // location validation value check
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const location = await createLocation(req.body);
+        res.status(200).send(location);
+    } catch (error) {
+        logger.error({ 
+            message: "POST /api/locations", 
+            error: error.stack 
+        });
+        res.status(500).send({ error: error.message });
+    }
 });
 
 /**
