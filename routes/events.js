@@ -108,19 +108,18 @@ router.get("/events", async (req, res) => {
 * Endpoint to create a new event.
 */
 router.post("/events", eventValidation, async (req, res) => {
- try {
-   // express validation
-   const errors = validationResult(req);
-   if (!errors.isEmpty()) {
-     return res.status(400).json({ errors: errors.array() });
-   }
-
-   const newEvent = await createEvent(req.body);
-   return res.status(201).send(newEvent);
- } catch (error) {
-   logger.error({ message: "POST /api/events", error: error.stack });
-   return res.status(500).send({ error: error.message });
- }
+  try {
+    // express validation
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const newEvent = await createEvent(req.body);
+    return res.status(201).send(newEvent);
+  } catch (error) {
+    logger.error({ message: "POST /api/events", error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
 });
 
 /**

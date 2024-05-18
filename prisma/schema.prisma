@@ -45,6 +45,7 @@ model Location {
   modifier             User?    @relation("LocationModifier", fields: [modified_by], references: [email], onDelete: NoAction)
   modified_by          String?  @db.VarChar(50)
   events_with_location Event[]  @relation("EventLocation")
+  series_location      Series[] @relation("SeriesLocation")
 }
 
 model Event {
@@ -73,6 +74,8 @@ model Event {
 model Series {
   series_id                  Int       @id @default(autoincrement())
   series_title               String    @db.VarChar(50)
+  series_location_id         Int?
+  location                   Location? @relation("SeriesLocation", fields: [series_location_id], references: [location_id], onDelete: NoAction)
   description                String?   @db.VarChar(200)
   facilitator                String?   @db.VarChar(200)
   start_time                 DateTime  @db.Time()
