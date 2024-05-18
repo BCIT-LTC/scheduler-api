@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const createLogger = require("../logger");
 const logger = createLogger(module);
+const userModel = require("./userModel").userModel;
 
 /**
  * Returns all locations in the database.
@@ -12,7 +13,7 @@ const logger = createLogger(module);
 
 /**
  * Returns all locations in the database.
- * @typedef {import('@prisma/client').Location} Location
+ * @typedef {PrismaClient.Location} Location
  */
 
 /**
@@ -31,6 +32,53 @@ const getLocations = async () => {
   } catch (error) {
     logger.error({ message: "Error fetching locations", error: error.stack });
   }
+};
+
+/**
+ * Create a location and append to the database.
+ *
+ * @type {Location}
+ * @namespace PrismaClient
+ * @description Prisma Method create a location to database.
+ * @date 2024-05-08 - 4:26:41 p.m.
+ * @async
+ * @param {Object} location - Takes room_location and modified_by from event
+ * @returns {unknown}
+ */
+const createLocation = async (location) => {
+    const { room_location, created_by } = location;
+
+    // If one of the fields is empty
+    if (!room_location || !created_by) {
+        throw new Error('Missing required fields');
+    }
+
+    // If the user does not exist in the database
+    try {
+        const user = await userModel.findOne(created_by);
+        if (!user) {
+            throw new Error('User does not exist');
+        }
+    } catch (error) {
+        throw error;
+    }
+
+    try {
+        return await prisma.location.create({
+            data: { 
+                room_location, 
+                creator: { connect: { email: created_by } },
+            }
+        })
+    } catch (error) {
+        // If room_location already exists
+        if (error.code === 'P2002' && error.meta.target.includes('room_location')) {
+            throw new Error('Location already exists');
+        }
+
+        logger.error({ message: "Error creating location", error: error.stack });
+        throw error;   
+    }
 };
 
 /**
@@ -67,5 +115,6 @@ const updateLocation = async (location) => {
 
 module.exports = {
   getLocations,
+  createLocation,
   updateLocation,
 };

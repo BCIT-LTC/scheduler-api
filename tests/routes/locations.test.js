@@ -2,9 +2,9 @@ const request = require("supertest");
 const app = require("../../app");
 const utilities = require("./utilities");
 const { token } = utilities;
+const endpoint = "/api/locations";
 
 describe("GET /locations", () => {
-    const endpoint = "/api/locations";
 
     // If your endpoint behaves differently with a token, you could add a test like this:
     it("should return all locations if a valid token is provided", async () => {
@@ -32,4 +32,17 @@ describe("GET /locations", () => {
         expect(res.body.error).toBe("Token invalid");
     });
 
+});
+
+describe("create a new location, POST /locations", () => {
+    it("should post new location NW4-3124", async () => {
+        const res = await request(app).post(endpoint).set({
+            Authorization: token,
+        }).send({
+            room_location: "NW4-3124",
+            modified_by: "admin@bcit.ca",
+        });
+        expect(res.statusCode).toBe(200);
+        expect(res.body.room_location).toBe("NW4-3124");
+    }); 
 });
