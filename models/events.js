@@ -170,14 +170,14 @@ const createEvent = async (event) => {
   try {
     const createdEvent = await prisma.event.create({
       data: {
-        location_id: event.location_id,
+        location: { connect: { location_id: event.location_id } },
         start_time: event.start_time,
         end_time: event.end_time,
         summary: event.summary,
         description: event.description,
         facilitator: event.facilitator,
         status: event.status,
-        created_by: event.created_by,
+        creator: { connect: { email: event.created_by } },
         modified_by: event.modified_by,
         series_id: event.series_id
       }
