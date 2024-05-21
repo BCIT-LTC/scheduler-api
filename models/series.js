@@ -189,9 +189,39 @@ const getSeries = async (seriesId) => {
   }
 }
 
+
+/**
+ *  Retrieve all events associated with a specific series
+ * @async
+ * @param {number} seriesId - The identifier for the series
+ * @returns {Promise<Array>} promise that resolves to the list of events
+ */
+const getSeriesEvents = async (seriesId) => {
+  if (!seriesId) {
+    throw new Error("Series identifier is null or undefined");
+  }
+
+  try {
+    const series = await prisma.series.findUnique({
+      where: { series_id: seriesId },
+      include: { events: true },
+    });
+
+    if (!series) {
+      throw new Error(`Series with id ${seriesId} not found`);
+    }
+
+    return series.events;
+  } catch (error) {
+    logger.error({ message: "Error fetching series events", error: error.stack });
+    throw error;
+  }
+};
+
 // Export functions
 module.exports = {
   createSeries,
   autoGenerateEvents,
+  getSeriesEvents,
   getSeries
 };
