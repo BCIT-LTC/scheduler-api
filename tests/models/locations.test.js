@@ -12,7 +12,7 @@ jest.mock('@prisma/client', () => {
 });
 
 const { prisma } = require("@prisma/client");
-const { createLocation } = require('../../models/locations.js');
+const { createLocation, deleteLocation } = require('../../models/locations.js');
 
 describe('createLocation', () => {
     const mockLocation = {
@@ -59,6 +59,23 @@ describe('createLocation', () => {
     //         mockLocation.modified_by
     //     )).rejects.toThrow('Location already exists');
     // });
+});
 
+describe('deleteLocation', () => {
+    it('deletes a location from the database', async () => {
+        const mockLocationId = 1;
+        prisma.location.delete.mockResolvedValue(mockLocationId);
 
+        const result = await deleteLocation(mockLocationId);
+
+        expect(prisma.location.delete).toHaveBeenCalledWith({
+            where: { id: mockLocationId },
+        });
+
+        expect(result).toEqual(mockLocationId);
+    });
+
+    it('throws an error if location_id does not exist', async () => {
+        await expect(deleteLocation()).rejects.toThrow();
+    });
 });

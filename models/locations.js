@@ -17,6 +17,25 @@ const userModel = require("./userModel").userModel;
  */
 
 /**
+ * Find an location by its id
+ * @async
+ * @param {number} id - the id of the location
+ * @returns {Object} the location object
+ */
+const getLocationById = async (id) => {
+    try {
+        var locationId = parseInt(id);
+        return await prisma.location.findUnique({
+            where: {
+            location_id: locationId,
+            },
+        });
+    } catch (error) {
+        logger.error({ message: "Error fetching location", error: error.stack });
+    }
+};
+
+/**
  * Retrieve a list of all the locations.
  *
  * @type {Location}
@@ -42,7 +61,7 @@ const getLocations = async () => {
  * @description Prisma Method create a location to database.
  * @date 2024-05-08 - 4:26:41 p.m.
  * @async
- * @param {Object} location - Takes room_location and modified_by from event
+ * @param {Object} location - Takes room_location and modified_by from location
  * @returns {unknown}
  */
 const createLocation = async (location) => {
@@ -113,8 +132,31 @@ const updateLocation = async (location) => {
   }
 };
 
+
+/**
+ * Delete a location from the database.
+ *
+ * @type {Location}
+ * @namespace PrismaClient
+ * @description Prisma Method delete a location from the database.
+ * @date 2024-05-17 - 9:57:41 a.m.
+ * @async
+ * @param {Number} param_id - id of the location to be deleted in string form
+ * @returns {Promise<object>} a promise that resolves to the result of the delete operation
+ */
+const deleteLocation = async (param_id) => {
+    try {
+      var id = parseInt(param_id); // parse and change to int
+      return await prisma.location.delete({ where: { location_id: id } });
+    } catch (error) {
+      logger.error({ message: "Error deleting location", error: error.stack });
+    }
+};
+
 module.exports = {
+  getLocationById,
   getLocations,
   createLocation,
+  deleteLocation,
   updateLocation,
 };
