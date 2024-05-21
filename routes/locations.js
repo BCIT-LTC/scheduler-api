@@ -70,8 +70,20 @@
  *         description: Location that was added
  *       500:
  *         description: Some server error
+ *   delete:
+ *     summary: Delete a location
+ *     tags: [locations]
+ *     consumes: application/json
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *     responses:
+ *       200: 
+ *         description: Location deleted successfully
+ *       500:
+ *         description: Some server error 
  * 
- *
  */
 
 /**
@@ -93,6 +105,8 @@ const {
     getLocations,
     createLocation,
     updateLocation,
+    getLocationById,
+    deleteLocation,
 } = require("../models/locations");
 const createLogger = require("../logger");
 const logger = createLogger(module);
@@ -169,6 +183,33 @@ router.put("/location/:id", async (req, res) => {
     logger.error({ message: `PUT /api/location/${id}`, error: error.stack });
     return res.status(500).send({ error: error.message });
   }
+});
+
+/**
+ * Middleware for handling delete location requests.
+ * @name apiRouter.delete
+ * @function
+ * @memberof locationsRouter
+ * @param {express.Request} req - The Express request object.
+ * @param {express.Response} res - The Express response object.
+ * @returns {Promise<any>} - The response data from the locations call.
+ */
+router.delete("/locations/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+        const location = await getLocationById(id);
+        if (!location) { // checks if location exists
+            return res.status(404).send({ error: "Location not found"});
+        }
+        await deleteLocation(id);
+        return res.status(200).send({ message: "Location deleted successfully"});
+    } catch (error) {
+        logger.error({ 
+            message: `DELETE /api/locations/${id}`, 
+            error: error.stack 
+        });
+        res.status(500).send({ error: error.message });
+    }
 });
 
 module.exports = router;
