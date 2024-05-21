@@ -15,39 +15,35 @@ const locations = require("./seedData/locations");
 const events = require("./seedData/events");
 
 /**
+ * Initial annoucement data from seedData/annoucements.js
+ */
+const annoucements = require("./seedData/annoucements");
+
+/**
  * Seed initial announcement data.
  * @async
  * @returns {Object} seeded announcement data
  */
 async function seedAnnouncements() {
   try {
-    return await prisma.announcement.upsert(
-      {
-        where: { announcement_id: 1 },
-        update: {},
-        create: {
-          title: 'Website Maintenance',
-          description: 'OpenLab Scheduler website will be down for maintenance on Sunday, May 26th, 2024 from 00:00 to 06:00 PST.',
-          // created_by: 'Jasica Munday',
-          created_at: new Date('2024-04-27T08:14:55'),
-          // modified_by: 'Jasica Munday',
-          last_modified: new Date('2024-05-01T08:20:31')
-        },
-      },
-      {
-        where: { announcement_id: 2 },
-        update: {},
-        create: {
-          title: 'Statutory Holiday: Victoria Day',
-          description: 'BCIT will be closed on May 20th, 2024 for Statutory Holiday: Victoria Day.',
-          // created_by: 'Jasica Munday',
-          created_at: new Date('2024-04-24T09:32:12'),
-          // modified_by: 'Jasica Munday',
-          last_modified: new Date('2024-04-24T09:32:12')
-        },
-      }
-    );
-  } catch (error) {
+    for (let i = 0; i < annoucements.length; i++) {
+      const announcement = annoucements[i];
+      await prisma.announcement.upsert(
+        {
+          where: { announcement_id: announcement.announcement_id },
+          update: {},
+          create: {
+            title: announcement.title,
+            description: announcement.description,
+            // created_by: 'Jasica Munday',
+            created_at: announcement.created_at,
+            // modified_by: 'Jasica Munday',
+            last_modified: announcement.last_modified
+          },
+        }
+      );
+    }
+    } catch (error) {
     logger.error({ message: "seedAnnouncements", error: error.stack });
     throw error;
   }
