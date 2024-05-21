@@ -177,7 +177,7 @@ const createEvent = async (event) => {
         description: event.description,
         facilitator: event.facilitator,
         status: event.status,
-        creator: { connect: { email: event.created_by } },
+        created_by: event.created_by,
         modified_by: event.modified_by,
         series_id: event.series_id
       }
