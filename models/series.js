@@ -45,7 +45,6 @@ const createSeries = async (series) => {
       throw new Error(`Required property ${property} is null or undefined`);
     }
   }
-
   try {
     const startTime = series.start_date + "T" + series.start_time;
     const endTime = series.end_date + "T" + series.end_time;
@@ -162,8 +161,37 @@ const autoGenerateEvents = async (series) => {
   return eventIds;
 };
 
+
+/**
+ * Retrieve a series by its ID
+ * @async
+ * @param {number} seriesId - the ID of the series to retrieve
+ * @returns {Promise<Object>} promise that resolves to the series object
+ */
+const getSeries = async (seriesId) => {
+  try {
+    const series = await prisma.series.findUnique({
+      where: { series_id: seriesId },
+      include: { events: true },
+    });
+
+    if (!series) {
+      throw new Error(`Series with id ${seriesId} not found`);
+    }
+    return series
+  }
+  catch (error) {
+    logger.error({
+      message: `Error fetching series with id ${seriesId}`,
+      error: error.stack,
+    });
+    throw error;
+  }
+}
+
 // Export functions
 module.exports = {
   createSeries,
   autoGenerateEvents,
+  getSeries
 };

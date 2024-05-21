@@ -1,7 +1,7 @@
 const express = require("express");
-const { body, validationResult } = require("express-validator");
+const { body, validationResult, param } = require("express-validator");
 const router = express.Router();
-const { createSeries, autoGenerateEvents } = require("../models/series");
+const { createSeries, autoGenerateEvents, getSeries } = require("../models/series");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 
@@ -39,6 +39,11 @@ const seriesValidation = [
     .withMessage("Each item in recurrence_frequency_days must be an integer"),
 ];
 
+// Define validation rules for series id. Only positive integers are allowed.
+const seriesIdValidation = [
+  param("id").isInt({min: 1}).withMessage("id must be a positive integer"),
+];
+
 /**
  * POST /api/series
  * Endpoint to create a new event.
@@ -60,6 +65,30 @@ router.post("/series", seriesValidation, async (req, res) => {
     return res.status(201).send(newSeries);
   } catch (error) {
     logger.error({ message: "POST /api/series", error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/series/:id
+ * Endpoint to retrieve a series by id.
+ */
+router.get("/series/:id", seriesIdValidation, async (req, res) => {
+  //validate the series ID
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const seriesId = parseInt(req.params.id); // Parse the id to an integer to ensure it is a number
+  try {
+    const series = await getSeries(seriesId);
+    if (!series) {
+      return res.status(404).send({ error: "Series not found" });
+    }
+    return res.status(200).send(series);
+  } catch (error) {
+    logger.error({ message: `GET /api/series/${seriesId}`, error: error.stack });
     return res.status(500).send({ error: error.message });
   }
 });
