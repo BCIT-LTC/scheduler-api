@@ -17,10 +17,11 @@ const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 
 // Define validation rules for creating event. Optional fields are not included based on prisma model.
+const dateErrorMsg = "Must be a valid ISO8601 format. Eg: 2024-06-25T15:30:00";
 const eventValidation = [
   body("location_id").isInt(),
-  body("start_time").isISO8601().toDate(), // Convert to date
-  body("end_time").isISO8601().toDate(), // Convert to date
+  body("start_time").isISO8601().withMessage(dateErrorMsg).toDate(), // Validate ISO8601 format
+  body("end_time").isISO8601().withMessage(dateErrorMsg).toDate(),
 ];
 
 /**
