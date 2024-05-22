@@ -3,7 +3,53 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const createLogger = require("../logger");
 const logger = createLogger(module);
-const { createEvent } = require("./events");
+const { createEvent, updateEvent } = require("./events");
+
+//////////////////////
+// Helper Functions //
+//////////////////////
+
+/**
+ * Compares the date range and frequency data of 2 Series.
+ * @param {Object} existingSeries - Existing series data from the database.
+ * @param {Object} newSeries - New series data to compare against the existing data.
+ * @returns {boolean} - Returns true if the properties are equal, otherwise false.
+ */
+const areSeriesDatesAndFrequenciesEqual = (existingSeries, newSeries) => {
+  const startDate = new Date(newSeries.start_date);
+  const endDate = new Date(newSeries.end_date);
+
+  return (
+    existingSeries.start_date.getTime() === startDate.getTime() &&
+    existingSeries.end_date.getTime() === endDate.getTime() &&
+    JSON.stringify(existingSeries.recurrence_frequency_weeks) ===
+      JSON.stringify(newSeries.recurrence_frequency_weeks) &&
+    JSON.stringify(existingSeries.recurrence_frequency_days) ===
+      JSON.stringify(newSeries.recurrence_frequency_days)
+  );
+};
+
+/**
+ * Maps event IDs to the series data.
+ *
+ * @param {Object} seriesData - The series data from the request body.
+ * @param {Array<number>} eventIds - An array of event IDs to map to the series data.
+ * @returns {Object} - The modified series data with mapped event IDs.
+ */
+const mapEventsToSeries = (seriesData, eventIds) => {
+  const seriesDataMappedWithEvents = {
+    ...seriesData,
+    events: eventIds.map((eventId) => ({
+      event_id: eventId,
+    })),
+  };
+
+  return seriesDataMappedWithEvents;
+};
+
+////////////////////
+// Main Functions //
+////////////////////
 
 // Required properties for both Create and Update functions
 const requiredPropertiesCommon = [
@@ -30,16 +76,46 @@ const getSeries = async (seriesId) => {
     if (!series) {
       throw new Error(`Series with id ${seriesId} not found`);
     }
-    return series
-  }
-  catch (error) {
+    return series;
+  } catch (error) {
     logger.error({
       message: `Error fetching series with id ${seriesId}`,
       error: error.stack,
     });
     throw error;
   }
-}
+};
+
+/**
+ *  Retrieve all events associated with a specific series
+ * @async
+ * @param {number} seriesId - The identifier for the series
+ * @returns {Promise<Array>} promise that resolves to the list of events
+ */
+const getSeriesEvents = async (seriesId) => {
+  if (!seriesId) {
+    throw new Error("Series identifier is null or undefined");
+  }
+
+  try {
+    const series = await prisma.series.findUnique({
+      where: { series_id: seriesId },
+      include: { events: true },
+    });
+
+    if (!series) {
+      throw new Error(`Series with id ${seriesId} not found`);
+    }
+
+    return series.events;
+  } catch (error) {
+    logger.error({
+      message: "Error fetching series events",
+      error: error.stack,
+    });
+    throw error;
+  }
+};
 
 /**
  * Creates a new Series entry in the database.
@@ -75,7 +151,9 @@ const createSeries = async (series) => {
   try {
     return await prisma.series.create({
       data: {
+        location: { connect: { location_id: series.location_id } },
         series_title: series.series_title,
+        summary: series.summary,
         description: series.description,
         facilitator: series.facilitator,
         start_time: new Date(series.start_date + "T" + series.start_time),
@@ -87,7 +165,9 @@ const createSeries = async (series) => {
         creator: { connect: { email: series.created_by } },
         recurrence_frequency_weeks: series.recurrence_frequency_weeks,
         recurrence_frequency_days: series.recurrence_frequency_days,
-        events: { connect: series.events.map((event) => ({ event_id: event.event_id })), },
+        events: {
+          connect: series.events.map((event) => ({ event_id: event.event_id })),
+        },
       },
     });
   } catch (error) {
@@ -169,7 +249,10 @@ const autoGenerateEvents = async (series) => {
           eventIds.push(createdEvent.event_id);
         } catch (error) {
           logger.error({
-            message: "Error creating event on [" + eventDate.toISOString().split("T")[0] + "]", // Only retrieve date
+            message:
+              "Error creating event on [" +
+              eventDate.toISOString().split("T")[0] +
+              "]", // Only retrieve date
             error: error.stack,
           });
         }
@@ -184,9 +267,9 @@ const autoGenerateEvents = async (series) => {
 };
 
 /**
- * Update a Series entry in the database.
+ * Update a Series entry in the database. Will also update Events tied to the Series entry.
  * @async
- * @param {Object} series - The series data payload from the request. The object includes:             
+ * @param {Object} series - The series data payload from the request. The object includes:
  *                          - series_title: Title of the series.
  *                          - description: Description of what the series entails.
  *                          - facilitator: Name or identifier of the person facilitating the series.
@@ -202,24 +285,38 @@ const autoGenerateEvents = async (series) => {
  * @returns {Promise<Object>} A promise that resolves to the updated series object as stored in the database.
  */
 const updateSeries = async (series) => {
-  try {
-    const s = await prisma.series.findUnique({
-      where: { series_id: series.series_id },
-    });
-    if (!s) {
-      throw new Error(`Series with ID [${series.series_id}] not found`);
+  if (!series) {
+    throw new Error("Argument cannot be null!");
+  }
+
+  const requiredProperties = [...requiredPropertiesCommon, "modified_by"];
+  for (const property of requiredProperties) {
+    if (!series[property]) {
+      throw new Error(`Required property ${property} is null or undefined`);
     }
+  }
 
-    const requiredProperties = [...requiredPropertiesCommon, "modified_by"];
-
-    for (const property of requiredProperties) {
-      if (!series[property]) {
-        throw new Error(`Required property ${property} is null or undefined`);
+  const existingSeries = await (async () => {
+    try {
+      const seriesData = await prisma.series.findUnique({
+        where: { series_id: series.series_id },
+      });
+      if (!seriesData) {
+        throw new Error(`Series with ID [${series.series_id}] not found`);
       }
+      return seriesData;
+    } catch (error) {
+      logger.error({
+        message: `Error finding series: ${error.message}`,
+        error: error.stack,
+      });
+      throw new Error(`Error finding series: ${error.message}`);
     }
+  })();
 
+  try {
     const updatedSeries = await prisma.series.update({
-      where: { series_id: s.series_id },
+      where: { series_id: existingSeries.series_id },
       data: {
         series_title: series.series_title,
         description: series.description,
@@ -233,6 +330,9 @@ const updateSeries = async (series) => {
         modifier: { connect: { email: series.modified_by } },
         recurrence_frequency_weeks: series.recurrence_frequency_weeks,
         recurrence_frequency_days: series.recurrence_frequency_days,
+        events: {
+          connect: series.events.map((event) => ({ event_id: event.event_id })),
+        },
       },
     });
     return updatedSeries;
@@ -241,45 +341,67 @@ const updateSeries = async (series) => {
       message: `Error updating series: ${error.message}`,
       error: error.stack,
     });
-    throw error;
+    throw new Error(`Error updating series: ${error.message}`);
   }
 };
 
-
 /**
- *  Retrieve all events associated with a specific series
- * @async
- * @param {number} seriesId - The identifier for the series
- * @returns {Promise<Array>} promise that resolves to the list of events
+ * Updates all events associated with a Series.
+ *
+ * @param {Object} series - The series data containing updates for associated events.
+ * @returns {Promise<string>} - A promise that resolves to a message indicating the number of successfully updated events.
+ * @throws {Error} - Throws an error if the series argument is null or if any event update fails.
  */
-const getSeriesEvents = async (seriesId) => {
-  if (!seriesId) {
-    throw new Error("Series identifier is null or undefined");
+const updateSeriesEvents = async (series) => {
+  if (!series) {
+    throw new Error("Argument cannot be null!");
   }
 
   try {
-    const series = await prisma.series.findUnique({
-      where: { series_id: seriesId },
-      include: { events: true },
+    // Find all events associated with this series
+    const events = await prisma.event.findMany({
+      where: { series_id: series.series_id },
     });
 
-    if (!series) {
-      throw new Error(`Series with id ${seriesId} not found`);
+    console.log(events);
+
+    let updatedEventIds = []; // To store IDs of successfully updated events
+
+    // Loop through each event and update
+    for (const event of events) {
+      // Extract the date from event to keep it the same for new Date object
+      const startDate = event.start_time.toISOString().split("T")[0];
+      const endDate = event.end_time.toISOString().split("T")[0];
+      const updatedEventData = {
+        ...series,
+        event_id: event.event_id,
+        summary: series.series_title,
+        start_time: startDate + "T" + series.start_time,
+        end_time: endDate + "T" + series.end_time,
+      };
+
+      // Update each event, throw error immediately if one fails
+      const updatedEvent = await updateEvent(updatedEventData);
+      console.log("Event Updated:", updatedEvent);
+      updatedEventIds.push(updatedEvent.event_id); // Store successful update IDs
     }
 
-    return series.events;
+    return `Events updated: ${updatedEventIds.length}`; // Return count of successfully updated events
   } catch (error) {
-    logger.error({ message: "Error fetching series events", error: error.stack });
-    throw error;
+    logger.error({
+      message: `Error updating events for series [${series.series_id}]: ${error.message}`,
+      error: error.stack,
+    });
+    throw error; // Rethrowing the error to exit the process on failure
   }
 };
 
 /**
-  * Deletes all events associated with a series.
-  * @async
-  * @param {number} series_id - The ID of the series to delete events for.
-  * @throws {Error} Throws an error if the series ID is null or undefined.
-  */
+ * Deletes all events associated with a series.
+ * @async
+ * @param {number} series_id - The ID of the series to delete events for.
+ * @throws {Error} Throws an error if the series ID is null or undefined.
+ */
 const autoDeleteEvents = async (series_id) => {
   const id = series_id;
   try {
@@ -297,15 +419,22 @@ const autoDeleteEvents = async (series_id) => {
       });
     }
   } catch (error) {
-    logger.error({ message: `Error deleting events for series ${id}`, error: error.stack });
+    logger.error({
+      message: `Error deleting events for series ${id}`,
+      error: error.stack,
+    });
   }
 };
 
 // Export functions
 module.exports = {
+  areSeriesDatesAndFrequenciesEqual,
+  mapEventsToSeries,
   getSeries,
+  getSeriesEvents,
   createSeries,
   autoGenerateEvents,
   updateSeries,
+  updateSeriesEvents,
   autoDeleteEvents,
 };

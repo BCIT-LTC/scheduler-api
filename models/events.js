@@ -20,7 +20,7 @@ const getEventById = async (id) => {
   } catch (error) {
     logger.error({ message: "Error fetching event", error: error.stack });
   }
-}
+};
 
 /**
  *  Find all the events for a specific day
@@ -50,14 +50,13 @@ const getEventsByDate = async (date) => {
 
 /**
  * Find all the events for a specific month
- * 
+ *
  * @date 2024-02-08
  * @async
  * @param {Date} date - the date to search for
  * @returns {Object} list of events
  */
 const getEventsByMonth = async (date) => {
-
   let lowerBound = new Date(date);
   lowerBound.setDate(date.getDate() - 15);
 
@@ -70,7 +69,7 @@ const getEventsByMonth = async (date) => {
         start_time: {
           gte: lowerBound,
           lte: upperBound,
-        }
+        },
       },
     });
   } catch (error) {
@@ -97,7 +96,7 @@ const getEventsByWeek = async (date = new Date()) => {
         start_time: {
           gte: lowerBound,
           lte: upperBound,
-        }
+        },
       },
     });
 
@@ -109,8 +108,8 @@ const getEventsByWeek = async (date = new Date()) => {
 
 /**
  * Find all events for a speciic start and end range
- * @param {Date} start 
- * @param {Date} end 
+ * @param {Date} start
+ * @param {Date} end
  * @returns {Object} list of events
  */
 const getEventsByRange = async (start, end) => {
@@ -147,10 +146,10 @@ const getEventsByRange = async (start, end) => {
  */
 const createEvent = async (event) => {
   if (!event) {
-    throw new Error('Event is null or undefined');
+    throw new Error("Event is null or undefined");
   }
 
-  const requiredProperties = ['location_id', 'start_time', 'end_time'];
+  const requiredProperties = ["location_id", "start_time", "end_time"];
 
   for (const property of requiredProperties) {
     if (!event[property]) {
@@ -162,18 +161,15 @@ const createEvent = async (event) => {
     const createdEvent = await prisma.event.create({
       data: {
         location: { connect: { location_id: event.location_id } },
-        start_time: event.start_time,
-        end_time: event.end_time,
+        start_time: new Date(event.start_time),
+        end_time: new Date(event.end_time),
         summary: event.summary,
         description: event.description,
         facilitator: event.facilitator,
         status: event.status,
-        created_by: event.created_by,
-        modified_by: event.modified_by,
-        series_id: event.series_id
-      }
+        creator: { connect: { email: event.created_by } },
+      },
     });
-
     return createdEvent;
   } catch (error) {
     logger.error({ message: "Error creating event", error: error.stack });
@@ -199,7 +195,7 @@ const deleteEvent = async (event_id) => {
   } catch (error) {
     logger.error({ message: "Error deleting event", error: error.stack });
   }
-}
+};
 
 /**
  * Update an existing event
@@ -210,23 +206,22 @@ const deleteEvent = async (event_id) => {
 const updateEvent = async (event) => {
   try {
     const e = await prisma.event.findUnique({
-      where: { event_id: event.event_id }
-    })
+      where: { event_id: event.event_id },
+    });
     if (!e) {
-      throw new Error(`Event with id ${event.event_id} not found`);
+      throw new Error(`Event with ID [${event.event_id}] not found`);
     }
     const updatedEvent = await prisma.event.update({
       where: { event_id: e.event_id },
       data: {
         location: { connect: { location_id: event.location_id } },
-        start_time: event.start_time,
-        end_time: event.end_time,
+        start_time: new Date(event.start_time),
+        end_time: new Date(event.end_time),
         summary: event.summary,
         description: event.description,
         facilitator: event.facilitator,
         modifier: { connect: { email: event.modified_by } },
-
-      }
+      },
     });
     return updatedEvent;
   } catch (error) {
@@ -236,8 +231,7 @@ const updateEvent = async (event) => {
     });
     throw error;
   }
-}
-
+};
 
 module.exports = {
   getEventById,
@@ -247,6 +241,5 @@ module.exports = {
   getEventsByRange,
   createEvent,
   deleteEvent,
-  updateEvent
+  updateEvent,
 };
-
