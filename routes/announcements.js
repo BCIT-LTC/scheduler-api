@@ -110,7 +110,6 @@ const {
   deleteAnnouncement,
   editAnnouncement,
 } = require("../models/announcement");
-const auth = require("../middleware/authentication_check");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 const { body, validationResult } = require('express-validator');
@@ -133,10 +132,14 @@ const validateAnnouncement = [
  * GET endpoint to retrieve all announcements.
  */
 router.get("/announcement", async (req, res) => {
-  // Check if the user is authenticated
-  if (!auth.authentication_check(req, true)) return res.sendStatus(403);
   try {
     const announcement = await getAnnouncement();
+    
+    // Return empty array if no announcements are found
+    if (announcement.length === 0) {
+      return res.status(200).send([]);
+    }
+
     return res.status(200).send(announcement);
   } catch (error) {
     logger.error({
@@ -151,8 +154,6 @@ router.get("/announcement", async (req, res) => {
  * POST endpoint to add or edit an announcement.
  */
 router.post("/announcement", validateAnnouncement, async (req, res) => {
-  // if (!auth.authentication_check(req, true)) return res.sendStatus(403);
-
   try {
     const announcement = await addAnnouncement(req.body);
     return res.status(200).send(announcement);
@@ -169,15 +170,7 @@ router.post("/announcement", validateAnnouncement, async (req, res) => {
 /**
  * DELETE endpoint to remove an announcement based on its ID.
  */
-router.delete("/announcement", async (req, res) => {
-  // Check if the user is authenticated
-  if (!auth.authentication_check(req, true)) return res.sendStatus(403);
-
-  // Validate inputs
-  const { id } = req.body;
-  if (!id)
-    return res.status(400).send({ error: "ID is required for deletion" });
-
+router.delete("/announcement", validateAnnouncement, async (req, res) => {
   try {
     await deleteAnnouncement(id);
     return res.status(200).send({ message: "Success" });
@@ -194,9 +187,6 @@ router.delete("/announcement", async (req, res) => {
  * PUT endpoint to edit an announcement based on its ID.
  */
 router.put("/announcement", validateAnnouncement, async (req, res) => {
-  // Check if the user is authenticated
-  if (!auth.authentication_check(req, true)) return res.sendStatus(403);
-
   const { id, title, description } = req.body;
 
   try {

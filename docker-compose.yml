@@ -68,11 +68,14 @@ services:
       - |
         npm run test --detectOpenHandles
     working_dir: /test
+    ports:
+      - 8001:8001
     environment:
       # - NODE_ENV=development
       - NODE_ENV=test
       # - NODE_ENV=production
       - DATABASE_URL=postgres://bsnmysql:bcitbsn491@postgres:5432/openlab-scheduler
+      - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
     depends_on:
       postgres:
         condition: service_healthy

@@ -43,7 +43,7 @@ const getLocationById = async (id) => {
  * @description Prisma Method retrieving locations from the database.
  * @date 2023-05-17 - 10:41:51 p.m.
  * @async
- * @returns {Object} list of all the locations.
+ * @returns {Object} List of all locations.
  */
 const getLocations = async () => {
   try {
