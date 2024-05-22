@@ -218,10 +218,38 @@ const getSeriesEvents = async (seriesId) => {
   }
 };
 
+/**
+  * Deletes all events associated with a series.
+  * @async
+  * @param {number} series_id - The ID of the series to delete events for.
+  * @throws {Error} Throws an error if the series ID is null or undefined.
+  */
+const autoDeleteEvents = async (series_id) => {
+  const id = series_id;
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        series_id: id,
+      },
+    });
+
+    for (const event of events) {
+      await prisma.event.delete({
+        where: {
+          event_id: event.event_id,
+        },
+      });
+    }
+  } catch (error) {
+    logger.error({ message: `Error deleting events for series ${id}`, error: error.stack });
+  }
+};
+
 // Export functions
 module.exports = {
   createSeries,
   autoGenerateEvents,
   getSeriesEvents,
-  getSeries
+  getSeries,
+  autoDeleteEvents,
 };
