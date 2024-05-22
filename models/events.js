@@ -146,15 +146,6 @@ const getEventsByRange = async (start, end) => {
  * @returns {Promise<Object>} promise that resolves to the created event object
  */
 const createEvent = async (event) => {
-  // // Presently, location is a string from the event created form. If this is the correct implementation, we will have to look up the location id.
-  // var location = await prisma.location.findUnique({
-  //   where: {
-  //     room_location: event.location,
-  //   },
-  // });
-  // var locationId = location ? location.location_id : null;
-
-  // event.location_id = locationId;
   if (!event) {
     throw new Error('Event is null or undefined');
   }
