@@ -1,7 +1,12 @@
 const express = require("express");
 const { body, validationResult, param } = require("express-validator");
 const router = express.Router();
-const { createSeries, autoGenerateEvents, getSeries } = require("../models/series");
+const {
+  getSeries,
+  createSeries,
+  autoGenerateEvents, 
+  updateSeries,
+} = require("../models/series");
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 
@@ -45,6 +50,30 @@ const seriesIdValidation = [
 ];
 
 /**
+ * GET /api/series/:id
+ * Endpoint to retrieve a series by id.
+ */
+router.get("/series/:id", seriesIdValidation, async (req, res) => {
+  //validate the series ID
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const seriesId = parseInt(req.params.id); // Parse the id to an integer to ensure it is a number
+  try {
+    const series = await getSeries(seriesId);
+    if (!series) {
+      return res.status(404).send({ error: "Series not found" });
+    }
+    return res.status(200).send(series);
+  } catch (error) {
+    logger.error({ message: `GET /api/series/${seriesId}`, error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+/**
  * POST /api/series
  * Endpoint to create a new event.
  */
@@ -70,25 +99,28 @@ router.post("/series", seriesValidation, async (req, res) => {
 });
 
 /**
- * GET /api/series/:id
- * Endpoint to retrieve a series by id.
+ * PUT /api/series/:id
+ * Endpoint to update an series by ID.
  */
-router.get("/series/:id", seriesIdValidation, async (req, res) => {
-  //validate the series ID
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const seriesId = parseInt(req.params.id); // Parse the id to an integer to ensure it is a number
+router.put("/series/:id", async (req, res) => {
+  // Convert the ID from string to a base 10 integer
+  const id = parseInt(req.params.id, 10);
   try {
-    const series = await getSeries(seriesId);
-    if (!series) {
-      return res.status(404).send({ error: "Series not found" });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    return res.status(200).send(series);
+
+    const existingSeries = await getSeries(id);
+    // Add ID to payload
+    let updatedEventsData = req.body;
+    updatedEventsData.series_id = id;
+    updatedEventsData.events = existingSeries.events;
+
+    const updatedSeries = await updateSeries(updatedEventsData);
+    return res.status(200).send(updatedSeries);
   } catch (error) {
-    logger.error({ message: `GET /api/series/${seriesId}`, error: error.stack });
+    logger.error({ message: `PUT /api/series/${id}`, error: error.stack });
     return res.status(500).send({ error: error.message });
   }
 });
