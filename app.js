@@ -28,6 +28,7 @@ const auth = require("./routes/auth");
 const events = require("./routes/events");
 const locations = require("./routes/locations");
 const series = require("./routes/series");
+const users = require("./routes/users");
 
 // Middleware for parsing URL-encoded data (extended: true allows parsing of arrays and objects)
 app.use(express.urlencoded({ extended: true }));
@@ -45,7 +46,7 @@ app.get("/log", (req, res) => {
 });
 
 // Using route files
-app.use("/api", authentication_check, announcements, auth, events, locations, series);
+app.use("/api", authentication_check, announcements, auth, events, locations, series, users);
 
 // Swagger API documentation setup
 const options = {
