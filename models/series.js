@@ -419,7 +419,10 @@ const autoDeleteEvents = async (series_id) => {
       });
     }
   } catch (error) {
-    logger.error({ message: `Error deleting events for series ${id}`, error: error.stack });
+    logger.error({
+      message: `Error deleting events for series ${id}`,
+      error: error.stack,
+    });
   }
 };
 
