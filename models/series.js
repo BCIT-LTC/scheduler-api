@@ -419,10 +419,33 @@ const autoDeleteEvents = async (series_id) => {
       });
     }
   } catch (error) {
-    logger.error({
-      message: `Error deleting events for series ${id}`,
-      error: error.stack,
+    logger.error({ message: `Error deleting events for series ${id}`, error: error.stack });
+  }
+};
+
+/**
+* Delete a series from the database
+* @async
+* @param {number} id - series id to delete
+* @returns {Promise<Object>} promise that resolves to the deleted series object
+*/
+const deleteSeries = async (id) => {
+  try {
+    const series_id = parseInt(id);
+    const series = await prisma.series.findUnique({
+      where: { series_id: series_id },
     });
+    if (!series) {
+      throw new Error(`Series with id ${series_id} not found`);
+    }
+    return await prisma.series.delete({
+      where: {
+        series_id: series_id,
+      },
+    });
+  } catch (error) {
+    logger.error({ message: "Error deleting series", error: error.stack });
+    throw error;
   }
 };
 
@@ -436,5 +459,6 @@ module.exports = {
   autoGenerateEvents,
   updateSeries,
   updateSeriesEvents,
+  deleteSeries,
   autoDeleteEvents,
 };

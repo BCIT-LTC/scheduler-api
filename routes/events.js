@@ -5,6 +5,7 @@ const {
 } = require("express-validator");
 const router = express.Router();
 const {
+  getEventById,
   getEventsByDate,
   getEventsByMonth,
   getEventsByWeek,
@@ -166,8 +167,8 @@ router.post("/events", eventValidation, async (req, res) => {
  * Note: so far only used to delete test events in unit tests
  */
 router.delete("/events/:id", async (req, res) => {
+  const id = parseInt(req.params.id, 10);
   try {
-    const id = req.params.id;
     const event = await getEventById(id);
     if (!event) {
       return res.status(404).send({

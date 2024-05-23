@@ -10,6 +10,7 @@ const {
   autoGenerateEvents,
   updateSeries,
   updateSeriesEvents,
+  deleteSeries,
   autoDeleteEvents,
 } = require("../models/series");
 const createLogger = require("../logger"); // Ensure the path is correct
@@ -148,6 +149,27 @@ router.put("/series/:id", async (req, res) => {
     return res.status(200).send(updatedSeries);
   } catch (error) {
     logger.error({ message: `PUT /api/series/${id}`, error: error.stack });
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/series/:series_id
+ * Endpoint to delete a series by id.
+ * @param {number} series_id - series id to delete
+ */
+router.delete("/series/:series_id", async (req, res) => {
+  const series_id = parseInt(req.params.series_id, 10);
+  try {
+    await autoDeleteEvents(series_id); // Must delete linked Events before Series itself
+    const deletedSeries = await deleteSeries(series_id);
+
+    return res.status(200).send(deletedSeries);
+  } catch (error) {
+    logger.error({
+      message: `DELETE /api/series/${series_id}`,
+      error: error.stack,
+    });
     return res.status(500).send({ error: error.message });
   }
 });
