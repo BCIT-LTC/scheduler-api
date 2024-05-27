@@ -47,6 +47,32 @@ const mapEventsToSeries = (seriesData, eventIds) => {
   return seriesDataMappedWithEvents;
 };
 
+/**
+ * Combines the date from one Date object with the time from another Date object.
+ * @param {Date} dateTimeObjectWithDate - The Date object containing the date.
+ * @param {Date} dateTimeObjectWithTime - The Date object containing the time.
+ * @returns {Date} A new Date object with the combined date and time.
+ */
+const combineDateAndTime = (dateTimeObjectWithDate, dateTimeObjectWithTime) => {
+  const year = dateTimeObjectWithDate.getFullYear();
+  const month = dateTimeObjectWithDate.getMonth();
+  const day = dateTimeObjectWithDate.getDate();
+
+  const hours = dateTimeObjectWithTime.getHours();
+  const minutes = dateTimeObjectWithTime.getMinutes();
+  const seconds = dateTimeObjectWithTime.getSeconds();
+  const perfectDateTimeObject = new Date(
+    year,
+    month,
+    day,
+    hours,
+    minutes,
+    seconds
+  );
+
+  return perfectDateTimeObject;
+};
+
 ////////////////////
 // Main Functions //
 ////////////////////
@@ -125,10 +151,10 @@ const getSeriesEvents = async (seriesId) => {
  *                          - series_title: Title of the series.
  *                          - description: Description of what the series entails.
  *                          - facilitator: Name or identifier of the person facilitating the series.
- *                          - start_time: Start time for each session in the series (HH:MM or HH:MM:SS).
- *                          - end_time: End time for each session in the series (HH:MM or HH:MM:SS).
- *                          - start_date: The start date of the series (YYYY-MM-DD).
- *                          - end_date: The end date of the series (YYYY-MM-DD).
+ *                          - start_time: The Date object containing the start time.
+ *                          - end_time: The Date object containing the end time.
+ *                          - start_date: The Date object containing the start date.
+ *                          - end_date: The Date object containing the end date.
  *                          - status: The current status of the series (default: 'TENTATIVE').
  *                          - creator: User responsible for creation. Must be an existing email in 'User' table of database.
  *                          - recurrence_frequency_weeks: Frequency of recurrence measured in weeks.
@@ -138,17 +164,25 @@ const getSeriesEvents = async (seriesId) => {
  */
 const createSeries = async (series) => {
   if (!series) {
-    throw new Error("Series is null or undefined");
+    throw new Error("Argument cannot be null!");
   }
 
   const requiredProperties = [...requiredPropertiesCommon, "created_by"];
-
   for (const property of requiredProperties) {
     if (!series[property]) {
       throw new Error(`Required property ${property} is null or undefined`);
     }
   }
   try {
+    const perfectStartData = combineDateAndTime(
+      new Date(series.start_date),
+      new Date(series.start_time)
+    );
+    const perfectEndData = combineDateAndTime(
+      new Date(series.end_date),
+      new Date(series.end_time)
+    );
+
     return await prisma.series.create({
       data: {
         location: { connect: { location_id: series.location_id } },
@@ -156,10 +190,10 @@ const createSeries = async (series) => {
         summary: series.summary,
         description: series.description,
         facilitator: series.facilitator,
-        start_time: new Date(series.start_date + "T" + series.start_time),
-        end_time: new Date(series.end_date + "T" + series.end_time),
-        start_date: new Date(series.start_date),
-        end_date: new Date(series.end_date),
+        start_time: perfectStartData,
+        end_time: perfectEndData,
+        start_date: perfectStartData,
+        end_date: perfectEndData,
         status: series.status,
         location: { connect: { location_id: series.location_id } },
         creator: { connect: { email: series.created_by } },
@@ -182,10 +216,10 @@ const createSeries = async (series) => {
  *                          - series_title: Title of the series.
  *                          - description: Description of what the series entails.
  *                          - facilitator: Name or identifier of the person facilitating the series.
- *                          - start_time: Start time for each session in the series (HH:MM or HH:MM:SS).
- *                          - end_time: End time for each session in the series (HH:MM or HH:MM:SS).
- *                          - start_date: The start date of the series (YYYY-MM-DD).
- *                          - end_date: The end date of the series (YYYY-MM-DD).
+ *                          - start_time: The Date object containing the start time.
+ *                          - end_time: The Date object containing the end time.
+ *                          - start_date: The Date object containing the start date.
+ *                          - end_date: The Date object containing the end date.
  *                          - status: The current status of the series (default: 'TENTATIVE').
  *                          - location_id: Location of the series. Must be an existing location_id in 'Location' table of database.
  *                          - creator: User responsible for creation. Must be an existing email in 'User' table of database.
@@ -199,6 +233,8 @@ const autoGenerateEvents = async (series) => {
   }
 
   const {
+    start_time,
+    end_time,
     start_date,
     end_date,
     recurrence_frequency_weeks,
@@ -207,20 +243,23 @@ const autoGenerateEvents = async (series) => {
 
   let currentDate = new Date(start_date);
   currentDate.setDate(currentDate.getDate() - currentDate.getDay()); // Set to Sunday of previous week
-  const startDateInitial = new Date(start_date + "T00:00:00");
-  const endDateTerminal = new Date(end_date + "T23:59:59");
+  // const startDateInitial = new Date(start_date + "T00:00:00");
+  // const endDateTerminal = new Date(end_date + "T23:59:59");
+  const startDateInitial = new Date(start_date);
+  startDateInitial.setHours(0, 0, 0, 0); // Sets the time to 00:00:00
+
+  const endDateTerminal = new Date(end_date);
+  endDateTerminal.setHours(23, 59, 59, 999); // Sets the time to 23:59:59.999
 
   const weekIncrement = 7 * recurrence_frequency_weeks;
 
-  const startDateAndTime = start_date + "T" + series.start_time;
-  const startTimeHours = new Date(startDateAndTime).getHours();
-  const startTimeMinutes = new Date(startDateAndTime).getMinutes();
-  const startTimeSeconds = new Date(startDateAndTime).getSeconds();
+  const startTimeHours = new Date(start_time).getHours();
+  const startTimeMinutes = new Date(start_time).getMinutes();
+  const startTimeSeconds = new Date(start_time).getSeconds();
 
-  const endDateAndTime = end_date + "T" + series.end_time;
-  const endTimeHours = new Date(endDateAndTime).getHours();
-  const endTimeMinutes = new Date(endDateAndTime).getMinutes();
-  const endTimeSeconds = new Date(endDateAndTime).getSeconds();
+  const endTimeHours = new Date(end_time).getHours();
+  const endTimeMinutes = new Date(end_time).getMinutes();
+  const endTimeSeconds = new Date(end_time).getSeconds();
 
   let eventIds = [];
 
@@ -273,10 +312,10 @@ const autoGenerateEvents = async (series) => {
  *                          - series_title: Title of the series.
  *                          - description: Description of what the series entails.
  *                          - facilitator: Name or identifier of the person facilitating the series.
- *                          - start_time: Start time for each session in the series (HH:MM or HH:MM:SS).
- *                          - end_time: End time for each session in the series (HH:MM or HH:MM:SS).
- *                          - start_date: The start date of the series (YYYY-MM-DD).
- *                          - end_date: The end date of the series (YYYY-MM-DD).
+ *                          - start_time: The Date object containing the start time.
+ *                          - end_time: The Date object containing the end time.
+ *                          - start_date: The Date object containing the start date.
+ *                          - end_date: The Date object containing the end date.
  *                          - status: The current status of the series (default: 'TENTATIVE').
  *                          - location_id: Location of the series. Must be an existing location_id in 'Location' table of database.
  *                          - modifier: User responsible for modification. Must be an existing email in 'User' table of database.
@@ -315,16 +354,25 @@ const updateSeries = async (series) => {
   })();
 
   try {
+    const perfectStartData = combineDateAndTime(
+      new Date(series.start_date),
+      new Date(series.start_time)
+    );
+    const perfectEndData = combineDateAndTime(
+      new Date(series.end_date),
+      new Date(series.end_time)
+    );
+
     const updatedSeries = await prisma.series.update({
       where: { series_id: existingSeries.series_id },
       data: {
         series_title: series.series_title,
         description: series.description,
         facilitator: series.facilitator,
-        start_time: new Date(series.start_date + "T" + series.start_time),
-        end_time: new Date(series.end_date + "T" + series.end_time),
-        start_date: new Date(series.start_date),
-        end_date: new Date(series.end_date),
+        start_time: perfectStartData,
+        end_time: perfectEndData,
+        start_date: perfectStartData,
+        end_date: perfectEndData,
         status: series.status,
         location: { connect: { location_id: series.location_id } },
         modifier: { connect: { email: series.modified_by } },
@@ -363,21 +411,32 @@ const updateSeriesEvents = async (series) => {
       where: { series_id: series.series_id },
     });
 
-    console.log(events);
-
     let updatedEventIds = []; // To store IDs of successfully updated events
+
+    const { start_time, end_time } = series;
+
+    const startTimeHours = new Date(start_time).getHours();
+    const startTimeMinutes = new Date(start_time).getMinutes();
+    const startTimeSeconds = new Date(start_time).getSeconds();
+
+    const endTimeHours = new Date(end_time).getHours();
+    const endTimeMinutes = new Date(end_time).getMinutes();
+    const endTimeSeconds = new Date(end_time).getSeconds();
 
     // Loop through each event and update
     for (const event of events) {
-      // Extract the date from event to keep it the same for new Date object
-      const startDate = event.start_time.toISOString().split("T")[0];
-      const endDate = event.end_time.toISOString().split("T")[0];
+      const startData = new Date(event.start_time);
+      startData.setHours(startTimeHours, startTimeMinutes, startTimeSeconds);
+
+      const endData = new Date(event.end_time);
+      endData.setHours(endTimeHours, endTimeMinutes, endTimeSeconds);
+
       const updatedEventData = {
         ...series,
         event_id: event.event_id,
         summary: series.series_title,
-        start_time: startDate + "T" + series.start_time,
-        end_time: endDate + "T" + series.end_time,
+        start_time: startData,
+        end_time: endData,
       };
 
       // Update each event, throw error immediately if one fails
@@ -427,11 +486,11 @@ const autoDeleteEvents = async (series_id) => {
 };
 
 /**
-* Delete a series from the database
-* @async
-* @param {number} id - series id to delete
-* @returns {Promise<Object>} promise that resolves to the deleted series object
-*/
+ * Delete a series from the database
+ * @async
+ * @param {number} id - series id to delete
+ * @returns {Promise<Object>} promise that resolves to the deleted series object
+ */
 const deleteSeries = async (id) => {
   try {
     const series_id = parseInt(id);

@@ -17,34 +17,44 @@ const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 
 // Define validation rules for creating event. Optional fields are not included based on prisma model.
-const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
-const timeErrorMsg = " must be in HH:MM or HH:MM:SS format";
-const dateErrorMsg = " must be a valid date in YYYY-MM-DD format";
+const iso8601ErrorMsg = " must be in valid ISO8601 format";
 const seriesValidation = [
-  body("start_time").custom((value) => {
-    if (!timeRegex.test(value)) {
-      throw new Error("start_time" + timeErrorMsg);
-    }
-    return true;
-  }),
-
-  body("end_time").custom((value) => {
-    if (!timeRegex.test(value)) {
-      throw new Error("end_time" + timeErrorMsg);
-    }
-    return true;
-  }),
+  body("start_time")
+    .isISO8601()
+    .withMessage("start_time" + iso8601ErrorMsg),
+  body("end_time")
+    .isISO8601()
+    .withMessage("end_time" + iso8601ErrorMsg),
 
   body("start_date")
     .isISO8601()
-    .withMessage("start_date" + dateErrorMsg),
+    .withMessage("start_date" + iso8601ErrorMsg),
   body("end_date")
     .isISO8601()
-    .withMessage("end_date" + dateErrorMsg),
+    .withMessage("end_date" + iso8601ErrorMsg),
 
   body("recurrence_frequency_weeks")
     .isInt()
-    .withMessage("recurrence_frequency_weeks must be an integer"),
+    .withMessage("recurrence_frequency_weeks must be an integer")
+    .custom((recurrenceFrequencyWeeks, { req }) => {
+      if (recurrenceFrequencyWeeks <= 0) {
+        throw new Error("recurrence_frequency_weeks must be greater than 0");
+      }
+
+      const startDate = new Date(req.body.start_date);
+      const endDate = new Date(req.body.end_date);
+
+      const timeDifference = endDate - startDate; // Calculate the time difference in milliseconds
+      const weeksDifference = timeDifference / (1000 * 60 * 60 * 24 * 7); // Convert time difference from milliseconds to weeks
+
+      // Check if the provided weeks exceed the weeks between the dates
+      if (recurrenceFrequencyWeeks > weeksDifference) {
+        throw new Error(
+          `recurrence_frequency_weeks [${recurrenceFrequencyWeeks}] exceeds number of weeks between [${startDate.toDateString()}] & [${endDate.toDateString()}] which is [${weeksDifference.toFixed(2)}] weeks.`);
+      }
+
+      return true;
+    }),
 
   body("recurrence_frequency_days")
     .isArray()
