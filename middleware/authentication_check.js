@@ -8,7 +8,7 @@ const authentication_check = (req, res, next) => {
   } catch {
     logger.error(`Token missing from Authorization header`);
     return res
-      .status(400)
+      .status(403)
       .send({ error: "Token missing from Authorization header" });
   }
 

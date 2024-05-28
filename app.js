@@ -82,8 +82,10 @@ app.use("/", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
 
 // Starting the server
-app.listen(port, hostname, () => {
-    logger.info(`scheduler-api started on port ${port}`);
-});
+if (process.env.NODE_ENV !== "test") {
+    app.listen(port, hostname, () => {
+        logger.info(`scheduler-api started on http://${hostname}:${port}/`);
+    });
+}
 
 module.exports = app;

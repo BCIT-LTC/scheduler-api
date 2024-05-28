@@ -1,102 +1,94 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const createLogger = require('../logger'); // Ensure the path is correct
-const logger = createLogger(module);
-
 
 /**
- * Retrieve a list of all the announcements.
+ * Retrieves an announcement by its ID
  *
- * @date 2023-05-17 - 10:41:51 p.m.
- * @async
- * @returns {Object} list of all the announcements.
+ * @param {number} id - The ID of the announcement
+ * @returns {Promise<object>} - The announcement object
+ */
+const getAnnouncementById = async (id) => {
+  try {
+    return await prisma.announcement.findUnique({
+      where: { announcement_id: parseInt(id) },
+    });
+  } catch (error) {
+    console.error("Error while fetching an announcement by id:", error.stack);
+    throw new Error("Error while fetching an announcement by id");
+  }
+};
+
+/**
+ * Retrieves all announcements
+ *
+ * @returns {Promise<Array<object>>} - An array of announcement objects
  */
 const getAnnouncement = async () => {
   try {
     return await prisma.announcement.findMany();
   } catch (error) {
-    logger.error({ message: "Error while fetching announcements", error: error.stack });
-    throw error;
+    console.error("Error while fetching announcements:", error.stack);
+    throw new Error("Error while fetching announcements");
   }
 };
 
-
 /**
- * Add an announcement to the database.
+ * Adds an announcement
  *
- * @date 2023-05-17 - 10:42:41 p.m.
- * @async
- * @param {Announcement} announcement - the announcement to add with title, description, email of the user who created it, and event_id
- * @returns {unknown}
+ * @param {object} announcement - The announcement object
+ * @returns {Promise<object>} - The added announcement object
  */
 const addAnnouncement = async (announcement) => {
   try {
     return await prisma.announcement.create({
-      data: {
-        title: announcement.title,
-        description: announcement.description,
-        created_by: announcement.created_by,
-        event_id: announcement.event_id,
-      },
+      data: announcement,
     });
   } catch (error) {
-    logger.error({ message: " Error while adding an announcement", error: error.stack });
+    console.error("Error while adding an announcement:", error.stack);
+    throw error;
   }
 };
 
-
 /**
- * Delete an announcement given an id
+ * Deletes an announcement by its ID
  *
- * @date 2023-05-17 - 10:43:52 p.m.
- * @async
- * @param {*} id of the announcement to delete
- * @returns {Object} deleted announcement
+ * @param {number} id - The ID of the announcement
+ * @returns {Promise<object>} - The deleted announcement object
  */
-const deleteAnnouncement = async(id) => {
-    try {
-        const deletedAnnouncement = await prisma.announcement.delete({
-            where: { announcement_id: id },
-        });
-        console.log("Deleted Announcement: ", deletedAnnouncement);
-        return deletedAnnouncement;
-    } catch (error) {
-        logger.error({ message: "Error while deleting an announcement", error: error.stack });
-        throw error;
-    }
+const deleteAnnouncement = async (id) => {
+  try {
+    return await prisma.announcement.delete({
+      where: { announcement_id: parseInt(id) },
+    });
+  } catch (error) {
+    console.error("Error while deleting an announcement:", error.stack);
+    throw new Error("Error while deleting an announcement");
+  }
 };
 
-
 /**
- * Update an announcement with its id
+ * Edits an announcement by its ID with new data
  *
- * @date 2023-05-17 - 10:44:51 p.m.
- * @async
- * @param {*} id - id of announcement to update
- * @param {*} updatedTitle - the new title
- * @param {*} updatedDescription - the new description
- * @returns {Object} the updated announcement
+ * @param {number} id - The ID of the announcement
+ * @param {string} title - The title of the announcement
+ * @param {string} description - The description of the announcement
+ * @param {string} modified_by - The user who modified the announcement
+ * @returns {Promise<object>} - The updated announcement object
  */
-const editAnnouncement = async(id, updatedTitle, updatedDescription, date) => {
-    try {
-        const editedAnnouncement = await prisma.announcement.update({
-            where: { announcement_id: id },
-            data: {
-                title: updatedTitle,
-                description: updatedDescription,
-                date: date,
-                last_updated: new Date(),
-            },
-        });
-        console.log("Edited Announcement: ", editedAnnouncement);
-        return editedAnnouncement;
-    } catch (error) {
-        logger.error({ message: "Error while editing an announcement", error: error.stack });
-        throw error;
-    }
+const editAnnouncement = async (id, title, description, modified_by) => {
+  try {
+    return await prisma.announcement.update({
+      where: { announcement_id: parseInt(id) },
+      data: { title, description, modified_by },
+    });
+  } catch (error) {
+    console.error("Error while editing an announcement:", error.stack);
+    throw new Error("Error while editing an announcement");
+  }
 };
 
 module.exports = {
+  getAnnouncementById,
   getAnnouncement,
   addAnnouncement,
   deleteAnnouncement,
