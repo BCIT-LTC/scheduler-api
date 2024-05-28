@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient, Role } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const userModel = {
@@ -44,23 +44,32 @@ const userModel = {
     }
   },
 
-  updateUserRole: async (email, newRole) => {
+  updateUserRole: async (user_id, newRoles) => {
     try {
+      // Check if all role in newRoles are valid roles in the Role enum
+      const validRoles = Object.values(Role);
+      const invalidRoles = newRole.filter((role) => !validRoles.includes(role));
+      if (invalidRoles.length > 0) {
+        throw new Error(`Invalid role(s): ${invalidRoles.join(", ")}`);
+      }
+
+      // Find the user by user_id
       const user = await prisma.user.findUnique({
-        where: { email },
+        where: { user_id },
       });
+
+      // Check if the user exists
       if (!user) {
-        throw new Error(`User with email ${email} not found`);
+        throw new Error(`User with user_id ${user_id} not found`);
       }
-      if (user.role === newRole) {
-        throw new Error(`User ${email} already has the role of ${newRole}`);
-      }
+      
       return await prisma.user.update({
-        where: { email },
-        data: { role: newRole },
-      });
+        where: {user_id},
+        data: {
+          app_roles: newRoles}, // Overwrite the users app_roles with the new roles
+        });
     } catch (error) {
-      throw new Error(`Error updating user's role for ${email}: ${error.message}`);
+      throw new Error(`Error updating user's role for ${user_id}: ${error.message}`);
     }
   },
 };
