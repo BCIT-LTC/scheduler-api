@@ -1,333 +1,187 @@
-// Mocking the Prisma Client
-jest.mock("@prisma/client", () => {
-  const mockPrisma = {
-    announcement: {
-      findMany: jest.fn(),
-      create: jest.fn(),
-      delete: jest.fn(),
-      update: jest.fn(),
-    },
-  };
-  return {
-    PrismaClient: jest.fn(() => mockPrisma),
-    prisma: mockPrisma,
-  };
-});
-
-const { prisma } = require("@prisma/client");
-const createLogger = require("../../logger");
-
-// Mock the logger
-jest.mock("../../logger");
-
-const logger = {
-  error: jest.fn(),
-};
-createLogger.mockReturnValue(logger);
-
-// Import the functions to test
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 const {
+  getAnnouncementById,
   getAnnouncement,
   addAnnouncement,
   deleteAnnouncement,
   editAnnouncement,
 } = require("../../models/announcement");
 
-// Organize related tests into a test suite
+jest.mock("@prisma/client", () => {
+  const mPrismaClient = {
+    announcement: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      delete: jest.fn(),
+      update: jest.fn(),
+    },
+    $disconnect: jest.fn(),
+  };
+  return { PrismaClient: jest.fn(() => mPrismaClient) };
+});
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  jest.spyOn(console, "error").mockImplementation(() => {});
+});
+
 describe("Announcement Model", () => {
-  // Ensures data clean up after each test
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  // Test sub-suite for the getAnnouncement function
-  describe("getAnnouncement", () => {
-    // Test case for successful retrieval of announcements
-    it("should successfully return all announcements", async () => {
-      const test_create_date = new Date("2024-04-27T15:14:55.000Z");
-      const test_modify_date = new Date("2024-04-28T17:18:21.000Z");
-
-      const mockAnnouncements = [
-        {
-          announcement_id: 1,
-          title: "Announcement 1",
-          description: "Description 1",
-          created_at: test_create_date,
-          created_by: "Admin",
-          last_modified: test_modify_date,
-          modified_by: "Admin",
-          event_id: 1,
-        },
-        {
-          announcement_id: 2,
-          title: "Announcement 2",
-          description: "Description 2",
-          created_at: test_create_date,
-          created_by: "Admin",
-          last_modified: test_modify_date,
-          modified_by: "Admin",
-          event_id: 2,
-        },
-      ];
-      // Mocks the database query
-      prisma.announcement.findMany.mockResolvedValue(mockAnnouncements);
-
-      // Retrieves the announcements
-      const announcements = await getAnnouncement();
-
-      // Validate the results and number of calls to the database
-      expect(announcements).toEqual(mockAnnouncements);
-      expect(prisma.announcement.findMany).toHaveBeenCalledTimes(1);
-    });
-
-    // Test case for failed retrieval of announcements
-    it("should log an error and throw an exception if retrieving announcements fails", async () => {
-      const mockError = new Error("Database query failed");
-
-      // Mock the rejected value for the database query
-      prisma.announcement.findMany.mockRejectedValue(mockError);
-
-      // Validate that the error is thrown and logged
-      await expect(getAnnouncement()).rejects.toThrow(mockError);
-      expect(logger.error).toHaveBeenCalledWith({
-        message: "Error while fetching announcements",
-        error: mockError.stack,
-      });
-    });
-  });
-
-  // Test sub-suite for the addAnnouncement function
-  describe("addAnnouncement", () => {
-    // Test case for successful addition of an announcement
-    it("should successfully add an announcement", async () => {
-      const test_date = new Date();
-      const mockAnnouncement = {
+  describe("getAnnouncementById", () => {
+    it("should retrieve an announcement by its ID", async () => {
+      const announcement = {
         announcement_id: 1,
-        title: "Announcement 1",
-        description: "Description 1",
-        created_at: test_date,
-        created_by: null,
-        last_modified: test_date,
-        modified_by: null,
-        event_id: null,
+        title: "Test Announcement",
+        description: "Test Description",
       };
 
-      // Mocks the database query
-      prisma.announcement.create.mockResolvedValue(mockAnnouncement);
+      prisma.announcement.findUnique.mockResolvedValue(announcement);
+      const result = await getAnnouncementById(1);
+      expect(result).toEqual(announcement);
+    });
 
-      // Adds the announcement
-      const announcement = await addAnnouncement(
-        "Announcement 1",
-        "Description 1",
-        test_date
+    it("should log an error and throw an exception if retrieving an announcement by ID fails", async () => {
+      const mockError = new Error("Error while fetching an announcement by id");
+      prisma.announcement.findUnique.mockRejectedValue(mockError);
+      await expect(getAnnouncementById(1)).rejects.toThrow(
+        "Error while fetching an announcement by id"
       );
 
-      // Validate the results and number of calls to the database
-      expect(announcement).toEqual(mockAnnouncement);
-      expect(prisma.announcement.create).toHaveBeenCalledWith({
-        data: {
-          title: "Announcement 1",
-          description: "Description 1",
-          created_at: test_date,
-          created_by: null,
-          last_modified: test_date,
-          modified_by: null,
-          event_id: null,
-        },
-      });
-      expect(prisma.announcement.create).toHaveBeenCalledTimes(1);
-    });
-
-    // Test case for failed addition of an announcement
-    it("should log an error and throw an exception if adding an announcement fails", async () => {
-      const test_date = new Date();
-      const mockError = new Error("Database query failed");
-
-      // Mock the rejected value for the database query
-      prisma.announcement.create.mockRejectedValue(mockError);
-
-      // Validate that the error is thrown and logged
-      await expect(
-        addAnnouncement("Announcement 1", "Description 1", test_date)
-      ).rejects.toThrow(mockError);
-      expect(logger.error).toHaveBeenCalledWith({
-        message: "Error while adding an announcement",
-        error: mockError.stack,
-      });
-    });
-
-    // Test case for null or undefined title
-    it("should throw an error if title is null or undefined", async () => {
-      const test_date = new Date();
-
-      await expect(
-        addAnnouncement(null, "Description 1", test_date)
-      ).rejects.toThrow();
-      await expect(
-        addAnnouncement(undefined, "Description 1", test_date)
-      ).rejects.toThrow();
-    });
-
-    // Test case for null or undefined description
-    it("should throw an error if description is null or undefined", async () => {
-      const test_date = new Date();
-
-      await expect(
-        addAnnouncement("Announcement 1", null, test_date)
-      ).rejects.toThrow();
-      await expect(
-        addAnnouncement("Announcement 1", undefined, test_date)
-      ).rejects.toThrow();
-    });
-
-    // Test case for null or undefined date
-    it("should throw an error if date is null or undefined", async () => {
-      await expect(
-        addAnnouncement("Announcement 1", "Description 1", null)
-      ).rejects.toThrow();
-      await expect(
-        addAnnouncement("Announcement 1", "Description 1", undefined)
-      ).rejects.toThrow();
+      expect(console.error).toHaveBeenCalledWith(
+        "Error while fetching an announcement by id:",
+        mockError.stack
+      );
     });
   });
 
-  // Test sub-suite for the deleteAnnouncement function
-  describe("deleteAnnouncement", () => {
-    it("should delete an announcement by its ID", async () => {
-      const test_create_date = new Date("2024-05-11T15:14:55.000Z");
-      const test_modify_date = new Date("2024-05-12T15:20:31.000Z");
+  describe("getAnnouncement", () => {
+    it("should retrieve all announcements", async () => {
+      const announcements = [
+        {
+          announcement_id: 1,
+          title: "Test Announcement",
+          description: "Test Description",
+        },
+      ];
 
-      const mockDeletedAnnouncement = {
-        announcement_id: 4,
-        title: "Deleted Announcement",
-        description: "Deleted Description",
-        created_at: test_create_date,
-        created_by: null,
-        last_modified: test_modify_date,
-        modified_by: null,
-        event_id: null,
-      };
-      prisma.announcement.delete.mockResolvedValue(mockDeletedAnnouncement);
-
-      // Delete the announcement and validate the results
-      const deletedAnnouncement = await deleteAnnouncement(4);
-      expect(deletedAnnouncement).toEqual(mockDeletedAnnouncement);
-      expect(prisma.announcement.delete).toHaveBeenCalledWith({
-        where: { announcement_id: 4 },
-      });
+      prisma.announcement.findMany.mockResolvedValue(announcements);
+      const result = await getAnnouncement();
+      expect(result).toEqual(announcements);
     });
 
-    // Test case for failed deletion of an announcement
+    it("should log an error and throw an exception if retrieving announcements fails", async () => {
+      const mockError = new Error("Error while fetching announcements");
+      prisma.announcement.findMany.mockRejectedValue(mockError);
+
+      await expect(getAnnouncement()).rejects.toThrow(
+        "Error while fetching announcements"
+      );
+
+      expect(console.error).toHaveBeenCalledWith(
+        "Error while fetching announcements:",
+        mockError.stack
+      );
+    });
+  });
+
+  describe("addAnnouncement", () => {
+    it("should add an announcement", async () => {
+      const newAnnouncement = {
+        announcement_id: 1,
+        title: "New Announcement",
+        description: "This is a new announcement",
+        created_by: "admin@bcit.ca",
+      };
+
+      prisma.announcement.create.mockResolvedValue(newAnnouncement);
+      const result = await addAnnouncement(newAnnouncement);
+
+      expect(result).toEqual(newAnnouncement);
+    });
+    it("should log an error and throw an exception if adding an announcement fails", async () => {
+      const mockError = new Error("Error while adding an announcement");
+
+      prisma.announcement.create.mockRejectedValue(mockError);
+
+      await expect(
+        addAnnouncement({
+          title: "New Announcement",
+          description: "This is a new announcement",
+          created_by: "admin@bcit.ca",
+        })
+      ).rejects.toThrow(mockError);
+
+      expect(console.error).toHaveBeenCalledWith(
+        "Error while adding an announcement:",
+        mockError.stack
+      );
+    });
+  });
+
+  describe("deleteAnnouncement", () => {
+    it("should delete an announcement by its ID", async () => {
+      const announcement = {
+        announcement_id: 1,
+        title: "Test Announcement",
+        description: "Test Description",
+      };
+
+      prisma.announcement.delete.mockResolvedValue(announcement);
+      const result = await deleteAnnouncement(1);
+
+      expect(result).toEqual(announcement);
+    });
     it("should log an error and throw an exception if deleting an announcement fails", async () => {
       const mockError = new Error("Database error");
       prisma.announcement.delete.mockRejectedValue(mockError);
 
-      // Validate that the error is thrown and logged
-      await expect(deleteAnnouncement(5)).rejects.toThrow(mockError);
-      expect(logger.error).toHaveBeenCalledWith({
-        message: "Error while deleting an announcement",
-        error: mockError.stack,
-      });
-    });
-
-    // Test case for null or undefined ID
-    it("should throw an error if ID is null or undefined", async () => {
-      await expect(deleteAnnouncement(null)).rejects.toThrow();
-      await expect(deleteAnnouncement(undefined)).rejects.toThrow();
+      await expect(deleteAnnouncement(1)).rejects.toThrow(
+        "Error while deleting an announcement"
+      );
+      expect(console.error).toHaveBeenCalledWith(
+        "Error while deleting an announcement:",
+        mockError.stack
+      );
     });
   });
-
-  // Test sub-suite for the editAnnouncement function
   describe("editAnnouncement", () => {
     it("should update an announcement by its ID", async () => {
-      const test_create_date = new Date("2024-05-01T15:14:55.000Z");
-      const test_modify_date = new Date("2024-05-12T15:20:31.000Z");
-
-      const updatedAnnouncement = {
-        announcement_id: 5,
-        title: "Test Announcement",
-        description: "Test Description",
-        created_at: test_create_date,
-        created_by: null,
-        last_modified: test_modify_date,
-        modified_by: null,
-        event_id: null,
+      const announcement = {
+        announcement_id: 1,
+        title: "Updated Announcement",
+        description: "Updated Description",
+        modified_by: "admin@bcit.ca",
       };
-      prisma.announcement.update.mockResolvedValue(updatedAnnouncement);
 
-      // Update the announcement and validate the results
-      const editedAnnouncement = await editAnnouncement(
-        5,
+      prisma.announcement.update.mockResolvedValue(announcement);
+      const result = await editAnnouncement(
+        1,
         "Updated Announcement",
         "Updated Description",
-        test_modify_date
+        "admin@bcit.ca"
       );
 
-      // Validate the results and number of calls to the database
-      expect(editedAnnouncement).toEqual(updatedAnnouncement);
-      expect(prisma.announcement.update).toHaveBeenCalledWith({
-        where: { announcement_id: 5 },
-        data: {
-          title: "Updated Announcement",
-          description: "Updated Description",
-          last_modified: test_modify_date,
-        },
-      });
-      expect(prisma.announcement.update).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(announcement);
     });
 
-    // Test case for failed update of an announcement
     it("should log an error and throw an exception if updating an announcement fails", async () => {
       const mockError = new Error("Database error");
+
       prisma.announcement.update.mockRejectedValue(mockError);
 
       await expect(
-        editAnnouncement(6, "Title", "Description", new Date())
-      ).rejects.toThrow(mockError);
-      expect(logger.error).toHaveBeenCalledWith({
-        message: "Error while editing an announcement",
-        error: mockError.stack,
-      });
-    });
-
-    // Test case for null or undefined ID
-    it("should throw an error if ID is null or undefined", async () => {
-      await expect(
-        editAnnouncement(null, "Title", "Description", new Date())
-      ).rejects.toThrow();
-      await expect(
-        editAnnouncement(undefined, "Title", "Description", new Date())
-      ).rejects.toThrow();
-    });
-
-    // Test case for null or undefined title
-    it("should throw an error if title is null or undefined", async () => {
-      await expect(
-        editAnnouncement(5, null, "Description", new Date())
-      ).rejects.toThrow();
-      await expect(
-        editAnnouncement(5, undefined, "Description", new Date())
-      ).rejects.toThrow();
-    });
-
-    // Test case for null or undefined description
-    it("should throw an error if description is null or undefined", async () => {
-      await expect(
-        editAnnouncement(5, "Title", null, new Date())
-      ).rejects.toThrow();
-      await expect(
-        editAnnouncement(5, "Title", undefined, new Date())
-      ).rejects.toThrow();
-    });
-
-    // Test case for null or undefined date
-    it("should throw an error if date is null or undefined", async () => {
-      await expect(
-        editAnnouncement(5, "Title", "Description", null)
-      ).rejects.toThrow();
-      await expect(
-        editAnnouncement(5, "Title", "Description", undefined)
-      ).rejects.toThrow();
+        editAnnouncement(
+          1,
+          "Updated Announcement",
+          "Updated Description",
+          "admin@bcit.ca"
+        )
+      ).rejects.toThrow("Error while editing an announcement");
+      expect(console.error).toHaveBeenCalledWith(
+        "Error while editing an announcement:",
+        mockError.stack
+      );
     });
   });
 });

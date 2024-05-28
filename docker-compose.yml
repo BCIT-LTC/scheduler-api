@@ -74,8 +74,14 @@ services:
       # - NODE_ENV=development
       - NODE_ENV=test
       # - NODE_ENV=production
-      - DATABASE_URL=postgres://bsnmysql:bcitbsn491@postgres:5432/openlab-scheduler
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=openlab-scheduler
+      - POSTGRES_USER=bsnmysql
+      - POSTGRES_PASSWORD=bcitbsn491
+      - TZ=America/Vancouver
       - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
+      - SUPERUSER=admin@bcit.ca
+      - DATABASE_URL=postgres://bsnmysql:bcitbsn491@postgres:5432/openlab-scheduler
     depends_on:
       postgres:
         condition: service_healthy
