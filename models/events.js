@@ -211,18 +211,28 @@ const updateEvent = async (event) => {
     if (!e) {
       throw new Error(`Event with ID [${event.event_id}] not found`);
     }
+
+    // Prepare the data object with conditional series handling
+    const updateData = {
+      location: { connect: { location_id: event.location_id } },
+      start_time: new Date(event.start_time),
+      end_time: new Date(event.end_time),
+      summary: event.summary,
+      description: event.description,
+      facilitator: event.facilitator,
+      modifier: { connect: { email: event.modified_by } },
+    };
+
+    // Only modify relation if series_id explicitly set to null
+    if (event.series_id === null) {
+      updateData.series = { disconnect: true };
+    }
+
     const updatedEvent = await prisma.event.update({
       where: { event_id: e.event_id },
-      data: {
-        location: { connect: { location_id: event.location_id } },
-        start_time: new Date(event.start_time),
-        end_time: new Date(event.end_time),
-        summary: event.summary,
-        description: event.description,
-        facilitator: event.facilitator,
-        modifier: { connect: { email: event.modified_by } },
-      },
+      data: updateData,
     });
+
     return updatedEvent;
   } catch (error) {
     logger.error({
