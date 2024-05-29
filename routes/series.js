@@ -58,7 +58,13 @@ const seriesValidation = [
 
   body("recurrence_frequency_days")
     .isArray()
-    .withMessage("recurrence_frequency_days must be an array"),
+    .withMessage("recurrence_frequency_days must be an array")
+    .custom((recurrenceFrequencyDays) => {
+      if (recurrenceFrequencyDays.length === 0) {
+        throw new Error("recurrence_frequency_days must not be an empty array");
+      }
+      return true;
+    }),
   body("recurrence_frequency_days.*")
     .isInt({ min: 0, max: 6 }) // 0 for Sunday, 6 for Saturday
     .withMessage("Each item in recurrence_frequency_days must be an integer"),
