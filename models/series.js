@@ -10,18 +10,32 @@ const { createEvent, updateEvent } = require("./events");
 //////////////////////
 
 /**
+ * Extracts the date portion (YYYY-MM-DD) from a Date object in UTC.
+ * @param {Date} dateTimeObject - The Date object from which to extract the date.
+ * @returns {string} - The date portion in the format 'YYYY-MM-DD'.
+ */
+const extractDateString = (dateTimeObject) => {
+  const year = dateTimeObject.getUTCFullYear();
+  const month = String(dateTimeObject.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(dateTimeObject.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+/**
  * Compares the date range and frequency data of 2 Series.
  * @param {Object} existingSeries - Existing series data from the database.
  * @param {Object} newSeries - New series data to compare against the existing data.
  * @returns {boolean} - Returns true if the properties are equal, otherwise false.
  */
 const areSeriesDatesAndFrequenciesEqual = (existingSeries, newSeries) => {
-  const startDate = new Date(newSeries.start_date);
-  const endDate = new Date(newSeries.end_date);
+  const oldStartDate = extractDateString(new Date(existingSeries.start_date));
+  const oldEndDate = extractDateString(new Date(existingSeries.end_date));
+  const newStartDate = extractDateString(new Date(newSeries.start_date));
+  const newEndDate = extractDateString(new Date(newSeries.end_date));
 
   return (
-    existingSeries.start_date.getTime() === startDate.getTime() &&
-    existingSeries.end_date.getTime() === endDate.getTime() &&
+    oldStartDate === newStartDate &&
+    oldEndDate === newEndDate &&
     JSON.stringify(existingSeries.recurrence_frequency_weeks) ===
       JSON.stringify(newSeries.recurrence_frequency_weeks) &&
     JSON.stringify(existingSeries.recurrence_frequency_days) ===
