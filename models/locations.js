@@ -106,14 +106,14 @@ const createLocation = async (location) => {
  * @param {Object} location - location to update
  * @returns {Promise<Object>} promise that resolves to the updated location object
  */
-const updateLocation = async (location) => {
+const updateLocation = async (id, location) => {
   try {
     // IDs should be unique with no duplicates
     const e = await prisma.location.findUnique({
-      where: { location_id: location.location_id },
+      where: { location_id: parseInt(id) },
     });
     if (!e) {
-      throw new Error(`Location with id ${location.location_id} not found`);
+      throw new Error(`Location with id ${id} not found`);
     }
     const updatedLocation = await prisma.location.update({
       where: { location_id: e.location_id },
