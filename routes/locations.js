@@ -165,19 +165,15 @@ router.post("/locations", locationValidation, async (req, res) => {
  * PUT /api/location/:id
  * Endpoint to update an location by ID.
  */
-router.put("/location/:id", async (req, res) => {
-  // Convert the ID from string to a base 10 integer
-  const id = parseInt(req.params.id, 10);
+router.put("/locations/:id", async (req, res) => {
+  const id = req.params.id;
+  const location = await getLocationById(id);
+  if (!location) {
+    return res.status(404).send({ error: "Location not found" });
+  }
+
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    // Add ID to req.body
-    req.body.location_id = id;
-
-    const updatedLocation = await updateLocation(req.body);
+    const updatedLocation = await updateLocation(id, req.body);
     return res.status(200).send(updatedLocation);
   } catch (error) {
     logger.error({ message: `PUT /api/location/${id}`, error: error.stack });
