@@ -5,20 +5,16 @@ const logger = createLogger(module);
 const userModel = require("./userModel").userModel;
 
 /**
- * Returns all locations in the database.
- *
- * @returns {Promise<Array<Object>>} A promise that resolves to an array of location objects.
- * @throws {Error} If there is an error fetching the locations.
- */
-
-/**
- * Returns all locations in the database.
- * @typedef {PrismaClient.Location} Location
+ * @namespace locationsModel
+ * @description model for handling locations requests.
  */
 
 /**
  * Find an location by its id
+ * @name getLocationById
+ * @memberof locationsModel
  * @async
+ * @function
  * @param {number} id - the id of the location
  * @returns {Object} the location object
  */
@@ -37,12 +33,13 @@ const getLocationById = async (id) => {
 
 /**
  * Retrieve a list of all the locations.
- *
+ * @name getLocations
  * @type {Location}
- * @namespace PrismaClient
+ * @memberof locationsModel
  * @description Prisma Method retrieving locations from the database.
  * @date 2023-05-17 - 10:41:51 p.m.
  * @async
+ * @function
  * @returns {Object} List of all locations.
  */
 const getLocations = async () => {
@@ -55,12 +52,13 @@ const getLocations = async () => {
 
 /**
  * Create a location and append to the database.
- *
+ * @name createLocation
  * @type {Location}
- * @namespace PrismaClient
+ * @memberof locationsModel
  * @description Prisma Method create a location to database.
  * @date 2024-05-08 - 4:26:41 p.m.
  * @async
+ * @function
  * @param {Object} location - Takes room_location and modified_by from location
  * @returns {unknown}
  */
@@ -101,10 +99,17 @@ const createLocation = async (location) => {
 };
 
 /**
- * Update an existing location
- *
- * @param {Object} location - location to update
- * @returns {Promise<Object>} promise that resolves to the updated location object
+ * Update a location from the database.
+ * @name updateLocation
+ * @type {Location}
+ * @memberof locationsModel
+ * @description Prisma Method update a location from the database.
+ * @date 2024-05-17 - 9:57:41 a.m.
+ * @async
+ * @function
+ * @param {Number} id - id of the location to be updated in string form
+ * @param {Number} location - the details of the new location to be updated
+ * @returns {Promise<object>} a promise that resolves to the result of the update operation
  */
 const updateLocation = async (id, location) => {
   try {
@@ -135,12 +140,13 @@ const updateLocation = async (id, location) => {
 
 /**
  * Delete a location from the database.
- *
+ * @name deleteLocation
  * @type {Location}
- * @namespace PrismaClient
+ * @memberof locationsModel
  * @description Prisma Method delete a location from the database.
  * @date 2024-05-17 - 9:57:41 a.m.
  * @async
+ * @function
  * @param {Number} param_id - id of the location to be deleted in string form
  * @returns {Promise<object>} a promise that resolves to the result of the delete operation
  */
