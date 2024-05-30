@@ -1,3 +1,8 @@
+/**
+ * @namespace seriesModel
+ * @description model for handling series requests.
+ */
+
 // Import Prisma client and logger
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
@@ -11,6 +16,8 @@ const { createEvent, updateEvent } = require("./events");
 
 /**
  * Extracts the date portion (YYYY-MM-DD) from a Date object in UTC.
+ * @memberof seriesModel
+ * @function
  * @param {Date} dateTimeObject - The Date object from which to extract the date.
  * @returns {string} - The date portion in the format 'YYYY-MM-DD'.
  */
@@ -23,6 +30,8 @@ const extractDateString = (dateTimeObject) => {
 
 /**
  * Compares the date range and frequency data of 2 Series.
+ * @memberof seriesModel
+ * @function
  * @param {Object} existingSeries - Existing series data from the database.
  * @param {Object} newSeries - New series data to compare against the existing data.
  * @returns {boolean} - Returns true if the properties are equal, otherwise false.
@@ -45,7 +54,8 @@ const areSeriesDatesAndFrequenciesEqual = (existingSeries, newSeries) => {
 
 /**
  * Maps event IDs to the series data.
- *
+ * @memberof seriesModel
+ * @function
  * @param {Object} seriesData - The series data from the request body.
  * @param {Array<number>} eventIds - An array of event IDs to map to the series data.
  * @returns {Object} - The modified series data with mapped event IDs.
@@ -63,6 +73,8 @@ const mapEventsToSeries = (seriesData, eventIds) => {
 
 /**
  * Combines the date from one Date object with the time from another Date object.
+ * @memberof seriesModel
+ * @function
  * @param {Date} dateTimeObjectWithDate - The Date object containing the date.
  * @param {Date} dateTimeObjectWithTime - The Date object containing the time.
  * @returns {Date} A new Date object with the combined date and time.
@@ -102,6 +114,8 @@ const requiredPropertiesCommon = [
 
 /**
  * Retrieve a series by its ID
+ * @memberof seriesModel
+ * @function
  * @async
  * @param {number} seriesId - the ID of the series to retrieve
  * @returns {Promise<Object>} promise that resolves to the series object
@@ -128,6 +142,8 @@ const getSeries = async (seriesId) => {
 
 /**
  *  Retrieve all events associated with a specific series
+ * @memberof seriesModel
+ * @function
  * @async
  * @param {number} seriesId - The identifier for the series
  * @returns {Promise<Array>} promise that resolves to the list of events
@@ -159,6 +175,8 @@ const getSeriesEvents = async (seriesId) => {
 
 /**
  * Creates a new Series entry in the database.
+ * @memberof seriesModel
+ * @function
  * @async
  * @param {Object} series - The series data payload from the request. The object includes:
  *                          - location_id: Location of the series. Must be an existing location_id in 'Location' table of database.
@@ -225,6 +243,8 @@ const createSeries = async (series) => {
 
 /**
  * Automatically generates event entries within a specified date range based on given recurrence rules.
+ * @memberof seriesModel
+ * @function
  * @async
  * @param {Object} series - The series data payload from the request. The object includes:
  *                          - series_title: Title of the series.
@@ -321,6 +341,8 @@ const autoGenerateEvents = async (series) => {
 
 /**
  * Update a Series entry in the database. Will also update Events tied to the Series entry.
+ * @memberof seriesModel
+ * @function
  * @async
  * @param {Object} series - The series data payload from the request. The object includes:
  *                          - series_title: Title of the series.
@@ -409,7 +431,8 @@ const updateSeries = async (series) => {
 
 /**
  * Updates all events associated with a Series.
- *
+ * @memberof seriesModel
+ * @function
  * @param {Object} series - The series data containing updates for associated events.
  * @returns {Promise<string>} - A promise that resolves to a message indicating the number of successfully updated events.
  * @throws {Error} - Throws an error if the series argument is null or if any event update fails.
@@ -471,6 +494,8 @@ const updateSeriesEvents = async (series) => {
 
 /**
  * Deletes all events associated with a series.
+ * @memberof seriesModel
+ * @function
  * @async
  * @param {number} series_id - The ID of the series to delete events for.
  * @throws {Error} Throws an error if the series ID is null or undefined.
@@ -501,6 +526,8 @@ const autoDeleteEvents = async (series_id) => {
 
 /**
  * Delete a series from the database
+ * @memberof seriesModel
+ * @function
  * @async
  * @param {number} id - series id to delete
  * @returns {Promise<Object>} promise that resolves to the deleted series object

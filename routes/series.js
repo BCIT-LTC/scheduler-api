@@ -1,3 +1,9 @@
+/**
+ * @type {ExpressRouter}
+ * @namespace seriesRouter
+ * @description Router for handling series requests.
+ */
+
 const express = require("express");
 const { body, validationResult, param } = require("express-validator");
 const router = express.Router();

@@ -1,3 +1,8 @@
+/**
+ * @namespace eventsModel
+ * @description model for handling series requests.
+ */
+
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const createLogger = require("../logger"); // Ensure the path is correct
@@ -5,6 +10,8 @@ const logger = createLogger(module);
 
 /**
  * Find an event by its id
+ * @memberof eventsModel
+ * @function
  * @async
  * @param {number} id - the id of the event
  * @returns {Object} the event object
@@ -23,7 +30,9 @@ const getEventById = async (id) => {
 };
 
 /**
- *  Find all the events for a specific day
+ * Find all the events for a specific day
+ * @memberof eventsModel
+ * @function
  * @async
  * @param {Date} date - the date to search for
  * @returns {Object} list of events
@@ -50,7 +59,8 @@ const getEventsByDate = async (date) => {
 
 /**
  * Find all the events for a specific month
- *
+ * @memberof eventsModel
+ * @function
  * @date 2024-02-08
  * @async
  * @param {Date} date - the date to search for
@@ -79,6 +89,8 @@ const getEventsByMonth = async (date) => {
 
 /**
  * Find all the events for a specific month
+ * @memberof eventsModel
+ * @function
  * @async
  * @param {Date} date - the date to search for
  * @returns {Object} list of events
@@ -108,6 +120,8 @@ const getEventsByWeek = async (date = new Date()) => {
 
 /**
  * Find all events for a speciic start and end range
+ * @memberof eventsModel
+ * @function
  * @param {Date} start
  * @param {Date} end
  * @returns {Object} list of events
@@ -141,6 +155,8 @@ const getEventsByRange = async (start, end) => {
 
 /**
  * Creates an event and persists it to the database
+ * @memberof eventsModel
+ * @function
  * @param {Object} event - event payload from the request
  * @returns {Promise<Object>} promise that resolves to the created event object
  */
@@ -179,7 +195,8 @@ const createEvent = async (event) => {
 
 /**
  * Asynchronously deletes an event from the database.
- *
+ * @memberof eventsModel
+ * @function
  * @param {number|string} event_id -id of event to delete
  * @returns {Promise<object>} a promise that resolves to the result of the delete operation
  */
@@ -199,7 +216,8 @@ const deleteEvent = async (event_id) => {
 
 /**
  * Update an existing event
- *
+ * @memberof eventsModel
+ * @function
  * @param {Object} event - event to update
  * @returns {Promise<Object>} promise that resolves to the updated event object
  */

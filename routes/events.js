@@ -1,3 +1,9 @@
+/**
+ * @type {ExpressRouter}
+ * @namespace eventsRouter
+ * @description Router for handling events requests.
+ */
+
 const express = require("express");
 const {
   body,
