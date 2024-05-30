@@ -42,10 +42,6 @@ services:
 
   jsdocs:
     image: node:21-alpine
-    environment:
-      POSTGRES_USER: bsnmysql
-      POSTGRES_PASSWORD: bcitbsn491
-      POSTGRES_DB: openlab-scheduler
     command:
       - /bin/sh
       - -c
@@ -54,7 +50,10 @@ services:
     working_dir: /build
     volumes:
       - .:/build
-        
+    depends_on:
+      app:
+        condition: service_started
+
   # adminer:
   #   image: adminer
   #   ports:
