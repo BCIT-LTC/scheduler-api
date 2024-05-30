@@ -96,12 +96,10 @@
  * @namespace locationsRouter
  * @description Router for handling locations requests.
  */
-
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const router = express.Router();
 const {
-    
     getLocations,
     createLocation,
     updateLocation,
@@ -115,7 +113,7 @@ const locationValidation = [ body("room_location") ];
 
 /**
  * Middleware for handling get location requests.
- * @name apiRouter.get
+ * @name locationsRouter.get
  * @function
  * @memberof locationsRouter
  * @param {express.Request} req - The Express request object.
@@ -134,7 +132,7 @@ router.get("/locations", async (req, res) => {
 
 /**
  * Middleware for handling and API Endpoint to create a location.
- * @name apiRouter.post
+ * @name locationsRouter.post
  * @function
  * @memberof locationsRouter
  * @param {express.Request} req - The Express request object.
@@ -162,8 +160,13 @@ router.post("/locations", locationValidation, async (req, res) => {
 });
 
 /**
- * PUT /api/location/:id
- * Endpoint to update an location by ID.
+ * Middleware for handling update location requests.
+ * @name locationsRouter.put
+ * @function
+ * @memberof locationsRouter
+ * @param {express.Request} req - The Express request object.
+ * @param {express.Response} res - The Express response object.
+ * @returns {Promise<any>} - The response data from the locations call.
  */
 router.put("/locations/:id", async (req, res) => {
   const id = req.params.id;
@@ -183,7 +186,7 @@ router.put("/locations/:id", async (req, res) => {
 
 /**
  * Middleware for handling delete location requests.
- * @name apiRouter.delete
+ * @name locationsRouter.delete
  * @function
  * @memberof locationsRouter
  * @param {express.Request} req - The Express request object.
