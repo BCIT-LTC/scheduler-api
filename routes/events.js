@@ -1,4 +1,152 @@
 /**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Event:
+ *       type: object
+ *       required:
+ *         - location_id
+ *         - start_time
+ *         - end_time
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The auto-generated ID of the event
+ *         location_id:
+ *           type: integer
+ *           description: The ID of the location associated with the event
+ *         start_time:
+ *           type: string
+ *           format: date-time
+ *           description: Start time of the event in ISO8601 format
+ *         end_time:
+ *           type: string
+ *           format: date-time
+ *           description: End time of the event in ISO8601 format
+ *       example:
+ *         id: 1
+ *         location_id: 5
+ *         start_time: '2024-06-25T15:30:00Z'
+ *         end_time: '2024-06-25T17:30:00Z'
+ *
+ * tags:
+ *   name: events
+ *   description: API endpoints for managing events
+ *
+ * /api/events/{id}:
+ *   get:
+ *     summary: Retrieve an event by ID
+ *     tags: [events]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the event to retrieve
+ *     responses:
+ *       200:
+ *         description: Detailed information about the event
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Event'
+ *       404:
+ *         description: Event not found
+ *       500:
+ *         description: Server error
+ *
+ *   put:
+ *     summary: Update an event by ID
+ *     tags: [events]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Event'
+ *     responses:
+ *       200:
+ *         description: Event updated successfully
+ *       400:
+ *         description: Validation error in the request body
+ *       500:
+ *         description: Server error
+ *
+ *   delete:
+ *     summary: Delete an event by ID
+ *     tags: [events]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the event to delete
+ *     responses:
+ *       200:
+ *         description: Event deleted successfully
+ *       404:
+ *         description: Event not found
+ *       500:
+ *         description: Server error
+ *
+ * /api/events:
+ *   post:
+ *     summary: Create a new event
+ *     tags: [events]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Event'
+ *     responses:
+ *       201:
+ *         description: Event created successfully
+ *       400:
+ *         description: Validation error in the request body
+ *       500:
+ *         description: Server error
+ *
+ *   get:
+ *     summary: Retrieve events by date range
+ *     tags: [events]
+ *     parameters:
+ *       - in: query
+ *         name: start
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: Start date and time of the event range
+ *       - in: query
+ *         name: end
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: End date and time of the event range
+ *     responses:
+ *       200:
+ *         description: List of events in the specified range
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Event'
+ *       500:
+ *         description: Server error
+ */
+
+/**
  * @type {ExpressRouter}
  * @namespace eventsRouter
  * @description Router for handling events requests.

@@ -15,76 +15,31 @@ const userRoleValidation = [
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     users:
- *       type: object
- *       required:
- *         - user_id
- *         - email
- *         - first_name
- *         - last_name
- *         - saml_role
- *         - app_roles
- *         - department
- *         - is_active
- *       properties:
- *         user_id:
- *           type: integer
- *           description: The auto-generated id of the user
- *         email:
- *           type: string
- *           description: The email of the user
- *         first_name:
- *           type: string
- *           description: The first name of the user
- *         last_name:
- *           type: string
- *           description: The last name of the user
- *         saml_role:
- *           type: string
- *           description: The SAML role of the user
- *         app_roles:
- *           type: array
- *           items:
- *             type: string
- *           description: The application roles of the user
- *         department:
- *           type: string
- *           description: The department of the user
- *         is_active:
- *           type: boolean
- *           description: The status of the user
- *       example:
- *         user_id: 1
- *         email: example@example.com
- *         first_name: John
- *         last_name: Doe
- *         saml_role: student
- *         app_roles: [role1]
- *         department: Test Department
- *         is_active: true
- *
  * tags:
  *   name: users
- *   description: The users managing API, JWT authentication is required to access this endpoint.
- * /api/users:
+ *   description: API endpoints for user management
+ *
+ * /users:
  *   get:
- *     summary: Retrieve the users
+ *     summary: Retrieve all users
  *     tags: [users]
  *     responses:
  *       200:
- *         description: The list of users
+ *         description: A list of all users
  *         content:
  *           application/json:
  *             schema:
  *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       404:
+ *         description: No users found
  *       500:
- *         description: Some server error
+ *         description: Error fetching users
  *
- * /api/user/{user_id}:
+ * /user/{user_id}:
  *   patch:
- *     summary: Update the user role
+ *     summary: Update a user's roles
  *     tags: [users]
  *     parameters:
  *       - in: path
@@ -92,23 +47,55 @@ const userRoleValidation = [
  *         required: true
  *         schema:
  *           type: integer
- *         description: The user ID
+ *         description: The ID of the user to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               roles:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of roles to assign to the user
  *     responses:
  *       200:
- *         description: The user role has been updated
+ *         description: User updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 user_id:
- *                   type: integer
- *                   description: The auto-generated id of the user
- *                 role:
- *                   type: string
- *                   description: The role of the user
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Validation error
  *       500:
- *         description: Some server error
+ *         description: Error updating user
+ *
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The user's ID
+ *         name:
+ *           type: string
+ *           description: The user's name
+ *         email:
+ *           type: string
+ *           description: The user's email address
+ *         roles:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: The roles assigned to the user
+ *       example:
+ *         id: 1
+ *         name: John Doe
+ *         email: johndoe@example.com
+ *         roles: ["admin", "user"]
  */
 
 /**
