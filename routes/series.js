@@ -1,4 +1,140 @@
 /**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Series:
+ *       type: object
+ *       required:
+ *         - start_date
+ *         - end_date
+ *         - start_time
+ *         - end_time
+ *         - recurrence_frequency_weeks
+ *         - recurrence_frequency_days
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The auto-generated id of the series
+ *         start_time:
+ *           type: string
+ *           format: date-time
+ *           description: Start time of the series in ISO8601 format
+ *         end_time:
+ *           type: string
+ *           format: date-time
+ *           description: End time of the series in ISO8601 format
+ *         start_date:
+ *           type: string
+ *           format: date
+ *           description: Start date of the series in ISO8601 format
+ *         end_date:
+ *           type: string
+ *           format: date
+ *           description: End date of the series in ISO8601 format
+ *         recurrence_frequency_weeks:
+ *           type: integer
+ *           description: Frequency of recurrence in weeks
+ *         recurrence_frequency_days:
+ *           type: array
+ *           items:
+ *             type: integer
+ *           description: Days of the week when the series recurs
+ *       example:
+ *         id: 1
+ *         start_time: '2024-05-06T08:00:00Z'
+ *         end_time: '2024-05-06T10:00:00Z'
+ *         start_date: '2024-05-06'
+ *         end_date: '2024-06-30'
+ *         recurrence_frequency_weeks: 1
+ *         recurrence_frequency_days: [1, 3, 5] # Monday, Wednesday, Friday
+ *
+ * tags:
+ *   name: series
+ *   description: The series managing API
+ *
+ * /api/series/{id}:
+ *   get:
+ *     summary: Retrieve a series by ID
+ *     tags: [series]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the series to retrieve
+ *     responses:
+ *       200:
+ *         description: Detailed information about the series
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Series'
+ *       400:
+ *         description: Validation error on the provided ID
+ *       404:
+ *         description: Series not found
+ *       500:
+ *         description: Server error
+ *
+ *   put:
+ *     summary: Update a series by ID
+ *     tags: [series]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Series'
+ *     responses:
+ *       200:
+ *         description: Series updated successfully
+ *       400:
+ *         description: Validation error in the request body
+ *       500:
+ *         description: Server error
+ *
+ *   delete:
+ *     summary: Delete a series by ID
+ *     tags: [series]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Series deleted successfully
+ *       500:
+ *         description: Server error
+ *
+ * /api/series:
+ *   post:
+ *     summary: Create a new series
+ *     tags: [series]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Series'
+ *     responses:
+ *       201:
+ *         description: Series created successfully
+ *       400:
+ *         description: Validation error in the request body
+ *       500:
+ *         description: Server error
+ */
+
+/**
  * @type {ExpressRouter}
  * @namespace seriesRouter
  * @description Router for handling series requests.
