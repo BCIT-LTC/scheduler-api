@@ -48,7 +48,7 @@ const userModel = {
     try {
       // Check if all role in newRoles are valid roles in the Role enum
       const validRoles = Object.values(Role);
-      const invalidRoles = newRole.filter((role) => !validRoles.includes(role));
+      const invalidRoles = newRoles.filter((role) => !validRoles.includes(role));
       if (invalidRoles.length > 0) {
         throw new Error(`Invalid role(s): ${invalidRoles.join(", ")}`);
       }
