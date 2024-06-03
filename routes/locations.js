@@ -44,9 +44,10 @@
  *               $ref: '#/components/schemas/locations'
  *       500:
  *         description: Some server error
- *   post:
- *     summary: Update or add locations
+*   post:
+ *     summary: Create a new location
  *     tags: [locations]
+ *     consumes: application/json
  *     requestBody:
  *       required: true
  *       content:
@@ -60,16 +61,55 @@
  *                 example: "NW4-3591"
  *               created_by:
  *                 type: string
- *                 description: The email of the user who modified the location
+ *                 description: The email of the user who created the location
  *                 example: "admin@bcit.ca"
  *             required:
  *               - room_location
  *               - created_by
  *     responses:
- *       200:
- *         description: Location that was added
+ *       201:
+ *         description: Location created successfully
  *       500:
  *         description: Some server error
+ *
+ * /api/locations/{id}:
+ *   put:
+ *     summary: Update a location that already exists
+ *     tags: [locations]
+ *     consumes: application/json
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the location to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               room_location:
+ *                 type: string
+ *                 description: The location of the room
+ *                 example: "NW4-3591"
+ *               modified_by:
+ *                 type: string
+ *                 description: The email of the user who modified the location
+ *                 example: "admin@bcit.ca"
+ *             required:
+ *               - room_location
+ *               - modified_by
+ *     responses:
+ *       200:
+ *         description: Location updated successfully
+ *       404:
+ *         description: Location not found
+ *       500:
+ *         description: Some server error
+ * 
  *   delete:
  *     summary: Delete a location
  *     tags: [locations]
@@ -79,11 +119,10 @@
  *        name: id
  *        required: true
  *     responses:
- *       200: 
+ *       200:
  *         description: Location deleted successfully
  *       500:
- *         description: Some server error 
- * 
+ *         description: Some server error
  */
 
 /**
@@ -97,19 +136,39 @@
  * @description Router for handling locations requests.
  */
 const express = require("express");
-const { body, validationResult } = require("express-validator");
 const router = express.Router();
 const {
-    getLocations,
-    createLocation,
-    updateLocation,
-    getLocationById,
-    deleteLocation,
+  getLocations,
+  createLocation,
+  updateLocation,
+  getLocationById,
+  deleteLocation,
 } = require("../models/locations");
-const createLogger = require("../logger");
-const logger = createLogger(module);
-const locationValidation = [ body("room_location") ];
+const { body, validationResult } = require("express-validator");
 
+const validateLocation = (field) => [
+  body("room_location").notEmpty().withMessage("Room location is required"),
+  body(field).notEmpty().withMessage(`${field} is required`),
+  body(field).isEmail().withMessage(`${field} must be an email`),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
+
+const checkID = [
+  (req, res, next) => {
+    const { id } = req.params;
+    if (!id || isNaN(id) || id <= 0) {
+      return res.status(400).json({ error: "ID must be a positive number" });
+    }
+    next();
+  },
+];
 
 /**
  * Middleware for handling get location requests.
@@ -123,10 +182,10 @@ const locationValidation = [ body("room_location") ];
 router.get("/locations", async (req, res) => {
   try {
     const locations = await getLocations();
-    res.status(200).send(locations);
+    return res.status(200).send(locations);
   } catch (error) {
-    logger.error({ message: "GET /api/locations", error: error.stack });
-    res.status(500).send({ error: error.message });
+    console.error("Error while fetching locations:", error.stack);
+    return res.status(500).send({ error: error.message });
   }
 });
 
@@ -139,24 +198,17 @@ router.get("/locations", async (req, res) => {
  * @param {express.Response} res - The Express response object.
  * @returns {Promise<any>} - The response data from the locations call.
  */
-router.post("/locations", locationValidation, async (req, res) => {
-    // Validate inputs if they are missing
-    try {
-        // location validation value check
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-
-        const location = await createLocation(req.body);
-        res.status(200).send(location);
-    } catch (error) {
-        logger.error({ 
-            message: "POST /api/locations", 
-            error: error.stack 
-        });
-        res.status(500).send({ error: error.message });
+router.post("/locations", validateLocation("created_by"), async (req, res) => {
+  try {
+    const location = await createLocation(req.body);
+    return res.status(201).send(location);
+  } catch (error) {
+    console.error("Error while adding a location:", error.stack);
+    if (error.message.includes("Foreign key constraint failed")) {
+      return res.status(400).send({ error: error.message });
     }
+    res.status(500).send({ error: error.message });
+  }
 });
 
 /**
@@ -168,18 +220,30 @@ router.post("/locations", locationValidation, async (req, res) => {
  * @param {express.Response} res - The Express response object.
  * @returns {Promise<any>} - The response data from the locations call.
  */
-router.put("/locations/:id", async (req, res) => {
-  const id = req.params.id;
-  const location = await getLocationById(id);
-  if (!location) {
-    return res.status(404).send({ error: "Location not found" });
+router.put("/locations/:id", checkID, validateLocation("modified_by"), async (req, res) => {
+  const { id } = req.params;
+  const { room_location, modified_by } = req.body;
+  if (!id) {
+    return res.status(400).send({ error: "ID is required" });
   }
+  if (!room_location || !modified_by) {
+    return res
+      .status(400)
+      .send({ error: "Room location and modified by are required" });
+  }
+  const data = { location_id: id, room_location, modified_by };
 
   try {
-    const updatedLocation = await updateLocation(id, req.body);
+    const location = await getLocationById(id);
+    if (!location) {
+      return res
+        .status(404)
+        .send({ error: "Record to update does not exist." });
+    }
+    const updatedLocation = await updateLocation(data);
     return res.status(200).send(updatedLocation);
   } catch (error) {
-    logger.error({ message: `PUT /api/location/${id}`, error: error.stack });
+    console.error("Error while updating a location:", error.stack);
     return res.status(500).send({ error: error.message });
   }
 });
@@ -193,22 +257,24 @@ router.put("/locations/:id", async (req, res) => {
  * @param {express.Response} res - The Express response object.
  * @returns {Promise<any>} - The response data from the locations call.
  */
-router.delete("/locations/:id", async (req, res) => {
-    try {
-        const id = req.params.id;
-        const location = await getLocationById(id);
-        if (!location) { // checks if location exists
-            return res.status(404).send({ error: "Location not found"});
-        }
-        await deleteLocation(id);
-        return res.status(200).send({ message: "Location deleted successfully"});
-    } catch (error) {
-        logger.error({ 
-            message: `DELETE /api/locations/${id}`, 
-            error: error.stack 
-        });
-        res.status(500).send({ error: error.message });
+router.delete("/locations/:id?", checkID, async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).send({ error: "ID is required" });
+  }
+  try {
+    const location = await getLocationById(id);
+    if (!location) {
+      return res
+        .status(404)
+        .send({ error: "Record to delete does not exist." });
     }
+    await deleteLocation(id);
+    return res.status(200).send({ message: "Success" });
+  } catch (error) {
+    console.error("Error while deleting a location:", error.stack);
+    return res.status(500).send({ error: error.message });
+  }
 });
 
 module.exports = router;
