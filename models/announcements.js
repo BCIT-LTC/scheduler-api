@@ -23,7 +23,7 @@ const getAnnouncementById = async (id) => {
  *
  * @returns {Promise<Array<object>>} - An array of announcement objects
  */
-const getAnnouncement = async () => {
+const getAnnouncements = async () => {
   try {
     return await prisma.announcement.findMany();
   } catch (error) {
@@ -33,19 +33,47 @@ const getAnnouncement = async () => {
 };
 
 /**
- * Adds an announcement
+ * Create an announcement
  *
  * @param {object} announcement - The announcement object
  * @returns {Promise<object>} - The added announcement object
  */
-const addAnnouncement = async (announcement) => {
+const createAnnouncement = async (announcement) => {
+  const { title, description, created_by } = announcement;
   try {
     return await prisma.announcement.create({
-      data: announcement,
+      data: {
+        title,
+        description,
+        creator: { connect: { email: created_by } }
+      },
     });
   } catch (error) {
     console.error("Error while adding an announcement:", error.stack);
     throw error;
+  }
+};
+
+/**
+ * Edits an announcement by its ID with new data
+*
+ * @param {object} announcement - The announcement object
+ * @returns {Promise<object>} - The updated announcement object
+*/
+const updateAnnouncement = async (announcement) => {
+  const { announcement_id, title, description, modified_by } = announcement;
+  try {
+    return await prisma.announcement.update({
+      where: { announcement_id: parseInt(announcement_id) },
+      data: {
+        title,
+        description,
+        modifier: { connect: { email: modified_by } }
+      },
+    });
+  } catch (error) {
+    console.error("Error while editing an announcement:", error.stack);
+    throw new Error("Error while editing an announcement");
   }
 };
 
@@ -66,31 +94,10 @@ const deleteAnnouncement = async (id) => {
   }
 };
 
-/**
- * Edits an announcement by its ID with new data
- *
- * @param {number} id - The ID of the announcement
- * @param {string} title - The title of the announcement
- * @param {string} description - The description of the announcement
- * @param {string} modified_by - The user who modified the announcement
- * @returns {Promise<object>} - The updated announcement object
- */
-const editAnnouncement = async (id, title, description, modified_by) => {
-  try {
-    return await prisma.announcement.update({
-      where: { announcement_id: parseInt(id) },
-      data: { title, description, modified_by },
-    });
-  } catch (error) {
-    console.error("Error while editing an announcement:", error.stack);
-    throw new Error("Error while editing an announcement");
-  }
-};
-
 module.exports = {
   getAnnouncementById,
-  getAnnouncement,
-  addAnnouncement,
+  getAnnouncements,
+  createAnnouncement,
   deleteAnnouncement,
-  editAnnouncement,
+  updateAnnouncement,
 };

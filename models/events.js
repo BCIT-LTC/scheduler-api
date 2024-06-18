@@ -174,9 +174,17 @@ const createEvent = async (event) => {
   }
 
   try {
+    const location = await prisma.location.findUnique({
+      where: {
+        location_id: event.location_id,
+      },
+    });
+
     const createdEvent = await prisma.event.create({
       data: {
-        location: { connect: { location_id: event.location_id } },
+        event_location_id: { connect: { location_id: event.location_id } },
+        // location_name: { connect: { room_location: event.room_location } },
+        room_location: location.room_location,
         start_time: new Date(event.start_time),
         end_time: new Date(event.end_time),
         summary: event.summary,
@@ -230,9 +238,17 @@ const updateEvent = async (event) => {
       throw new Error(`Event with ID [${event.event_id}] not found`);
     }
 
+    const location = await prisma.location.findUnique({
+      where: {
+        location_id: event.location_id,
+      },
+    });
+
     // Prepare the data object with conditional series handling
     const updateData = {
-      location: { connect: { location_id: event.location_id } },
+      event_location_id: { connect: { location_id: event.location_id } },
+      // location_name: { connect: { room_location: event.room_location } },
+      room_location: location.room_location,
       start_time: new Date(event.start_time),
       end_time: new Date(event.end_time),
       summary: event.summary,

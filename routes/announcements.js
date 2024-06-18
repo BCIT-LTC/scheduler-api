@@ -29,7 +29,7 @@
  * tags:
  *   name: announcements
  *   description: The announcements managing API, JWT authentication is required to access this endpoint.
- * /api/announcement:
+ * /api/announcements:
  *   get:
  *     summary: Retrieve the announcements
  *     tags: [announcements]
@@ -64,7 +64,7 @@
  *               $ref: '#/components/schemas/announcements'
  *       500:
  *         description: Some server error
- * /api/announcement/{id}:
+ * /api/announcements/{id}:
  *   delete:
  *     summary: Remove an announcement
  *     tags: [announcements]
@@ -110,18 +110,18 @@ const express = require("express");
 const router = express.Router();
 const {
   getAnnouncementById,
-  getAnnouncement,
-  addAnnouncement,
+  getAnnouncements,
+  createAnnouncement,
   deleteAnnouncement,
-  editAnnouncement,
-} = require("../models/announcement");
+  updateAnnouncement,
+} = require("../models/announcements");
 const { body, validationResult } = require("express-validator");
 
-const validateAnnouncement = [
+const validateAnnouncement = (field) => [
   body("title").notEmpty().withMessage("Title is required"),
   body("description").notEmpty().withMessage("Description is required"),
-  body("created_by").notEmpty().withMessage("Created by is required"),
-  body("created_by").isEmail().withMessage("Created by must be an email"),
+  body(field).notEmpty().withMessage(`${field} is required`),
+  body(field).isEmail().withMessage(`${field} must be an email`),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -130,7 +130,6 @@ const validateAnnouncement = [
     next();
   },
 ];
-
 const checkID = [
   (req, res, next) => {
     if (!req.params) {
@@ -153,9 +152,9 @@ const checkID = [
 /**
  * GET endpoint to retrieve all announcements.
  */
-router.get("/announcement", async (req, res) => {
+router.get("/announcements", async (req, res) => {
   try {
-    const announcements = await getAnnouncement();
+    const announcements = await getAnnouncements();
     return res.status(200).send(announcements);
   } catch (error) {
     console.error("Error while fetching announcements:", error.stack);
@@ -166,9 +165,9 @@ router.get("/announcement", async (req, res) => {
 /**
  * POST endpoint to add an announcement.
  */
-router.post("/announcement", validateAnnouncement, async (req, res) => {
+router.post("/announcements", validateAnnouncement("created_by"), async (req, res) => {
   try {
-    const announcement = await addAnnouncement(req.body);
+    const announcement = await createAnnouncement(req.body);
     return res.status(201).send(announcement);
   } catch (error) {
     console.error("Error while adding an announcement:", error.stack);
@@ -180,9 +179,39 @@ router.post("/announcement", validateAnnouncement, async (req, res) => {
 });
 
 /**
+ * PUT endpoint to edit an announcement based on its ID.
+ */
+router.put(
+  "/announcements/:id",
+  checkID,
+  validateAnnouncement("modified_by"),
+  async (req, res) => {
+    const { id } = req.params;
+    const { title, description, modified_by } = req.body;
+    if (!id) {
+      return res.status(400).send({ error: "ID is required" });
+    }
+    const data = { announcement_id: id, title, description, modified_by };
+    try {
+      const announcement = await getAnnouncementById(id);
+      if (!announcement) {
+        return res
+          .status(404)
+          .send({ error: "Record to update does not exist." });
+      }
+      const updatedAnnouncement = await updateAnnouncement(data);
+      return res.status(200).send(updatedAnnouncement);
+    } catch (error) {
+      console.error("Error while editing an announcement:", error.stack);
+      return res.status(500).send({ error: error.message });
+    }
+  }
+);
+
+/**
  * DELETE endpoint to remove an announcement based on its ID.
  */
-router.delete("/announcement/:id?", checkID, async (req, res) => {
+router.delete("/announcements/:id?", checkID, async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).send({ error: "ID is required" });
@@ -201,36 +230,5 @@ router.delete("/announcement/:id?", checkID, async (req, res) => {
     return res.status(500).send({ error: error.message });
   }
 });
-
-/**
- * PUT endpoint to edit an announcement based on its ID.
- */
-router.put(
-  "/announcement/:id",
-  checkID,
-  validateAnnouncement,
-  async (req, res) => {
-    const { id } = req.params;
-    const { title, description, modified_by } = req.body;
-    try {
-      const announcement = await getAnnouncementById(id);
-      if (!announcement) {
-        return res
-          .status(404)
-          .send({ error: "Record to update does not exist." });
-      }
-      const updatedAnnouncement = await editAnnouncement(
-        id,
-        title,
-        description,
-        modified_by
-      );
-      return res.status(200).send(updatedAnnouncement);
-    } catch (error) {
-      console.error("Error while editing an announcement:", error.stack);
-      return res.status(500).send({ error: error.message });
-    }
-  }
-);
 
 module.exports = router;

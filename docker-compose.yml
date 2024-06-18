@@ -25,6 +25,7 @@ services:
     volumes:
       - .:/app
 
+
   postgres:
     image: postgres
     environment:
@@ -40,53 +41,81 @@ services:
     volumes:  
       - api_db:/var/lib/postgresql/data 
 
-  jsdocs:
-    image: node:21-alpine
-    command:
-      - /bin/sh
-      - -c
-      - |
-        ./node_modules/.bin/jsdoc -c ./jsdoc.conf.json -r
-    working_dir: /build
-    volumes:
-      - .:/build
-    depends_on:
-      app:
-        condition: service_started
 
-  # adminer:
-  #   image: adminer
+  # jsdocs:
+  #   image: node:21-alpine
+  #   command:
+  #     - /bin/sh
+  #     - -c
+  #     - |
+  #       ./node_modules/.bin/jsdoc -c ./jsdoc.conf.json -r
+  #   working_dir: /build
+  #   volumes:
+  #     - .:/build
+  #   depends_on:
+  #     app:
+  #       condition: service_started
+
+      
+  # testing:
+  #   image: node:21-alpine
+  #   command:
+  #     - /bin/sh
+  #     - -c
+  #     - |
+  #       npm run test --detectOpenHandles
+  #   working_dir: /test
   #   ports:
-  #     - 8080:8080
+  #     - 8001:8001
+  #   environment:
+  #     # - NODE_ENV=development
+  #     - NODE_ENV=test
+  #     # - NODE_ENV=production
+  #     - POSTGRES_HOST=postgres
+  #     - POSTGRES_DB=openlab-scheduler
+  #     - POSTGRES_USER=bsnmysql
+  #     - POSTGRES_PASSWORD=bcitbsn491
+  #     - TZ=America/Vancouver
+  #     - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
+  #     - SUPERUSER=admin@bcit.ca
+  #     - DATABASE_URL=postgres://bsnmysql:bcitbsn491@postgres:5432/openlab-scheduler
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   volumes:
+  #     - .:/test
 
-  testing:
-    image: node:21-alpine
-    command:
-      - /bin/sh
-      - -c
-      - |
-        npm run test --detectOpenHandles
-    working_dir: /test
+
+  adminer:
+    image: adminer
     ports:
-      - 8001:8001
+      - 8080:8080
     environment:
-      # - NODE_ENV=development
-      - NODE_ENV=test
-      # - NODE_ENV=production
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DB=openlab-scheduler
-      - POSTGRES_USER=bsnmysql
-      - POSTGRES_PASSWORD=bcitbsn491
-      - TZ=America/Vancouver
-      - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
-      - SUPERUSER=admin@bcit.ca
-      - DATABASE_URL=postgres://bsnmysql:bcitbsn491@postgres:5432/openlab-scheduler
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - .:/test
+      - ADMINER_DEFAULT_DRIVER=pgsql
+      - ADMINER_DEFAULT_SERVER=postgres
+      - ADMINER_DEFAULT_DB=openlab-scheduler
+      - ADMINER_DEFAULT_USERNAME=bsnmysql
+      - ADMINER_DEFAULT_PASSWORD=bcitbsn491
+    configs:
+      - source: adminer-index.php
+        target: /var/www/html/index.php
 
+
+configs:
+  adminer-index.php:
+    content: |
+      <?php
+        if(!count($$_GET)) {
+          $$_POST['auth'] = [
+            'driver' => $$_ENV['ADMINER_DEFAULT_DRIVER'],
+            'server' => $$_ENV['ADMINER_DEFAULT_SERVER'],
+            'db'    => $$_ENV['ADMINER_DEFAULT_DB'],
+            'username' => $$_ENV['ADMINER_DEFAULT_USERNAME'],
+            'password' => $$_ENV['ADMINER_DEFAULT_PASSWORD']
+          ];
+        }
+        include './adminer.php';
+      ?>
 
 volumes:
   api_db:
