@@ -1,7 +1,6 @@
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
-
 
 datasource db {
   provider = "postgresql"
@@ -14,7 +13,7 @@ model User {
   first_name            String         @db.VarChar(50)
   last_name             String         @db.VarChar(50)
   saml_role             String         @db.VarChar(50)
-  app_roles             Role[]         @default([user])
+  app_roles             Role[]         @default([guest])
   department            String         @db.VarChar(50)
   is_active             Boolean        @default(true)
   created_at            DateTime       @default(now())
@@ -29,37 +28,38 @@ model User {
 }
 
 enum Role {
-  user
+  guest
   admin
   student
   employee
 }
 
 model Location {
-  location_id          Int      @id @default(autoincrement())
-  room_location        String   @unique @db.VarChar(50)
-  created_at           DateTime @default(now())
-  creator              User?    @relation("LocationCreator", fields: [created_by], references: [email], onDelete: NoAction)
-  created_by           String?  @db.VarChar(50)
-  last_modified        DateTime @updatedAt
-  modifier             User?    @relation("LocationModifier", fields: [modified_by], references: [email], onDelete: NoAction)
-  modified_by          String?  @db.VarChar(50)
-  events_with_location Event[]  @relation("EventLocation")
-  series_location      Series[] @relation("SeriesLocation")
+  location_id         Int      @id @default(autoincrement())
+  room_location       String   @unique @db.VarChar(50)
+  created_at          DateTime @default(now())
+  creator             User?    @relation("LocationCreator", fields: [created_by], references: [email], onDelete: NoAction)
+  created_by          String?  @db.VarChar(50)
+  last_modified       DateTime @updatedAt
+  modifier            User?    @relation("LocationModifier", fields: [modified_by], references: [email], onDelete: NoAction)
+  modified_by         String?  @db.VarChar(50)
+  event_location_id   Event[]  @relation("EventLocationId")
+  // event_room_location Event[]  @relation("EventRoomLocation")
+  series_location     Series[] @relation("SeriesLocation")
 }
 
 model Event {
   event_id            Int            @id @default(autoincrement())
-  location_id         Int?      
-  event_location_id   Int?
-  location            Location?      @relation("EventLocation", fields: [location_id], references: [location_id], onDelete: NoAction)
-  event_location      String?        @db.VarChar(50)
-  start_time          DateTime       
-  end_time            DateTime       
+  event_location_id   Location?      @relation("EventLocationId", fields: [location_id], references: [location_id], onDelete: SetNull)
+  location_id         Int?
+  // location_name       Location?      @relation("EventRoomLocation", fields: [room_location], references: [room_location], onDelete: SetNull)
+  room_location      String?        @db.VarChar(50)
+  start_time          DateTime
+  end_time            DateTime
   summary             String         @db.VarChar(200)
   description         String?        @db.VarChar(200)
   facilitator         String?        @db.VarChar(200)
-  status              status         @default(TENTATIVE)
+  status              status         @default(CONFIRMED)
   created_at          DateTime       @default(now())
   creator             User?          @relation("EventCreator", fields: [created_by], references: [email], onDelete: NoAction)
   created_by          String?        @db.VarChar(50)
@@ -82,7 +82,7 @@ model Series {
   end_time                   DateTime  @db.Time()
   start_date                 DateTime  @db.Date()
   end_date                   DateTime  @db.Date()
-  status                     status?   @default(TENTATIVE)
+  status                     status?   @default(CONFIRMED)
   recurrence_frequency_weeks Int
   recurrence_frequency_days  Int[]
   created_at                 DateTime  @default(now())

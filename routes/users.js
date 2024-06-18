@@ -6,9 +6,9 @@ const logger = createLogger(module);
 const { userModel } = require("../models/userModel");
 
 const userRoleValidation = [
-    body('roles')
+    body('app_roles')
         // Check if roles is an array with at least one role
-        .isArray({min: 1}).withMessage('Roles must be an array with at least one role')
+        .isArray({min: 1}).withMessage('app_roles must be an array with at least one role')
         // Check if all roles are strings
         .custom(roles => roles.every(role => typeof role === 'string'))
 ];
@@ -121,7 +121,7 @@ router.get('/users', async (req, res) => {
  */
 router.patch('/user/:user_id', userRoleValidation, async (req, res) => {
     const { user_id } = req.params;
-    const { roles } = req.body;
+    const { app_roles } = req.body;
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -130,7 +130,7 @@ router.patch('/user/:user_id', userRoleValidation, async (req, res) => {
 
     try {
         // Update the user role
-        const updatedUser = await userModel.updateUserRole(parseInt(user_id, 10), roles);
+        const updatedUser = await userModel.updateUserRole(parseInt(user_id, 10), app_roles);
         return res.status(200).json(updatedUser);
     } catch (error) {
         logger.error({

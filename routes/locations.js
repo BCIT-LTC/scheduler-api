@@ -229,7 +229,7 @@ router.put("/locations/:id", checkID, validateLocation("modified_by"), async (re
   if (!room_location || !modified_by) {
     return res
       .status(400)
-      .send({ error: "Room location and modified by are required" });
+      .send({ error: "Room location and modified_by are required" });
   }
   const data = { location_id: id, room_location, modified_by };
 

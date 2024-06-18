@@ -25,7 +25,7 @@ If you run into an error that says `"can't find file \r\n"`, go to the `docker-e
 
 ## Making API calls with a JWT
 
-> For example, making calls to `http://localhost:8000/api/announcement` using Postman/Insomnia...
+> For example, making calls to `http://localhost:8000/api/announcements` using Postman/Insomnia...
 
 Calls to `scheduler-api` require a `Bearer token` to be added to the request. To create the `Bearer token` you have to generate a JWT token. You can use any JWT tool, but a simple, standard one can be created on [`jwt.io`](https://jwt.io). The current JWT structure looks like the following:
 

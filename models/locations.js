@@ -93,7 +93,10 @@ const updateLocation = async (location) => {
   try {
     return await prisma.location.update({
       where: { location_id: parseInt(location_id) },
-      data: { room_location, modified_by },
+      data: {
+        room_location,
+        modifier: { connect: { email: modified_by } },
+      },
     });
   } catch (error) {
     console.error("Error updating location:", error.stack);

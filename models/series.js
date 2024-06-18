@@ -238,6 +238,7 @@ const createSeries = async (series) => {
     });
   } catch (error) {
     logger.error({ message: "Error creating series", error: error.stack });
+    throw new Error("Error creating series: " + error.stack);
   }
 };
 

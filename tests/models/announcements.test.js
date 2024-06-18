@@ -2,11 +2,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const {
   getAnnouncementById,
-  getAnnouncement,
-  addAnnouncement,
+  getAnnouncements,
+  createAnnouncement,
   deleteAnnouncement,
-  editAnnouncement,
-} = require("../../models/announcement");
+  updateAnnouncement,
+} = require("../../models/announcements");
 
 jest.mock("@prisma/client", () => {
   const mPrismaClient = {
@@ -55,7 +55,7 @@ describe("Announcement Model", () => {
     });
   });
 
-  describe("getAnnouncement", () => {
+  describe("getAnnouncements", () => {
     it("should retrieve all announcements", async () => {
       const announcements = [
         {
@@ -66,7 +66,7 @@ describe("Announcement Model", () => {
       ];
 
       prisma.announcement.findMany.mockResolvedValue(announcements);
-      const result = await getAnnouncement();
+      const result = await getAnnouncements();
       expect(result).toEqual(announcements);
     });
 
@@ -74,7 +74,7 @@ describe("Announcement Model", () => {
       const mockError = new Error("Error while fetching announcements");
       prisma.announcement.findMany.mockRejectedValue(mockError);
 
-      await expect(getAnnouncement()).rejects.toThrow(
+      await expect(getAnnouncements()).rejects.toThrow(
         "Error while fetching announcements"
       );
 
@@ -85,7 +85,7 @@ describe("Announcement Model", () => {
     });
   });
 
-  describe("addAnnouncement", () => {
+  describe("createAnnouncement", () => {
     it("should add an announcement", async () => {
       const newAnnouncement = {
         announcement_id: 1,
@@ -95,7 +95,7 @@ describe("Announcement Model", () => {
       };
 
       prisma.announcement.create.mockResolvedValue(newAnnouncement);
-      const result = await addAnnouncement(newAnnouncement);
+      const result = await createAnnouncement(newAnnouncement);
 
       expect(result).toEqual(newAnnouncement);
     });
@@ -105,7 +105,7 @@ describe("Announcement Model", () => {
       prisma.announcement.create.mockRejectedValue(mockError);
 
       await expect(
-        addAnnouncement({
+        createAnnouncement({
           title: "New Announcement",
           description: "This is a new announcement",
           created_by: "admin@bcit.ca",
@@ -145,7 +145,7 @@ describe("Announcement Model", () => {
       );
     });
   });
-  describe("editAnnouncement", () => {
+  describe("updateAnnouncement", () => {
     it("should update an announcement by its ID", async () => {
       const announcement = {
         announcement_id: 1,
@@ -155,7 +155,7 @@ describe("Announcement Model", () => {
       };
 
       prisma.announcement.update.mockResolvedValue(announcement);
-      const result = await editAnnouncement(
+      const result = await updateAnnouncement(
         1,
         "Updated Announcement",
         "Updated Description",
@@ -171,7 +171,7 @@ describe("Announcement Model", () => {
       prisma.announcement.update.mockRejectedValue(mockError);
 
       await expect(
-        editAnnouncement(
+        updateAnnouncement(
           1,
           "Updated Announcement",
           "Updated Description",

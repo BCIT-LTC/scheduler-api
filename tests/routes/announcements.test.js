@@ -32,10 +32,10 @@ afterAll(async () => {
 });
 
 describe("Announcements API", () => {
-  const endpoint = "/api/announcement";
+  const endpoint = "/api/announcements";
   const authHeader = { Authorization: admin };
 
-  describe("GET /announcement", () => {
+  describe("GET /announcements", () => {
     it("should return all announcements", async () => {
       const announcements = [
         {
@@ -57,7 +57,7 @@ describe("Announcements API", () => {
     });
   });
 
-  describe("POST /announcement", () => {
+  describe("POST /announcements", () => {
     it("should add an announcement", async () => {
       const newAnnouncement = {
         title: "New Announcement",
@@ -121,7 +121,7 @@ describe("Announcements API", () => {
     });
   });
 
-  describe("DELETE /announcement/:id", () => {
+  describe("DELETE /announcements/:id", () => {
     it("should delete an announcement", async () => {
       const announcement = {
         announcement_id: 1,
@@ -166,7 +166,7 @@ describe("Announcements API", () => {
     });
   });
 
-  describe("PUT /announcement/:id", () => {
+  describe("PUT /announcements/:id", () => {
     it("should edit an announcement", async () => {
       const announcement = {
         announcement_id: 1,

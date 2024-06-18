@@ -1,8 +1,14 @@
-const { PrismaClient, Role } = require("@prisma/client");
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const createLogger = require("../logger"); // Ensure the path is correct
 const logger = createLogger(module);
 const environment = process.env.NODE_ENV;
+
+/**
+ * Initial user data from seedData/users.js
+ */
+const users = require("./seedData/users");
+
 
 /**
  * Initial location data from seedData/locations.js
@@ -43,34 +49,39 @@ async function seedAnnouncements() {
         }
       );
     }
-    } catch (error) {
+  } catch (error) {
     logger.error({ message: "seedAnnouncements", error: error.stack });
     throw error;
   }
 }
 
 /**
- * Seed initial superuser data.
+ * Seed initial users data including superuser.
  * @async
- * @returns {Object} seeded superuser data
+ * @returns {Object} seeded users data
  */
-async function seedSuperuser() {
+async function seedUsers() {
   try {
-    await prisma.user.upsert({
-      where: { email: process.env.SUPERUSER },
-      update: {},
-      create: {
-        email: process.env.SUPERUSER,
-        first_name: "",
-        last_name: "",
-        saml_role: "",
-        app_roles: [Role.admin],
-        department: "",
-        is_active: true,
-      },
-    });
+
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      await prisma.user.upsert({
+        where: { user_id: user.user_id },
+        update: {},
+        create: {
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          saml_role: user.saml_role,
+          app_roles: user.app_roles,
+          department: user.department,
+          is_active: user.is_active,
+          created_at: new Date(user.created_at),
+        },
+      });
+    }
   } catch (error) {
-    logger.error({ message: "seedSuperuser", error: error.stack });
+    logger.error({ message: "seedUsers", error: error.stack });
     throw error;
   }
 }
@@ -100,9 +111,10 @@ async function seedEvents() {
           created_at: new Date(),
           last_modified: new Date(),
           status: event.status,
-          location: {
-            connect: { location_id: locations[0].location_id },
-          },
+          event_location_id: { connect: { location_id: locations[0].location_id } },
+          // location_name: { connect: { room_location: locations[0].room_location } },
+          room_location: locations[0].room_location,
+          creator: { connect: { email: process.env.SUPERUSER } },
         },
       });
     }
@@ -120,9 +132,10 @@ async function seedEvents() {
           description: event.description,
           facilitator: event.facilitator,
           status: event.status,
-          location: {
-            connect: { location_id: locations[1].location_id },
-          },
+          event_location_id: { connect: { location_id: locations[1].location_id } },
+          // location_name: { connect: { room_location: locations[1].room_location } },
+          room_location: locations[0].room_location,
+          creator: { connect: { email: process.env.SUPERUSER } },
         },
       });
     }
@@ -164,18 +177,16 @@ async function seedDatabase() {
     switch (environment) {
       case "development":
         // add development AND production seed data
-        await seedAnnouncements();
+        await seedUsers();
         await seedLocations();
         await seedEvents();
-        await seedSuperuser();
+        await seedAnnouncements();
         break;
       case "test":
         // add test seed data, running all test scripts at once
 
         break;
       default:
-        // add production seed data (defaults to production if no environment is specified)
-        seedLocations();
         break;
     }
   } catch (error) {
