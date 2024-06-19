@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ./mariadb
+  - ./postgres
   - deployment.yaml
   - ingress.yaml
   - service.yaml
@@ -21,7 +21,7 @@ patches:
   # Remove kustomize-generated secret from base; replace with Vault secret
   - target:
       kind: Secret
-      name: mariadb-credentials
+      name: postgres-credentials
     patch: |
       $patch: delete
       kind: Kustomization
@@ -41,11 +41,11 @@ configMapGenerator:
     literals:
       - ELASTIC_APM_SERVER_URL=https://bcit-ltc.apm.westus2.azure.elastic-cloud.com
 
-  # Sets mariadb db
+  # Sets postgres db
   #
-  - name: mariadb-config
+  - name: postgres-config
     literals:
-      - MARIADB_DATABASE=scheduler-api
-      - MARIADB_ROOT_HOST=scheduler-api-mariadb-service
+      - POSTGRES_DB=scheduler-api
+      - POSTGRES_HOST=scheduler-api-postgres-service
       - TZ=America/Vancouver
     behavior: replace

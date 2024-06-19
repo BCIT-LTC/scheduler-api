@@ -3,13 +3,13 @@ kind: Service
 metadata: # kpt-merge: /service
   name: service
   labels:
-    tier: mariadb
+    tier: postgres
   annotations:
     internal.kpt.dev/upstream-identifier: '|Service|default|service'
 spec:
   ports:
-    - name: mariadb
-      port: 3306
+    - name: postgres
+      port: 5432
   selector:
-    tier: mariadb
+    tier: postgres
   clusterIP: None

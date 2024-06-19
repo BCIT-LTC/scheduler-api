@@ -1,28 +1,28 @@
 apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
-  name: mariadb
+  name: postgres
   annotations:
     config.kubernetes.io/local-config: "true"
 upstream:
   type: git
   git:
     repo: https://issues.ltc.bcit.ca/web-apps/base-packages
-    directory: /mariadb
-    ref: v0.5
+    directory: /postgres
+    ref: v0.1
   updateStrategy: force-delete-replace
 upstreamLock:
   type: git
   git:
     repo: https://issues.ltc.bcit.ca/web-apps/base-packages
-    directory: /mariadb
-    ref: mariadb/v0.5
-    commit: 5185f742f7bbea7fb5bfe4937234f503912e44b2
+    directory: /postgres
+    ref: postgres/v0.1
+    commit: ef21b9139feb73b014cb5f9222ad464d1084b4a9
 info:
   emails:
     - courseproduction@bcit.ca
   license: MPL-2.0
-  description: base package for mariadb stateful sets
+  description: base package for postgres stateful sets
 pipeline:
   validators:
     - image: gcr.io/kpt-fn/kubeval:v0.2.0

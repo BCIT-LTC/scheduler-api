@@ -5,22 +5,22 @@ metadata: # kpt-merge: /statefulset
   annotations:
     internal.kpt.dev/upstream-identifier: 'apps|StatefulSet|default|statefulset'
 spec:
-  serviceName: mariadb
+  serviceName: postgres
   selector:
     matchLabels:
-      tier: mariadb
+      tier: postgres
   template:
     metadata:
       labels:
-        tier: mariadb
+        tier: postgres
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-        - name: mariadb
-          image: mariadb
+        - name: postgres
+          image: postgres
           ports:
-            - containerPort: 3306
-              name: mariadb
+            - containerPort: 5432
+              name: postgres
           envFrom:
             - configMapRef:
                 name: config
@@ -36,7 +36,7 @@ spec:
               command:
                 - sh
                 - -c
-                - mariadb-admin -u$$MARIADB_USER -p$$MARIADB_PASSWORD ping
+                - pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
             periodSeconds: 5
           startupProbe:
             initialDelaySeconds: 10
@@ -44,6 +44,6 @@ spec:
               command:
                 - sh
                 - -c
-                - mariadb $$MARIADB_DATABASE -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'
+                - pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
             periodSeconds: 5
             failureThreshold: 12 # total 60s = 1min to startup and configure the database

@@ -11,17 +11,18 @@ resources:
   - Kptfile
   - service.yaml
 
-namePrefix: mariadb-
+namePrefix: postgres-
 
 configMapGenerator:
   - name: config
     literals:
-      - MARIADB_DATABASE=mariadb
+      - POSTGRES_DB=postgres
 
 secretGenerator:
 
   # root credentials rotated by Vault
   - name: credentials
     literals:
-      - MARIADB_ROOT_PASSWORD=rootpassword
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 

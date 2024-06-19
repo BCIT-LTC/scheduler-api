@@ -5,7 +5,7 @@
   path: /spec/template/spec/containers/0/envFrom/-
   value:
     secretRef:
-      name: mariadb-credentials
+      name: postgres-credentials
 
 - op: add
   path: /spec/template/spec/containers/0/envFrom/-
