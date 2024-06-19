@@ -17,13 +17,13 @@ spec:
         - name: scheduler-api
           image: scheduler-api
           env:
-            - name: MARIADB_ROOT_HOST
-              value: mariadb-service
+            - name: POSTGRES_HOST
+              value: postgres-service
           envFrom:
             - configMapRef:
                 name: elasticapm-config
             - configMapRef:
-                name: mariadb-config
+                name: postgres-config
           readinessProbe:
             tcpSocket:
               port: 8000

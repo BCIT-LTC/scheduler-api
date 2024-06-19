@@ -3,20 +3,20 @@ kind: StatefulSet
 metadata:
   name: statefulset
   labels:
-    tier: mariadb
+    tier: postgres
 spec:
-  serviceName: mariadb-service
+  serviceName: postgres-service
   selector:
     matchLabels:
-      tier: mariadb
+      tier: postgres
   template:
     metadata:
       labels:
-        tier: mariadb
+        tier: postgres
     spec:
       serviceAccountName: scheduler-api-serviceaccount
       containers:
-        - name: mariadb
+        - name: postgres
           envFrom:
             - configMapRef:
-                name: mariadb-config
+                name: postgres-config

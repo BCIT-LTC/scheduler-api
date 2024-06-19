@@ -65,11 +65,7 @@ secretGenerator:
     literals:
       - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
 
-  - name: mariadb-credentials
+  - name: postgres-credentials
     literals:
-      - MARIADB_USER=bsnmysql
-      - MARIADB_PASSWORD=bcitbsn491
-
-  - name: root-mariadb-password
-    literals:
-      - MARIADB_ROOT_PASSWORD=isajrqwoihjwaor
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres

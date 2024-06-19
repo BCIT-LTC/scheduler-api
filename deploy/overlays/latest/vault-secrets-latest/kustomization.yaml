@@ -5,6 +5,5 @@ kind: Component
 resources:
   - auth-signing-key.yaml
   - elastic-apm-token.yaml
-  - mariadb-credentials.yaml
-  - root-mariadb-password.yaml
+  - postgres-credentials.yaml
   - star-ltc-bcit-ca.yaml
