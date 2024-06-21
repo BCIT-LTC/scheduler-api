@@ -147,6 +147,7 @@ const getEventsByRange = async (start, end) => {
           lt: end,
         },
       },
+      include: { series: true, event_announcement: true },
     });
   } catch (error) {
     logger.error({ message: "Error fetching events", error: error.stack });

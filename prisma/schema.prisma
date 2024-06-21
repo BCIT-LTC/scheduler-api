@@ -35,40 +35,40 @@ enum Role {
 }
 
 model Location {
-  location_id         Int      @id @default(autoincrement())
-  room_location       String   @unique @db.VarChar(50)
-  created_at          DateTime @default(now())
-  creator             User?    @relation("LocationCreator", fields: [created_by], references: [email], onDelete: NoAction)
-  created_by          String?  @db.VarChar(50)
-  last_modified       DateTime @updatedAt
-  modifier            User?    @relation("LocationModifier", fields: [modified_by], references: [email], onDelete: NoAction)
-  modified_by         String?  @db.VarChar(50)
-  event_location_id   Event[]  @relation("EventLocationId")
+  location_id       Int      @id @default(autoincrement())
+  room_location     String   @unique @db.VarChar(50)
+  created_at        DateTime @default(now())
+  creator           User?    @relation("LocationCreator", fields: [created_by], references: [email], onDelete: NoAction)
+  created_by        String?  @db.VarChar(50)
+  last_modified     DateTime @updatedAt
+  modifier          User?    @relation("LocationModifier", fields: [modified_by], references: [email], onDelete: NoAction)
+  modified_by       String?  @db.VarChar(50)
+  event_location_id Event[]  @relation("EventLocationId")
   // event_room_location Event[]  @relation("EventRoomLocation")
-  series_location     Series[] @relation("SeriesLocation")
+  series_location   Series[] @relation("SeriesLocation")
 }
 
 model Event {
-  event_id            Int            @id @default(autoincrement())
-  event_location_id   Location?      @relation("EventLocationId", fields: [location_id], references: [location_id], onDelete: SetNull)
-  location_id         Int?
+  event_id           Int           @id @default(autoincrement())
+  event_location_id  Location?     @relation("EventLocationId", fields: [location_id], references: [location_id], onDelete: SetNull)
+  location_id        Int?
   // location_name       Location?      @relation("EventRoomLocation", fields: [room_location], references: [room_location], onDelete: SetNull)
-  room_location      String?        @db.VarChar(50)
-  start_time          DateTime
-  end_time            DateTime
-  summary             String         @db.VarChar(200)
-  description         String?        @db.VarChar(200)
-  facilitator         String?        @db.VarChar(200)
-  status              status         @default(CONFIRMED)
-  created_at          DateTime       @default(now())
-  creator             User?          @relation("EventCreator", fields: [created_by], references: [email], onDelete: NoAction)
-  created_by          String?        @db.VarChar(50)
-  last_modified       DateTime       @updatedAt
-  modifier            User?          @relation("EventModifier", fields: [modified_by], references: [email], onDelete: NoAction)
-  modified_by         String?        @db.VarChar(50)
-  series              Series?        @relation("SeriesEvents", fields: [series_id], references: [series_id], onDelete: NoAction)
-  series_id           Int?
-  event_announcements Announcement[] @relation("EventAnnouncements")
+  room_location      String?       @db.VarChar(50)
+  start_time         DateTime
+  end_time           DateTime
+  summary            String        @db.VarChar(200)
+  description        String?       @db.VarChar(200)
+  facilitator        String?       @db.VarChar(200)
+  status             status        @default(CONFIRMED)
+  created_at         DateTime      @default(now())
+  creator            User?         @relation("EventCreator", fields: [created_by], references: [email], onDelete: NoAction)
+  created_by         String?       @db.VarChar(50)
+  last_modified      DateTime      @updatedAt
+  modifier           User?         @relation("EventModifier", fields: [modified_by], references: [email], onDelete: NoAction)
+  modified_by        String?       @db.VarChar(50)
+  series             Series?       @relation("SeriesEvents", fields: [series_id], references: [series_id], onDelete: NoAction)
+  series_id          Int?
+  event_announcement Announcement? @relation("AnnouncementEventId")
 }
 
 model Series {
@@ -95,17 +95,17 @@ model Series {
 }
 
 model Announcement {
-  announcement_id Int      @id @default(autoincrement())
-  title           String   @db.VarChar(50)
-  description     String   @db.VarChar(200)
-  created_at      DateTime @default(now())
-  creator         User?    @relation("AnnouncementCreator", fields: [created_by], references: [email], onDelete: NoAction)
-  created_by      String?  @db.VarChar(50)
-  last_modified   DateTime @updatedAt
-  modifier        User?    @relation("AnnouncementModifier", fields: [modified_by], references: [email], onDelete: NoAction)
-  modified_by     String?  @db.VarChar(50)
-  event           Event?   @relation("EventAnnouncements", fields: [event_id], references: [event_id], onDelete: NoAction)
-  event_id        Int?
+  announcement_id    Int      @id @default(autoincrement())
+  title              String   @db.VarChar(50)
+  description        String   @db.VarChar(200)
+  created_at         DateTime @default(now())
+  creator            User?    @relation("AnnouncementCreator", fields: [created_by], references: [email], onDelete: NoAction)
+  created_by         String?  @db.VarChar(50)
+  last_modified      DateTime @updatedAt
+  modifier           User?    @relation("AnnouncementModifier", fields: [modified_by], references: [email], onDelete: NoAction)
+  modified_by        String?  @db.VarChar(50)
+  announcement_event Event?   @relation("AnnouncementEventId", fields: [event_id], references: [event_id])
+  event_id           Int?     @unique
 }
 
 enum status {
