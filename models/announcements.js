@@ -9,9 +9,25 @@ const prisma = new PrismaClient();
  */
 const getAnnouncementById = async (id) => {
   try {
-    return await prisma.announcement.findUnique({
+    const announcement = await prisma.announcement.findUnique({
       where: { announcement_id: parseInt(id) },
     });
+
+    if (!announcement) {
+      throw new Error(`No announcement found with id: ${id}`);
+    }
+
+    if (announcement.event_id) {
+      const event = await prisma.event.findUnique({
+        where: { event_id: announcement.event_id },
+      });
+
+      if (event) {
+        announcement.event = event;
+      }
+    }
+
+    return announcement;
   } catch (error) {
     console.error("Error while fetching an announcement by id:", error.stack);
     throw new Error("Error while fetching an announcement by id");
@@ -25,7 +41,21 @@ const getAnnouncementById = async (id) => {
  */
 const getAnnouncements = async () => {
   try {
-    return await prisma.announcement.findMany();
+    const announcements = await prisma.announcement.findMany();
+
+    for (let announcement of announcements) {
+      if (announcement.event_id) {
+        const event = await prisma.event.findUnique({
+          where: { event_id: announcement.event_id },
+        });
+
+        if (event) {
+          announcement.event = event;
+        }
+      }
+    }
+
+    return announcements;
   } catch (error) {
     console.error("Error while fetching announcements:", error.stack);
     throw new Error("Error while fetching announcements");
@@ -39,13 +69,16 @@ const getAnnouncements = async () => {
  * @returns {Promise<object>} - The added announcement object
  */
 const createAnnouncement = async (announcement) => {
-  const { title, description, created_by } = announcement;
+  const { title, description, created_by, event_id } = announcement;
   try {
     return await prisma.announcement.create({
       data: {
         title,
         description,
-        creator: { connect: { email: created_by } }
+        creator: { connect: { email: created_by } },
+        ...(event_id && {
+          announcement_event: { connect: { event_id: parseInt(event_id) } }
+        })
       },
     });
   } catch (error) {
