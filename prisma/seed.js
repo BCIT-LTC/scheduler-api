@@ -7,7 +7,7 @@ const environment = process.env.NODE_ENV;
 /**
  * Initial user data from seedData/users.js
  */
-const users = require("./seedData/users");
+const { dev_users, superuser } = require("./seedData/users");
 
 
 /**
@@ -60,14 +60,23 @@ async function seedAnnouncements() {
  * @async
  * @returns {Object} seeded users data
  */
-async function seedUsers() {
+async function seedUsers(users) {
   try {
 
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
       await prisma.user.upsert({
-        where: { user_id: user.user_id },
-        update: {},
+        where: { email: user.email },
+        update: {
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          saml_role: user.saml_role,
+          app_roles: user.app_roles,
+          department: user.department,
+          is_active: user.is_active,
+          created_at: new Date(user.created_at),
+        },
         create: {
           email: user.email,
           first_name: user.first_name,
@@ -114,7 +123,7 @@ async function seedEvents() {
           event_location_id: { connect: { location_id: locations[0].location_id } },
           // location_name: { connect: { room_location: locations[0].room_location } },
           room_location: locations[0].room_location,
-          creator: { connect: { email: process.env.SUPERUSER } },
+          creator: { connect: { email: process.env.SAML_SUPERUSER } },
         },
       });
     }
@@ -135,7 +144,7 @@ async function seedEvents() {
           event_location_id: { connect: { location_id: locations[1].location_id } },
           // location_name: { connect: { room_location: locations[1].room_location } },
           room_location: locations[0].room_location,
-          creator: { connect: { email: process.env.SUPERUSER } },
+          creator: { connect: { email: process.env.SAML_SUPERUSER } },
         },
       });
     }
@@ -173,27 +182,37 @@ async function seedLocations() {
  * @async
  */
 async function seedDatabase() {
+  console.log("Seeding database for environment: ", environment);
   try {
     switch (environment) {
+      case "production":
+        // add production seed data
+        console.log("Production seed data");
+        await seedUsers(superuser);
+        break;
       case "development":
-        // add development AND production seed data
-        await seedUsers();
+        // add development seed data
+        console.log("Development seed data");
+        await seedUsers(dev_users);
         await seedLocations();
         await seedEvents();
         await seedAnnouncements();
         break;
       case "test":
+        console.log("test seed data");
         // add test seed data, running all test scripts at once
-
         break;
       default:
+        console.log("Default seed data");
         break;
     }
+    console.log("Database seeding finished.");
   } catch (error) {
     logger.error({ message: "seedDatabase", error: error.stack });
   } finally {
+    console.log("Database seed command finished.");
     await prisma.$disconnect();
   }
 }
 
-seedDatabase().then((r) => console.log(r));
+seedDatabase().then((r) => { if (r) console.log(r) });

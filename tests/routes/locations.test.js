@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 const utilities = require("./utilities");
 const { admin } = utilities;
 
-const SUPERUSER = process.env.SUPERUSER ?? "admin@bcit.ca";
+const SAML_SUPERUSER = process.env.SAML_SUPERUSER ?? "admin@bcit.ca";
 
 jest.mock("@prisma/client", () => {
   const mPrismaClient = {
@@ -60,7 +60,7 @@ describe("Locations API", () => {
     it("should add a location", async () => {
       const newLocation = {
         room_location: "NW4-3124",
-        created_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
       };
       prisma.location.create.mockResolvedValue(newLocation);
       const res = await request(app)
@@ -89,7 +89,7 @@ describe("Locations API", () => {
     it("should return a 403 status code if no authorization is provided", async () => {
       const newLocation = {
         room_location: "NW4-3124",
-        created_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
       };
       const res = await request(app).post(endpoint).send(newLocation);
       expect(res.statusCode).toBe(403);
@@ -164,12 +164,12 @@ describe("Locations API", () => {
       const location = {
         location_id: 1,
         room_location: "Test Location",
-        created_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
       };
       const updatedLocation = {
         room_location: "Updated Location",
-        created_by: SUPERUSER,
-        modified_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
+        modified_by: SAML_SUPERUSER,
       };
       prisma.location.update.mockResolvedValue({
         ...location,
@@ -207,12 +207,12 @@ describe("Locations API", () => {
       const location = {
         location_id: 1,
         room_location: "Test Location",
-        created_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
       };
       const updatedLocation = {
         room_location: "Updated Location",
-        created_by: SUPERUSER,
-        modified_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
+        modified_by: SAML_SUPERUSER,
       };
       const res = await request(app)
         .put(`${endpoint}/${location.location_id}`)
@@ -223,8 +223,8 @@ describe("Locations API", () => {
     it("should return 404 if the record to update does not exist", async () => {
       const updatedLocation = {
         room_location: "Updated Location",
-        created_by: SUPERUSER,
-        modified_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
+        modified_by: SAML_SUPERUSER,
       };
       const mockError = new Error("Record to update does not exist.");
       prisma.location.update.mockRejectedValue(mockError);

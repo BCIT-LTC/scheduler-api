@@ -49,3 +49,9 @@ configMapGenerator:
       - POSTGRES_HOST=scheduler-api-postgres-service
       - TZ=America/Vancouver
     behavior: replace
+
+  # Sets node environment
+  #
+  - name: node-env-config
+    literals:
+      - NODE_ENV=production

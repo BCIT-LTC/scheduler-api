@@ -1,0 +1,14 @@
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: saml-superuser
+spec:
+  type: kv-v2
+  vaultAuthRef: vault-auth
+  refreshAfter: 6h
+  mount: apps
+  path: scheduler-api/latest/saml-superuser
+  destination:
+    name: saml-superuser
+    create: true

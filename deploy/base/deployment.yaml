@@ -24,6 +24,8 @@ spec:
                 name: elasticapm-config
             - configMapRef:
                 name: postgres-config
+            - configMapRef:
+                name: node-env-config
           readinessProbe:
             tcpSocket:
               port: 8000

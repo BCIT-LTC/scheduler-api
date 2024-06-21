@@ -1,12 +1,23 @@
 // This file is used to seed the database with users.
 const { Role } = require("@prisma/client");
-const users = [
+const superuser = [
     {
-        email: process.env.SUPERUSER,
-        user_id: 1,
-        first_name: "Ad",
-        last_name: "Min",
-        saml_role: Role.admin,
+        email: process.env.SAML_SUPERUSER,
+        first_name: "Super",
+        last_name: "User",
+        saml_role: "unregistered",
+        app_roles: [Role.admin],
+        department: "LTC",
+        is_active: true,
+        created_at: new Date(),
+    }
+]
+const dev_users = [
+    {
+        email: process.env.SAML_SUPERUSER,
+        first_name: "DEV",
+        last_name: "SuperUser2",
+        saml_role: "unregistered",
         app_roles: [Role.admin],
         department: "LTC",
         is_active: true,
@@ -14,7 +25,6 @@ const users = [
     },
     {
         email: "employee_one@bcit.ca",
-        user_id: 2,
         first_name: "Emma",
         last_name: "Onesie",
         saml_role: "employee",
@@ -25,7 +35,6 @@ const users = [
     },
     {
         email: "nursing_student@bcit.ca",
-        user_id: 3,
         first_name: "Nurs",
         last_name: "Dent",
         saml_role: "student",
@@ -36,4 +45,4 @@ const users = [
     },
 ];
 
-module.exports = users;
+module.exports = { dev_users, superuser };

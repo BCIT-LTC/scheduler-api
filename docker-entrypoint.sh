@@ -10,9 +10,7 @@ fi
 # Configure connection info
 >&2 echo "Configuring DATABASE_URL...\n"
 export DATABASE_URL="postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
-
-# Log the DATABASE_URL to ensure it's correctly set
->&2 echo "DATABASE_URL is set to $DATABASE_URL"
+>&2 echo "DATABASE_URL is now set"
 
 # update the prisma schema
 >&2 echo "Updating prisma schema...\n"

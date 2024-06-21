@@ -64,7 +64,9 @@ secretGenerator:
   - name: auth-signing-key
     literals:
       - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
-
+  - name: saml-superuser
+    literals:
+      - SAML_SUPERUSER=courseproduction@bcit.ca
   - name: postgres-credentials
     literals:
       - POSTGRES_USER=postgres
