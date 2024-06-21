@@ -188,6 +188,8 @@ async function seedDatabase() {
       case "production":
         // add production seed data
         console.log("Production seed data");
+        console.log("Applying production seed data \
+          for superuser: ", superuser[0].email);
         await seedUsers(superuser);
         break;
       case "development":
