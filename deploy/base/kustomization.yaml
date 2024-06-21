@@ -27,6 +27,14 @@ patches:
       kind: Kustomization
       metadata:
         name: DOES NOT MATTER
+  - target:
+      kind: Secret
+      name: saml-superuser
+    patch: |
+      $patch: delete
+      kind: Kustomization
+      metadata:
+        name: DOES NOT MATTER
 
   # Update statefulset to use secrets retrieved from Vault
   #
