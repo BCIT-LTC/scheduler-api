@@ -8,7 +8,7 @@ spec:
   vaultAuthRef: vault-auth
   refreshAfter: 6h
   mount: apps
-  path: scheduler-api/latest/saml-superuser
+  path: scheduler-api/stable/saml-superuser
   destination:
     name: saml-superuser
     create: true
