@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 const utilities = require("./utilities");
 const { admin } = utilities;
 
-const SUPERUSER = process.env.SUPERUSER ?? "admin@bcit.ca";
+const SAML_SUPERUSER = process.env.SAML_SUPERUSER ?? "admin@bcit.ca";
 
 jest.mock("@prisma/client", () => {
   const mPrismaClient = {
@@ -42,7 +42,7 @@ describe("Announcements API", () => {
           announcement_id: 1,
           title: "Test Announcement",
           description: "Test Description",
-          created_by: SUPERUSER,
+          created_by: SAML_SUPERUSER,
         },
       ];
       prisma.announcement.findMany.mockResolvedValue(announcements);
@@ -62,7 +62,7 @@ describe("Announcements API", () => {
       const newAnnouncement = {
         title: "New Announcement",
         description: "This is a new announcement",
-        created_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
       };
       prisma.announcement.create.mockResolvedValue(newAnnouncement);
       const res = await request(app)
@@ -80,7 +80,7 @@ describe("Announcements API", () => {
     it("should return 400 if required fields are missing", async () => {
       const newAnnouncement = {
         description: "This is a new announcement without title",
-        created_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
       };
       const res = await request(app)
         .post(endpoint)
@@ -93,7 +93,7 @@ describe("Announcements API", () => {
       const newAnnouncement = {
         title: "New Announcement",
         description: "This is a new announcement",
-        created_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
       };
       const res = await request(app).post(endpoint).send(newAnnouncement);
       expect(res.statusCode).toBe(403);
@@ -172,13 +172,13 @@ describe("Announcements API", () => {
         announcement_id: 1,
         title: "Test Announcement",
         description: "Test Description",
-        created_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
       };
       const updatedAnnouncement = {
         title: "Updated Announcement",
         description: "Updated Description",
-        created_by: SUPERUSER,
-        modified_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
+        modified_by: SAML_SUPERUSER,
       };
       prisma.announcement.update.mockResolvedValue({
         ...announcement,
@@ -218,13 +218,13 @@ describe("Announcements API", () => {
         announcement_id: 1,
         title: "Test Announcement",
         description: "Test Description",
-        created_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
       };
       const updatedAnnouncement = {
         title: "Updated Announcement",
         description: "Updated Description",
-        created_by: SUPERUSER,
-        modified_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
+        modified_by: SAML_SUPERUSER,
       };
       const res = await request(app)
         .put(`${endpoint}/${announcement.announcement_id}`)
@@ -236,8 +236,8 @@ describe("Announcements API", () => {
       const updatedAnnouncement = {
         title: "Updated Announcement",
         description: "Updated Description",
-        created_by: SUPERUSER,
-        modified_by: SUPERUSER,
+        created_by: SAML_SUPERUSER,
+        modified_by: SAML_SUPERUSER,
       };
       const mockError = new Error("Record to update does not exist.");
       prisma.announcement.update.mockRejectedValue(mockError);

@@ -3,22 +3,19 @@ services:
     command:
       - /bin/sh
       - -c
-      # - npm run test
       - npm start
     build: ./
     ports:
       - 8000:8000
     environment:
       - NODE_ENV=development
-      # - NODE_ENV=test
-      # - NODE_ENV=production
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=openlab-scheduler
       - POSTGRES_USER=bsnmysql
       - POSTGRES_PASSWORD=bcitbsn491
       - TZ=America/Vancouver
       - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
-      - SUPERUSER=admin@bcit.ca
+      - SAML_SUPERUSER=courseproduction@bcit.ca
     depends_on:
       postgres:
         condition: service_healthy
@@ -77,7 +74,7 @@ services:
   #     - POSTGRES_PASSWORD=bcitbsn491
   #     - TZ=America/Vancouver
   #     - JWT_AUTH_SIGNING_KEY=insecureT0kenSigningKey
-  #     - SUPERUSER=admin@bcit.ca
+  #     - SAML_SUPERUSER=admin@bcit.ca
   #     - DATABASE_URL=postgres://bsnmysql:bcitbsn491@postgres:5432/openlab-scheduler
   #   depends_on:
   #     postgres:

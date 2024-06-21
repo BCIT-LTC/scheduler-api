@@ -6,4 +6,5 @@ resources:
   - auth-signing-key.yaml
   - elastic-apm-token.yaml
   - postgres-credentials.yaml
+  - saml-superuser.yaml
   - star-ltc-bcit-ca.yaml

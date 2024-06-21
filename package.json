@@ -4,7 +4,7 @@
   "description": "server for the openlab-scheduler app",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "NODE_ENV=development nodemon app.js",
     "test": "jest",
     "prod": "NODE_ENV=production node app.js"
   },

@@ -19,7 +19,7 @@ const userRoleValidation = [
  *   name: users
  *   description: API endpoints for user management
  *
- * /users:
+ * /api/users:
  *   get:
  *     summary: Retrieve all users
  *     tags: [users]
@@ -37,7 +37,7 @@ const userRoleValidation = [
  *       500:
  *         description: Error fetching users
  *
- * /user/{user_id}:
+ * /api/users/{user_id}:
  *   patch:
  *     summary: Update a user's roles
  *     tags: [users]
@@ -119,7 +119,7 @@ router.get('/users', async (req, res) => {
  * PATCH api/user/:user_id
  * Updates the user's app_roles field with new roles
  */
-router.patch('/user/:user_id', userRoleValidation, async (req, res) => {
+router.patch('/users/:user_id', userRoleValidation, async (req, res) => {
     const { user_id } = req.params;
     const { app_roles } = req.body;
     const errors = validationResult(req);
@@ -134,7 +134,7 @@ router.patch('/user/:user_id', userRoleValidation, async (req, res) => {
         return res.status(200).json(updatedUser);
     } catch (error) {
         logger.error({
-            message: `PATCH /api/user/${user_id}`,
+            message: `PATCH /api/users/${user_id}`,
             error: error.stack
         });
         return res.status(500).json({ error: error.message });
