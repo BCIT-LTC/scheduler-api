@@ -182,14 +182,13 @@ async function seedLocations() {
  * @async
  */
 async function seedDatabase() {
-  console.log("Seeding database for environment: ", environment);
+  console.log("Seeding database for environment:", environment);
   try {
     switch (environment) {
       case "production":
         // add production seed data
-        console.log("Production seed data");
-        console.log("Applying production seed data \
-          for superuser: ", superuser[0].email);
+        console.log("Applying production seed data");
+        console.log("for superuser:", superuser[0].email);
         await seedUsers(superuser);
         break;
       case "development":
