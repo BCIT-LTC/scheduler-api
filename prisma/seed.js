@@ -21,9 +21,9 @@ const locations = require("./seedData/locations");
 const events = require("./seedData/events");
 
 /**
- * Initial annoucement data from seedData/annoucements.js
+ * Initial annoucement data from seedData/announcements.js
  */
-const annoucements = require("./seedData/annoucements");
+const announcements = require("./seedData/announcements");
 
 /**
  * Seed initial announcement data.
@@ -32,8 +32,8 @@ const annoucements = require("./seedData/annoucements");
  */
 async function seedAnnouncements() {
   try {
-    for (let i = 0; i < annoucements.length; i++) {
-      const announcement = annoucements[i];
+    for (let i = 0; i < announcements.length; i++) {
+      const announcement = announcements[i];
       await prisma.announcement.upsert(
         {
           where: { announcement_id: announcement.announcement_id },

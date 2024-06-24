@@ -18,7 +18,6 @@ const authentication_check = (req, res, next) => {
     const verified_token_user = jwt.verify(token, test_signing_key); // verifies and decodes the token
     res.locals.user = verified_token_user; // res.locals.user to pass user data to the next middleware
     next(); // Token is valid, continue
-    logger.debug(`Authentication successful`);
   } catch (err) {
     logger.error(`Failed to authenticate token: ${err.message}`);
     return res.status(400).send({ error: "Failed to authenticate token" });

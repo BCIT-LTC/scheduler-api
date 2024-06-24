@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Role } = require("@prisma/client");
+const { App_Role } = require("@prisma/client");
 const createLogger = require('../logger');
 const logger = createLogger(module);
 
@@ -9,7 +9,7 @@ const logger = createLogger(module);
  */
 router.get('/roles', async (req, res) => {
     try {
-        const roles = Object.values(Role);
+        const roles = Object.values(App_Role);
         if (!roles) {
             logger.error("No roles found");
             return res.status(404).send("No roles found");
