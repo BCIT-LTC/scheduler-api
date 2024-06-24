@@ -15,7 +15,7 @@ jest.mock("@prisma/client", () => {
   };
 });
 
-describe("Role Management Functions", () => {
+describe("App_Role Management Functions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });

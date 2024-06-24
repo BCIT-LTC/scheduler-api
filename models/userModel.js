@@ -1,4 +1,4 @@
-const { PrismaClient, Role } = require("@prisma/client");
+const { PrismaClient, App_Role } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const userModel = {
@@ -18,11 +18,11 @@ const userModel = {
         where: { email },
       });
       if (!user) {
-        throw new Error(`User with email ${email} not found`);
+        return null;
       }
       return user;
     } catch (error) {
-      throw new Error(`Error fetching user with email ${email}: ${error.message}`);
+      throw new Error(`Error searching database for user ${email}: ${error.message}`);
     }
   },
 
@@ -46,8 +46,8 @@ const userModel = {
 
   updateUserRole: async (user_id, newRoles) => {
     try {
-      // Check if all role in newRoles are valid roles in the Role enum
-      const validRoles = Object.values(Role);
+      // Check if all role in newRoles are valid roles in the App_Role enum
+      const validRoles = Object.values(App_Role);
       const invalidRoles = newRoles.filter((role) => !validRoles.includes(role));
       if (invalidRoles.length > 0) {
         throw new Error(`Invalid role(s): ${invalidRoles.join(", ")}`);
