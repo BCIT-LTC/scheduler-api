@@ -108,6 +108,9 @@
 
 const express = require("express");
 const router = express.Router();
+const logger = require("../logger")(module);
+const authorization_check = require('../middleware/authorization_check');
+
 const {
   getAnnouncementById,
   getAnnouncements,
@@ -165,24 +168,27 @@ router.get("/announcements", async (req, res) => {
 /**
  * POST endpoint to add an announcement.
  */
-router.post("/announcements", validateAnnouncement("created_by"), async (req, res) => {
-  try {
-    const announcement = await createAnnouncement(req.body);
-    return res.status(201).send(announcement);
-  } catch (error) {
-    console.error("Error while adding an announcement:", error.stack);
-    if (error.message.includes("Foreign key constraint failed")) {
-      return res.status(400).send({ error: error.message });
+router.post("/announcements",
+  authorization_check(['admin']),
+  validateAnnouncement("created_by"), async (req, res) => {
+    try {
+      const announcement = await createAnnouncement(req.body);
+      return res.status(201).send(announcement);
+    } catch (error) {
+      console.error("Error while adding an announcement:", error.stack);
+      if (error.message.includes("Foreign key constraint failed")) {
+        return res.status(400).send({ error: error.message });
+      }
+      res.status(500).send({ error: error.message });
     }
-    res.status(500).send({ error: error.message });
-  }
-});
+  });
 
 /**
  * PUT endpoint to edit an announcement based on its ID.
  */
 router.put(
   "/announcements/:id",
+  authorization_check(['admin']),
   checkID,
   validateAnnouncement("modified_by"),
   async (req, res) => {
@@ -211,24 +217,26 @@ router.put(
 /**
  * DELETE endpoint to remove an announcement based on its ID.
  */
-router.delete("/announcements/:id?", checkID, async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    return res.status(400).send({ error: "ID is required" });
-  }
-  try {
-    const announcement = await getAnnouncementById(id);
-    if (!announcement) {
-      return res
-        .status(404)
-        .send({ error: "Record to delete does not exist." });
+router.delete("/announcements/:id?",
+  authorization_check(['admin']),
+  checkID, async (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).send({ error: "ID is required" });
     }
-    await deleteAnnouncement(id);
-    return res.status(200).send({ message: "Success" });
-  } catch (error) {
-    console.error("Error while deleting an announcement:", error.stack);
-    return res.status(500).send({ error: error.message });
-  }
-});
+    try {
+      const announcement = await getAnnouncementById(id);
+      if (!announcement) {
+        return res
+          .status(404)
+          .send({ error: "Record to delete does not exist." });
+      }
+      await deleteAnnouncement(id);
+      return res.status(200).send({ message: "Success" });
+    } catch (error) {
+      console.error("Error while deleting an announcement:", error.stack);
+      return res.status(500).send({ error: error.message });
+    }
+  });
 
 module.exports = router;

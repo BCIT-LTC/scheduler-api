@@ -9,16 +9,26 @@ const { combine, timestamp, label, json } = format;
  * @param {Object} callingModule - The module invoking the logger.
  * @returns {string} - Directory and filename.
  */
-const getLabel = function(callingModule) {
+const getLabel = function (callingModule) {
   const parts = callingModule.filename.split(path.sep);
   return path.join(parts[parts.length - 2], parts.pop());
 };
 
-// if (process.env.NODE_ENV !== 'production') {
-//   logger.add(new winston.transports.Console({
-//       format: winston.format.simple()
-//   }));
-// }
+
+const developmentTransport = new winston.transports.Console({
+  level: 'debug',
+  format: winston.format.simple()
+});
+
+const productionTransport = new winston.transports.Console({
+  level: 'info',
+  format: combine(
+    timestamp(),
+    label({ label: getLabel(module) }),
+    json())
+});
+
+const transport = process.env.NODE_ENV === 'production' ? [productionTransport] : [developmentTransport];
 
 /**
  * Creates a custom logger instance for the calling module.
@@ -28,21 +38,6 @@ const getLabel = function(callingModule) {
  */
 module.exports = function (callingModule) {
   return new winston.createLogger({
-    transports: [
-            new winston.transports.File({
-              filename: 'combined.log',
-              format: combine(
-                timestamp(),
-                label({ label: getLabel(callingModule) }),
-                json())
-            }),
-            new winston.transports.Console({
-              level: 'debug',
-              format: combine(
-                timestamp(),
-                label({ label: getLabel(callingModule) }),
-                json())
-            })
-          ]
+    transports: transport
   });
 };

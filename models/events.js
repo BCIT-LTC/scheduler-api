@@ -5,8 +5,7 @@
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const createLogger = require("../logger"); // Ensure the path is correct
-const logger = createLogger(module);
+const logger = require("../logger")(module);
 
 /**
  * Find an event by its id
