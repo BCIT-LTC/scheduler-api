@@ -155,7 +155,7 @@ const {
   deleteSeries,
   autoDeleteEvents,
 } = require("../models/series");
-const authorization_check = require('../middleware/authorization_check');
+const permission_check = require('../middleware/permission_check');
 const logger = require("../logger")(module);
 
 // Define validation rules for creating event. Optional fields are not included based on prisma model.
@@ -249,7 +249,7 @@ router.get("/series/:id", seriesIdValidation, async (req, res) => {
  * Endpoint to create a new event.
  */
 router.post("/series", 
-  authorization_check(['admin']),
+  permission_check(['admin']),
   seriesValidation, async (req, res) => {
   try {
     // express validation
@@ -274,7 +274,7 @@ router.post("/series",
  * Endpoint to update an series by ID.
  */
 router.put("/series/:id", 
-  authorization_check(['admin']),
+  permission_check(['admin']),
   async (req, res) => {
   // Convert the ID from string to a base 10 integer
   const id = parseInt(req.params.id, 10);
@@ -321,7 +321,7 @@ router.put("/series/:id",
  * @param {number} series_id - series id to delete
  */
 router.delete("/series/:series_id", 
-  authorization_check(['admin']),
+  permission_check(['admin']),
   async (req, res) => {
   const series_id = parseInt(req.params.series_id, 10);
   try {

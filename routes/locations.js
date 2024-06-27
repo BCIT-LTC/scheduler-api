@@ -146,7 +146,7 @@ const {
 } = require("../models/locations");
 const { body, validationResult } = require("express-validator");
 const logger = require("../logger")(module);
-const authorization_check = require('../middleware/authorization_check');
+const permission_check = require('../middleware/permission_check');
 
 const validateLocation = (field) => [
   body("room_location").notEmpty().withMessage("Room location is required"),
@@ -201,7 +201,7 @@ router.get("/locations", async (req, res) => {
  * @returns {Promise<any>} - The response data from the locations call.
  */
 router.post("/locations",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   validateLocation("created_by"),
   async (req, res) => {
     try {
@@ -226,7 +226,7 @@ router.post("/locations",
  * @returns {Promise<any>} - The response data from the locations call.
  */
 router.put("/locations/:id",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   checkID, validateLocation("modified_by"), async (req, res) => {
     const { id } = req.params;
     const { room_location, modified_by } = req.body;
@@ -265,7 +265,7 @@ router.put("/locations/:id",
  * @returns {Promise<any>} - The response data from the locations call.
  */
 router.delete("/locations/:id?",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   checkID, async (req, res) => {
     const { id } = req.params;
     if (!id) {

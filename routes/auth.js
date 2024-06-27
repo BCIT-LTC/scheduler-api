@@ -51,9 +51,7 @@ router.post("/authorize", async (req, res) => {
 
     // Retrieve the details of the authorized user
     let userDetails = await userModel.findOne(userToAuthorize.email);
-    console.log("userDetails");
-    console.log(userDetails);
-
+    
     if (userDetails !== null) {
       // Send back the user details
       return res.status(200).json(userDetails);

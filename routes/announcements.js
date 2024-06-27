@@ -109,7 +109,7 @@
 const express = require("express");
 const router = express.Router();
 const logger = require("../logger")(module);
-const authorization_check = require('../middleware/authorization_check');
+const permission_check = require('../middleware/permission_check');
 
 const {
   getAnnouncementById,
@@ -169,7 +169,7 @@ router.get("/announcements", async (req, res) => {
  * POST endpoint to add an announcement.
  */
 router.post("/announcements",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   validateAnnouncement("created_by"), async (req, res) => {
     try {
       const announcement = await createAnnouncement(req.body);
@@ -188,7 +188,7 @@ router.post("/announcements",
  */
 router.put(
   "/announcements/:id",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   checkID,
   validateAnnouncement("modified_by"),
   async (req, res) => {
@@ -218,7 +218,7 @@ router.put(
  * DELETE endpoint to remove an announcement based on its ID.
  */
 router.delete("/announcements/:id?",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   checkID, async (req, res) => {
     const { id } = req.params;
     if (!id) {

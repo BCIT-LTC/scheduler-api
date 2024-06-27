@@ -1,8 +1,8 @@
-// authorization_check.js
+// permission_check.js
 const logger = require("../logger")(module);
 
 // Middleware function to check authorized roles
-const authorization_check = (roles) => {
+const permission_check = (roles) => {
     return (req, res, next) => {
         try {
             // Check if user has any of the authorized roles
@@ -19,10 +19,10 @@ const authorization_check = (roles) => {
                 res.status(403).json({ error: 'Forbidden' });
             }
         } catch (error) {
-            logger.error("Error in authorization_check: " + error);
+            logger.error("Error in permission_check: " + error);
             res.status(403).json({ error: 'Forbidden' });
         }
     };
 };
 
-module.exports = authorization_check;
+module.exports = permission_check;

@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const { App_Role } = require("@prisma/client");
-const authorization_check = require('../middleware/authorization_check');
+const permission_check = require('../middleware/permission_check');
 const logger = require("../logger")(module);
 
 /**
  * GET endpoint to retrieve all roles
  */
 router.get('/roles', 
-    authorization_check(['admin']),
+    permission_check(['admin']),
     async (req, res) => {
     try {
         const roles = Object.values(App_Role);

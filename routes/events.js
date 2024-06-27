@@ -169,7 +169,7 @@ const {
   updateEvent,
 } = require("../models/events");
 const logger = require("../logger")(module);
-const authorization_check = require('../middleware/authorization_check');
+const permission_check = require('../middleware/permission_check');
 
 // Define validation rules for creating event. Optional fields are not included based on prisma model.
 const dateErrorMsg = "Must be a valid ISO8601 format. Eg: 2024-06-25T15:30:00";
@@ -184,7 +184,7 @@ const eventValidation = [
  * Endpoint to retrieve an event by ID.
  */
 router.get("/events/:id",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   async (req, res) => {
     try {
       const id = req.params.id;
@@ -296,7 +296,7 @@ router.get("/events", async (req, res) => {
  * Endpoint to create a new event.
  */
 router.post("/events",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   eventValidation, async (req, res) => {
     try {
       // express validation
@@ -325,7 +325,7 @@ router.post("/events",
  * Note: so far only used to delete test events in unit tests
  */
 router.delete("/events/:id",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   async (req, res) => {
     const id = parseInt(req.params.id, 10);
     try {
@@ -355,7 +355,7 @@ router.delete("/events/:id",
  * Endpoint to update an event by ID.
  */
 router.put("/events/:id",
-  authorization_check(['admin']),
+  permission_check(['admin']),
   eventValidation, async (req, res) => {
     const id = req.params.id;
     try {

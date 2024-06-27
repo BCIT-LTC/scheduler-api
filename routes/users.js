@@ -3,7 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const logger = require("../logger")(module);
 const { userModel } = require("../models/userModel");
-const authorization_check = require('../middleware/authorization_check');
+const permission_check = require('../middleware/permission_check');
 
 const userRoleValidation = [
     body('app_roles')
@@ -102,7 +102,7 @@ const userRoleValidation = [
  * GET endpoint to retrieve all users.
  */
 router.get('/users',
-    authorization_check(['admin']),
+    permission_check(['admin']),
     async (req, res) => {
         try {
             const users = await userModel.listAllUsers();
@@ -122,7 +122,7 @@ router.get('/users',
  * Updates the user's app_roles field with new roles
  */
 router.patch('/users/:user_id', 
-    authorization_check(['admin']),
+    permission_check(['admin']),
     userRoleValidation, async (req, res) => {
     const { user_id } = req.params;
     const { app_roles } = req.body;
