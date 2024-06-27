@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
-const createLogger = require('../logger');
-const logger = createLogger(module);
+const logger = require("../logger")(module);
 const { userModel } = require("../models/userModel");
+const authorization_check = require('../middleware/authorization_check');
 
 const userRoleValidation = [
     body('app_roles')
         // Check if roles is an array with at least one role
-        .isArray({min: 1}).withMessage('app_roles must be an array with at least one role')
+        .isArray({ min: 1 }).withMessage('app_roles must be an array with at least one role')
         // Check if all roles are strings
         .custom(roles => roles.every(role => typeof role === 'string'))
 ];
@@ -101,25 +101,29 @@ const userRoleValidation = [
 /**
  * GET endpoint to retrieve all users.
  */
-router.get('/users', async (req, res) => {
-    try {
-        const users = await userModel.listAllUsers();
-        if (!users) {
-            logger.error("No users found");
-            return res.status(404).send("No users found");
+router.get('/users',
+    authorization_check(['admin']),
+    async (req, res) => {
+        try {
+            const users = await userModel.listAllUsers();
+            if (!users) {
+                logger.error("No users found");
+                return res.status(404).send("No users found");
+            }
+            res.status(200).json(users);
+        } catch (error) {
+            logger.error(`Error fetching users: ${error.message}`);
+            res.status(500).send('Error fetching users');
         }
-        res.status(200).json(users);
-    } catch (error) {
-        logger.error(`Error fetching users: ${error.message}`);
-        res.status(500).send('Error fetching users');
-    }
-});
+    });
 
 /**
  * PATCH api/user/:user_id
  * Updates the user's app_roles field with new roles
  */
-router.patch('/users/:user_id', userRoleValidation, async (req, res) => {
+router.patch('/users/:user_id', 
+    authorization_check(['admin']),
+    userRoleValidation, async (req, res) => {
     const { user_id } = req.params;
     const { app_roles } = req.body;
     const errors = validationResult(req);

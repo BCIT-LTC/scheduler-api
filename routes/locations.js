@@ -145,6 +145,8 @@ const {
   deleteLocation,
 } = require("../models/locations");
 const { body, validationResult } = require("express-validator");
+const logger = require("../logger")(module);
+const authorization_check = require('../middleware/authorization_check');
 
 const validateLocation = (field) => [
   body("room_location").notEmpty().withMessage("Room location is required"),
@@ -198,18 +200,21 @@ router.get("/locations", async (req, res) => {
  * @param {express.Response} res - The Express response object.
  * @returns {Promise<any>} - The response data from the locations call.
  */
-router.post("/locations", validateLocation("created_by"), async (req, res) => {
-  try {
-    const location = await createLocation(req.body);
-    return res.status(201).send(location);
-  } catch (error) {
-    console.error("Error while adding a location:", error.stack);
-    if (error.message.includes("Foreign key constraint failed")) {
-      return res.status(400).send({ error: error.message });
+router.post("/locations",
+  authorization_check(['admin']),
+  validateLocation("created_by"),
+  async (req, res) => {
+    try {
+      const location = await createLocation(req.body);
+      return res.status(201).send(location);
+    } catch (error) {
+      console.error("Error while adding a location:", error.stack);
+      if (error.message.includes("Foreign key constraint failed")) {
+        return res.status(400).send({ error: error.message });
+      }
+      res.status(500).send({ error: error.message });
     }
-    res.status(500).send({ error: error.message });
-  }
-});
+  });
 
 /**
  * Middleware for handling update location requests.
@@ -220,33 +225,35 @@ router.post("/locations", validateLocation("created_by"), async (req, res) => {
  * @param {express.Response} res - The Express response object.
  * @returns {Promise<any>} - The response data from the locations call.
  */
-router.put("/locations/:id", checkID, validateLocation("modified_by"), async (req, res) => {
-  const { id } = req.params;
-  const { room_location, modified_by } = req.body;
-  if (!id) {
-    return res.status(400).send({ error: "ID is required" });
-  }
-  if (!room_location || !modified_by) {
-    return res
-      .status(400)
-      .send({ error: "Room location and modified_by are required" });
-  }
-  const data = { location_id: id, room_location, modified_by };
-
-  try {
-    const location = await getLocationById(id);
-    if (!location) {
-      return res
-        .status(404)
-        .send({ error: "Record to update does not exist." });
+router.put("/locations/:id",
+  authorization_check(['admin']),
+  checkID, validateLocation("modified_by"), async (req, res) => {
+    const { id } = req.params;
+    const { room_location, modified_by } = req.body;
+    if (!id) {
+      return res.status(400).send({ error: "ID is required" });
     }
-    const updatedLocation = await updateLocation(data);
-    return res.status(200).send(updatedLocation);
-  } catch (error) {
-    console.error("Error while updating a location:", error.stack);
-    return res.status(500).send({ error: error.message });
-  }
-});
+    if (!room_location || !modified_by) {
+      return res
+        .status(400)
+        .send({ error: "Room location and modified_by are required" });
+    }
+    const data = { location_id: id, room_location, modified_by };
+
+    try {
+      const location = await getLocationById(id);
+      if (!location) {
+        return res
+          .status(404)
+          .send({ error: "Record to update does not exist." });
+      }
+      const updatedLocation = await updateLocation(data);
+      return res.status(200).send(updatedLocation);
+    } catch (error) {
+      console.error("Error while updating a location:", error.stack);
+      return res.status(500).send({ error: error.message });
+    }
+  });
 
 /**
  * Middleware for handling delete location requests.
@@ -257,24 +264,26 @@ router.put("/locations/:id", checkID, validateLocation("modified_by"), async (re
  * @param {express.Response} res - The Express response object.
  * @returns {Promise<any>} - The response data from the locations call.
  */
-router.delete("/locations/:id?", checkID, async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    return res.status(400).send({ error: "ID is required" });
-  }
-  try {
-    const location = await getLocationById(id);
-    if (!location) {
-      return res
-        .status(404)
-        .send({ error: "Record to delete does not exist." });
+router.delete("/locations/:id?",
+  authorization_check(['admin']),
+  checkID, async (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).send({ error: "ID is required" });
     }
-    await deleteLocation(id);
-    return res.status(200).send({ message: "Success" });
-  } catch (error) {
-    console.error("Error while deleting a location:", error.stack);
-    return res.status(500).send({ error: error.message });
-  }
-});
+    try {
+      const location = await getLocationById(id);
+      if (!location) {
+        return res
+          .status(404)
+          .send({ error: "Record to delete does not exist." });
+      }
+      await deleteLocation(id);
+      return res.status(200).send({ message: "Success" });
+    } catch (error) {
+      console.error("Error while deleting a location:", error.stack);
+      return res.status(500).send({ error: error.message });
+    }
+  });
 
 module.exports = router;

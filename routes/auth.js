@@ -2,9 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userModel = require("../models/userModel").userModel;
 const { App_Role } = require("@prisma/client");
-
-const createLogger = require("../logger"); // Ensure the path is correct
-const logger = createLogger(module);
+const logger = require("../logger")(module);
 
 /**
  * POST endpoint to authorize a user

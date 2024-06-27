@@ -155,8 +155,8 @@ const {
   deleteSeries,
   autoDeleteEvents,
 } = require("../models/series");
-const createLogger = require("../logger"); // Ensure the path is correct
-const logger = createLogger(module);
+const authorization_check = require('../middleware/authorization_check');
+const logger = require("../logger")(module);
 
 // Define validation rules for creating event. Optional fields are not included based on prisma model.
 const iso8601ErrorMsg = " must be in valid ISO8601 format";
@@ -248,7 +248,9 @@ router.get("/series/:id", seriesIdValidation, async (req, res) => {
  * POST /api/series
  * Endpoint to create a new event.
  */
-router.post("/series", seriesValidation, async (req, res) => {
+router.post("/series", 
+  authorization_check(['admin']),
+  seriesValidation, async (req, res) => {
   try {
     // express validation
     const errors = validationResult(req);
@@ -271,7 +273,9 @@ router.post("/series", seriesValidation, async (req, res) => {
  * PUT /api/series/:id
  * Endpoint to update an series by ID.
  */
-router.put("/series/:id", async (req, res) => {
+router.put("/series/:id", 
+  authorization_check(['admin']),
+  async (req, res) => {
   // Convert the ID from string to a base 10 integer
   const id = parseInt(req.params.id, 10);
   try {
@@ -316,7 +320,9 @@ router.put("/series/:id", async (req, res) => {
  * Endpoint to delete a series by id.
  * @param {number} series_id - series id to delete
  */
-router.delete("/series/:series_id", async (req, res) => {
+router.delete("/series/:series_id", 
+  authorization_check(['admin']),
+  async (req, res) => {
   const series_id = parseInt(req.params.series_id, 10);
   try {
     await autoDeleteEvents(series_id); // Must delete linked Events before Series itself

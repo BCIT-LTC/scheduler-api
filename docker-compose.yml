@@ -8,7 +8,7 @@ services:
     ports:
       - 8000:8000
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=development # production || development
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=openlab-scheduler
       - POSTGRES_USER=bsnmysql
