@@ -64,11 +64,16 @@ const getLocations = async () => {
 const createLocation = async (location) => {
   const { room_location, created_by } = location;
   try {
-    return await prisma.location.create({
-      data: {
+    return await prisma.location.upsert({
+      update: {
         room_location,
         creator: { connect: { email: created_by } },
       },
+      create: {
+        room_location,
+        creator: { connect: { email: created_by } },
+      },
+      where: { room_location },
     });
   } catch (error) {
     console.error("Error creating location:", error.stack);

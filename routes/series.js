@@ -183,18 +183,6 @@ const seriesValidation = [
         throw new Error("recurrence_frequency_weeks must be greater than 0");
       }
 
-      const startDate = new Date(req.body.start_date);
-      const endDate = new Date(req.body.end_date);
-
-      const timeDifference = endDate - startDate; // Calculate the time difference in milliseconds
-      const weeksDifference = timeDifference / (1000 * 60 * 60 * 24 * 7); // Convert time difference from milliseconds to weeks
-
-      // Check if the provided weeks exceed the weeks between the dates
-      if (recurrenceFrequencyWeeks > weeksDifference) {
-        throw new Error(
-          `recurrence_frequency_weeks [${recurrenceFrequencyWeeks}] exceeds number of weeks between [${startDate.toDateString()}] & [${endDate.toDateString()}] which is [${weeksDifference.toFixed(2)}] weeks.`);
-      }
-
       return true;
     }),
 
@@ -248,94 +236,71 @@ router.get("/series/:id", seriesIdValidation, async (req, res) => {
  * POST /api/series
  * Endpoint to create a new event.
  */
-router.post("/series", 
+router.post("/series",
   permission_check(['admin']),
   seriesValidation, async (req, res) => {
-  try {
-    // express validation
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    try {
+      // express validation
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const newSeries = await createSeries(req.body);
+
+      return res.status(201).send({ ...newSeries });
+    } catch (error) {
+      logger.error({ message: "POST /api/series", error: error.stack });
+      return res.status(500).send({ error: error.message });
     }
-
-    const eventIds = await autoGenerateEvents(req.body);
-    const seriesDataWithEvents = mapEventsToSeries(req.body, eventIds);
-
-    const newSeries = await createSeries(seriesDataWithEvents);
-    return res.status(201).send(newSeries);
-  } catch (error) {
-    logger.error({ message: "POST /api/series", error: error.stack });
-    return res.status(500).send({ error: error.message });
-  }
-});
+  });
 
 /**
  * PUT /api/series/:id
  * Endpoint to update an series by ID.
  */
-router.put("/series/:id", 
+router.put("/series/:id",
   permission_check(['admin']),
-  async (req, res) => {
-  // Convert the ID from string to a base 10 integer
-  const id = parseInt(req.params.id, 10);
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const existingSeries = await getSeries(id);
-    // Add ID to payload
-    let updatedEventsData = req.body;
-    updatedEventsData.series_id = id;
-    updatedEventsData.events = existingSeries.events;
-
+  seriesValidation, async (req, res) => {
+    // Convert the ID from string to a base 10 integer
+    const id = parseInt(req.params.id, 10);
     try {
-      // If Dates and Frequencies unchanged, update events
-      if (
-        areSeriesDatesAndFrequenciesEqual(existingSeries, updatedEventsData)
-      ) {
-        await updateSeriesEvents(updatedEventsData);
-      } else {
-        // Otherwise, delete existing ones linked to the Series and create batch with new properties
-        await autoDeleteEvents(id);
-        updatedEventsData.created_by = existingSeries.created_by; // Must be before autoGenerateEvents
-        const eventIds = await autoGenerateEvents(updatedEventsData);
-        updatedEventsData = mapEventsToSeries(updatedEventsData, eventIds);
+      // express validation
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
       }
-    } catch (error) {
-      throw new Error(`Error processing series events: ${error.message}`);
-    }
+      const newSeries = await updateSeries(id, req.body);
 
-    const updatedSeries = await updateSeries(updatedEventsData);
-    return res.status(200).send(updatedSeries);
-  } catch (error) {
-    logger.error({ message: `PUT /api/series/${id}`, error: error.stack });
-    return res.status(500).send({ error: error.message });
-  }
-});
+      return res.status(201).send({ ...newSeries });
+
+    } catch (error) {
+      logger.error({ message: `PUT /api/series/${id}`, error: error.stack });
+      return res.status(500).send({ error: error.message });
+    }
+  });
 
 /**
  * DELETE /api/series/:series_id
  * Endpoint to delete a series by id.
  * @param {number} series_id - series id to delete
  */
-router.delete("/series/:series_id", 
+router.delete("/series/:series_id",
   permission_check(['admin']),
   async (req, res) => {
-  const series_id = parseInt(req.params.series_id, 10);
-  try {
-    await autoDeleteEvents(series_id); // Must delete linked Events before Series itself
-    const deletedSeries = await deleteSeries(series_id);
+    const series_id = parseInt(req.params.series_id, 10);
+    try {
+      await autoDeleteEvents(series_id); // Must delete linked Events before Series itself
+      const deletedSeries = await deleteSeries(series_id);
 
-    return res.status(200).send(deletedSeries);
-  } catch (error) {
-    logger.error({
-      message: `DELETE /api/series/${series_id}`,
-      error: error.stack,
-    });
-    return res.status(500).send({ error: error.message });
-  }
-});
+      return res.status(200).send(deletedSeries);
+    } catch (error) {
+      logger.error({
+        message: `DELETE /api/series/${series_id}`,
+        error: error.stack,
+      });
+      return res.status(500).send({ error: error.message });
+    }
+  });
 
 module.exports = router;

@@ -119,9 +119,9 @@ async function seedEvents() {
           created_at: new Date(),
           last_modified: new Date(),
           status: event.status,
-          event_location_id: { connect: { location_id: locations[0].location_id } },
+          location: { connect: { location_id: locations[0].location_id } },
           // location_name: { connect: { room_location: locations[0].room_location } },
-          room_location: locations[0].room_location,
+          // room_location: locations[0].room_location,
           creator: { connect: { email: process.env.SAML_SUPERUSER } },
         },
       });
@@ -140,9 +140,9 @@ async function seedEvents() {
           description: event.description,
           facilitator: event.facilitator,
           status: event.status,
-          event_location_id: { connect: { location_id: locations[1].location_id } },
+          location: { connect: { location_id: locations[1].location_id } },
           // location_name: { connect: { room_location: locations[1].room_location } },
-          room_location: locations[0].room_location,
+          // room_location: locations[0].room_location,
           creator: { connect: { email: process.env.SAML_SUPERUSER } },
         },
       });
@@ -196,7 +196,7 @@ async function seedDatabase() {
         await seedUsers(dev_users);
         await seedLocations();
         await seedEvents();
-        await seedAnnouncements();
+        // await seedAnnouncements();
         break;
       case "test":
         console.log("test seed data");

@@ -146,7 +146,10 @@ const getEventsByRange = async (start, end) => {
           lt: end,
         },
       },
-      include: { series: true, event_announcement: true },
+      include: {
+        series: true,
+        event_announcement: true,
+      }
     });
   } catch (error) {
     logger.error({ message: "Error fetching events", error: error.stack });
@@ -174,17 +177,9 @@ const createEvent = async (event) => {
   }
 
   try {
-    const location = await prisma.location.findUnique({
-      where: {
-        location_id: event.location_id,
-      },
-    });
-
     const createdEvent = await prisma.event.create({
       data: {
-        event_location_id: { connect: { location_id: event.location_id } },
-        // location_name: { connect: { room_location: event.room_location } },
-        room_location: location.room_location,
+        location: { connect: { location_id: event.location_id } },
         start_time: new Date(event.start_time),
         end_time: new Date(event.end_time),
         summary: event.summary,
@@ -246,9 +241,7 @@ const updateEvent = async (event) => {
 
     // Prepare the data object with conditional series handling
     const updateData = {
-      event_location_id: { connect: { location_id: event.location_id } },
-      // location_name: { connect: { room_location: event.room_location } },
-      room_location: location.room_location,
+      location: { connect: { location_id: event.location_id } },
       start_time: new Date(event.start_time),
       end_time: new Date(event.end_time),
       summary: event.summary,
@@ -257,8 +250,8 @@ const updateEvent = async (event) => {
       modifier: { connect: { email: event.modified_by } },
     };
 
-    // Only modify relation if series_id explicitly set to null
-    if (event.series_id === null) {
+    // Disconnect the series if the series_id is not null
+    if (event.series_id !== null) {
       updateData.series = { disconnect: true };
     }
 
