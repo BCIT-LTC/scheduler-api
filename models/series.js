@@ -46,9 +46,9 @@ const areSeriesDatesAndFrequenciesEqual = (existingSeries, newSeries) => {
     oldStartDate === newStartDate &&
     oldEndDate === newEndDate &&
     JSON.stringify(existingSeries.recurrence_frequency_weeks) ===
-      JSON.stringify(newSeries.recurrence_frequency_weeks) &&
+    JSON.stringify(newSeries.recurrence_frequency_weeks) &&
     JSON.stringify(existingSeries.recurrence_frequency_days) ===
-      JSON.stringify(newSeries.recurrence_frequency_days)
+    JSON.stringify(newSeries.recurrence_frequency_days)
   );
 };
 
@@ -194,48 +194,52 @@ const getSeriesEvents = async (seriesId) => {
  *                          - events: Array of event objects, each containing an 'event_id' that links to specific events.
  * @returns {Promise<Object>} A promise that resolves to the created series object as stored in the database.
  */
-const createSeries = async (series) => {
-  if (!series) {
+const createSeries = async (seriesFields) => {
+  if (!seriesFields) {
     throw new Error("Argument cannot be null!");
   }
 
   const requiredProperties = [...requiredPropertiesCommon, "created_by"];
   for (const property of requiredProperties) {
-    if (!series[property]) {
+    if (!seriesFields[property]) {
       throw new Error(`Required property ${property} is null or undefined`);
     }
   }
+
   try {
     const perfectStartData = combineDateAndTime(
-      new Date(series.start_date),
-      new Date(series.start_time)
+      new Date(seriesFields.start_date),
+      new Date(seriesFields.start_time)
     );
     const perfectEndData = combineDateAndTime(
-      new Date(series.end_date),
-      new Date(series.end_time)
+      new Date(seriesFields.end_date),
+      new Date(seriesFields.end_time)
     );
+
+    let eventsQueueBatch = await autoGenerateEvents(seriesFields);
 
     return await prisma.series.create({
       data: {
-        location: { connect: { location_id: series.location_id } },
-        series_title: series.series_title,
-        summary: series.summary,
-        description: series.description,
-        facilitator: series.facilitator,
+        series_title: seriesFields.series_title,
+        summary: seriesFields.summary,
+        description: seriesFields.description,
+        facilitator: seriesFields.facilitator,
         start_time: perfectStartData,
         end_time: perfectEndData,
         start_date: perfectStartData,
         end_date: perfectEndData,
-        status: series.status,
-        location: { connect: { location_id: series.location_id } },
-        creator: { connect: { email: series.created_by } },
-        recurrence_frequency_weeks: series.recurrence_frequency_weeks,
-        recurrence_frequency_days: series.recurrence_frequency_days,
+        status: seriesFields.status,
+        location: { connect: { location_id: seriesFields.location_id } },
+        creator: { connect: { email: seriesFields.created_by } },
+        modifier: { connect: { email: seriesFields.created_by } },
+        recurrence_frequency_weeks: seriesFields.recurrence_frequency_weeks,
+        recurrence_frequency_days: seriesFields.recurrence_frequency_days,
         events: {
-          connect: series.events.map((event) => ({ event_id: event.event_id })),
+          connect: eventsQueueBatch
         },
       },
     });
+
   } catch (error) {
     logger.error({ message: "Error creating series", error: error.stack });
     throw new Error("Error creating series: " + error.stack);
@@ -266,7 +270,6 @@ const autoGenerateEvents = async (series) => {
   if (!series) {
     throw new Error("Argument cannot be null!");
   }
-
   const {
     start_time,
     end_time,
@@ -276,68 +279,83 @@ const autoGenerateEvents = async (series) => {
     recurrence_frequency_days,
   } = series;
 
+  let weekscounter = 1;
   let currentDate = new Date(start_date);
-  currentDate.setDate(currentDate.getDate() - currentDate.getDay()); // Set to Sunday of previous week
-  // const startDateInitial = new Date(start_date + "T00:00:00");
-  // const endDateTerminal = new Date(end_date + "T23:59:59");
-  const startDateInitial = new Date(start_date);
-  startDateInitial.setHours(0, 0, 0, 0); // Sets the time to 00:00:00
+  const startDate = new Date(start_date);
+  if (startDate.getDay() == 0) { //if the start day is sunday delay counting by 1 week
+    weekscounter = 0;
+  }
+  const endDate = new Date(end_date);
+  let eventsQueueBatch = [];
+  
+  while (currentDate <= new Date(end_date)) {
+    if (weekscounter > recurrence_frequency_weeks) {
+      break;
+    }
 
-  const endDateTerminal = new Date(end_date);
-  endDateTerminal.setHours(23, 59, 59, 999); // Sets the time to 23:59:59.999
+    if (recurrence_frequency_days.includes(currentDate.getDay())) {
 
-  const weekIncrement = 7 * recurrence_frequency_weeks;
+      const startTime = new Date(currentDate);
+      startTime.setHours(new Date(start_time).getHours(), new Date(start_time).getMinutes(), new Date(start_time).getSeconds());
+      const endTime = new Date(currentDate);
+      endTime.setHours(new Date(end_time).getHours(), new Date(end_time).getMinutes(), new Date(end_time).getSeconds());
 
-  const startTimeHours = new Date(start_time).getHours();
-  const startTimeMinutes = new Date(start_time).getMinutes();
-  const startTimeSeconds = new Date(start_time).getSeconds();
+      const newEventData = {
+        ...series, // Spreads all properties from series
+        summary: series.series_title,
+        start_time: startTime,
+        end_time: endTime,
+      };
 
-  const endTimeHours = new Date(end_time).getHours();
-  const endTimeMinutes = new Date(end_time).getMinutes();
-  const endTimeSeconds = new Date(end_time).getSeconds();
-
-  let eventIds = [];
-
-  while (currentDate <= endDateTerminal) {
-    for (let dayOfWeek of recurrence_frequency_days) {
-      const eventDate = new Date(currentDate);
-      eventDate.setDate(eventDate.getDate() + dayOfWeek);
-
-      if (eventDate >= startDateInitial && eventDate <= endDateTerminal) {
-        const startTime = new Date(eventDate);
-        startTime.setHours(startTimeHours, startTimeMinutes, startTimeSeconds);
-
-        const endTime = new Date(eventDate);
-        endTime.setHours(endTimeHours, endTimeMinutes, endTimeSeconds);
-
-        const newEventData = {
-          ...series, // Spreads all properties from series
-          summary: series.series_title,
-          start_time: startTime,
-          end_time: endTime,
-        };
-
-        try {
-          const createdEvent = await createEvent(newEventData);
-          console.log("Event Created:", createdEvent);
-          eventIds.push(createdEvent.event_id);
-        } catch (error) {
-          logger.error({
-            message:
-              "Error creating event on [" +
-              eventDate.toISOString().split("T")[0] +
-              "]", // Only retrieve date
-            error: error.stack,
-          });
+      let createEventData = {
+        data: {
+          location: { connect: { location_id: newEventData.location_id } },
+          start_time: new Date(newEventData.start_time),
+          end_time: new Date(newEventData.end_time),
+          summary: newEventData.summary,
+          description: newEventData.description,
+          facilitator: newEventData.facilitator,
+          status: newEventData.status,
         }
+      }
+
+      if (newEventData.modified_by) {
+        createEventData.data = {
+          ...createEventData.data,
+          modifier: { connect: { email: newEventData.modified_by } }
+        }
+      }
+      if (newEventData.created_by) {
+        createEventData.data = {
+          ...createEventData.data,
+          creator: { connect: { email: newEventData.created_by } }
+        }
+      }
+
+      try {
+        const createdEvent = await prisma.event.create(
+          createEventData
+        );
+
+        eventsQueueBatch.push(createdEvent)
+
+      } catch (error) {
+        logger.error({
+          message: "Error creating event on [" + currentDate.toISOString().split("T")[0] + "],",
+          error: error.stack,
+        });
       }
     }
 
-    const nextWeek = currentDate.getDate() + weekIncrement;
-    currentDate.setDate(nextWeek);
+    if (currentDate.getDay() == 0) { //if the day is sunday start count for another week
+      weekscounter++;
+    }
+
+    currentDate.setDate(currentDate.getDate() + 1); //increment the date by 1 day
   }
 
-  return eventIds;
+  return eventsQueueBatch;
+
 };
 
 /**
@@ -360,66 +378,55 @@ const autoGenerateEvents = async (series) => {
  *                          - recurrence_frequency_days: An array of integers representing the days of the week on which events should occur (1 for Monday, 5 for Friday).
  * @returns {Promise<Object>} A promise that resolves to the updated series object as stored in the database.
  */
-const updateSeries = async (series) => {
-  if (!series) {
+const updateSeries = async (id, seriesFields) => {
+  if (!seriesFields) {
     throw new Error("Argument cannot be null!");
   }
 
   const requiredProperties = [...requiredPropertiesCommon, "modified_by"];
   for (const property of requiredProperties) {
-    if (!series[property]) {
+    if (!seriesFields[property]) {
       throw new Error(`Required property ${property} is null or undefined`);
     }
   }
 
-  const existingSeries = await (async () => {
-    try {
-      const seriesData = await prisma.series.findUnique({
-        where: { series_id: series.series_id },
-      });
-      if (!seriesData) {
-        throw new Error(`Series with ID [${series.series_id}] not found`);
-      }
-      return seriesData;
-    } catch (error) {
-      logger.error({
-        message: `Error finding series: ${error.message}`,
-        error: error.stack,
-      });
-      throw new Error(`Error finding series: ${error.message}`);
-    }
-  })();
-
   try {
     const perfectStartData = combineDateAndTime(
-      new Date(series.start_date),
-      new Date(series.start_time)
+      new Date(seriesFields.start_date),
+      new Date(seriesFields.start_time)
     );
     const perfectEndData = combineDateAndTime(
-      new Date(series.end_date),
-      new Date(series.end_time)
+      new Date(seriesFields.end_date),
+      new Date(seriesFields.end_time)
     );
 
+    const deleteEvents = await prisma.event.deleteMany({
+      where: { series_id: seriesFields.series_id },
+    })
+
+    let eventsQueueBatch = await autoGenerateEvents(seriesFields);
+
     const updatedSeries = await prisma.series.update({
-      where: { series_id: existingSeries.series_id },
+      where: { series_id: id },
       data: {
-        series_title: series.series_title,
-        description: series.description,
-        facilitator: series.facilitator,
+        series_title: seriesFields.series_title,
+        description: seriesFields.description,
+        facilitator: seriesFields.facilitator,
         start_time: perfectStartData,
         end_time: perfectEndData,
         start_date: perfectStartData,
         end_date: perfectEndData,
-        status: series.status,
-        location: { connect: { location_id: series.location_id } },
-        modifier: { connect: { email: series.modified_by } },
-        recurrence_frequency_weeks: series.recurrence_frequency_weeks,
-        recurrence_frequency_days: series.recurrence_frequency_days,
+        status: seriesFields.status,
+        location: { connect: { location_id: seriesFields.location_id } },
+        modifier: { connect: { email: seriesFields.modified_by } },
+        recurrence_frequency_weeks: seriesFields.recurrence_frequency_weeks,
+        recurrence_frequency_days: seriesFields.recurrence_frequency_days,
         events: {
-          connect: series.events.map((event) => ({ event_id: event.event_id })),
+          connect: eventsQueueBatch
         },
       },
     });
+
     return updatedSeries;
   } catch (error) {
     logger.error({

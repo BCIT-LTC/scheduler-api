@@ -42,16 +42,15 @@ model Location {
   last_modified     DateTime @updatedAt
   modifier          User?    @relation("LocationModifier", fields: [modified_by], references: [email], onDelete: NoAction)
   modified_by       String?  @db.VarChar(50)
-  event_location_id Event[]  @relation("EventLocationId")
-  // event_room_location Event[]  @relation("EventRoomLocation")
+  event_location    Event[]  @relation("EventLocation")
   series_location   Series[] @relation("SeriesLocation")
+  @@unique([location_id, room_location])
 }
 
 model Event {
   event_id           Int           @id @default(autoincrement())
-  event_location_id  Location?     @relation("EventLocationId", fields: [location_id], references: [location_id], onDelete: SetNull)
+  location           Location?     @relation("EventLocation", fields: [location_id, room_location], references: [location_id, room_location], onDelete: SetNull)
   location_id        Int?
-  // location_name       Location?      @relation("EventRoomLocation", fields: [room_location], references: [room_location], onDelete: SetNull)
   room_location      String?       @db.VarChar(50)
   start_time         DateTime
   end_time           DateTime
@@ -73,14 +72,15 @@ model Event {
 model Series {
   series_id                  Int       @id @default(autoincrement())
   series_title               String    @db.VarChar(50)
-  series_location_id         Int?
-  location                   Location? @relation("SeriesLocation", fields: [series_location_id], references: [location_id], onDelete: NoAction)
+  location                   Location? @relation("SeriesLocation", fields: [location_id, room_location], references: [location_id, room_location], onDelete: SetNull)
+  location_id                Int?
+  room_location              String?   @db.VarChar(50)
   description                String?   @db.VarChar(200)
   facilitator                String?   @db.VarChar(200)
-  start_time                 DateTime  @db.Time()
-  end_time                   DateTime  @db.Time()
-  start_date                 DateTime  @db.Date()
-  end_date                   DateTime  @db.Date()
+  start_time                 DateTime  
+  end_time                   DateTime  
+  start_date                 DateTime  
+  end_date                   DateTime  
   status                     status?   @default(CONFIRMED)
   recurrence_frequency_weeks Int
   recurrence_frequency_days  Int[]
