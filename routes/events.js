@@ -357,7 +357,7 @@ router.delete("/events/:id",
 router.put("/events/:id",
   permission_check(['admin']),
   eventValidation, async (req, res) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -365,7 +365,8 @@ router.put("/events/:id",
           errors: errors.array()
         });
       }
-      const updatedEvent = await updateEvent(req.body);
+      const data = {event_id: id, ...req.body};
+      const updatedEvent = await updateEvent(data);
       return res.status(200).send(updatedEvent);
     } catch (error) {
       logger.error({

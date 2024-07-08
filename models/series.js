@@ -279,83 +279,77 @@ const autoGenerateEvents = async (series) => {
     recurrence_frequency_days,
   } = series;
 
-  let weekscounter = 1;
+  let weeksCounter = 0;
   let currentDate = new Date(start_date);
   const startDate = new Date(start_date);
-  if (startDate.getDay() == 0) { //if the start day is sunday delay counting by 1 week
-    weekscounter = 0;
-  }
   const endDate = new Date(end_date);
+
   let eventsQueueBatch = [];
   
-  while (currentDate <= new Date(end_date)) {
-    if (weekscounter > recurrence_frequency_weeks) {
-      break;
-    }
-
+  while (currentDate <= endDate) {
+    // Check if the current day is in the recurrence days
     if (recurrence_frequency_days.includes(currentDate.getDay())) {
+      // Check if the current week is to be skipped based on recurrence_frequency_weeks
+      if (weeksCounter % recurrence_frequency_weeks === 0) {
+        const startTime = new Date(currentDate);
+        startTime.setHours(new Date(start_time).getHours(), new Date(start_time).getMinutes(), new Date(start_time).getSeconds());
+        const endTime = new Date(currentDate);
+        endTime.setHours(new Date(end_time).getHours(), new Date(end_time).getMinutes(), new Date(end_time).getSeconds());
 
-      const startTime = new Date(currentDate);
-      startTime.setHours(new Date(start_time).getHours(), new Date(start_time).getMinutes(), new Date(start_time).getSeconds());
-      const endTime = new Date(currentDate);
-      endTime.setHours(new Date(end_time).getHours(), new Date(end_time).getMinutes(), new Date(end_time).getSeconds());
+        const newEventData = {
+          ...series,
+          summary: series.series_title,
+          start_time: startTime,
+          end_time: endTime,
+        };
 
-      const newEventData = {
-        ...series, // Spreads all properties from series
-        summary: series.series_title,
-        start_time: startTime,
-        end_time: endTime,
-      };
+        let createEventData = {
+          data: {
+            location: { connect: { location_id: newEventData.location_id } },
+            start_time: new Date(newEventData.start_time),
+            end_time: new Date(newEventData.end_time),
+            summary: newEventData.summary,
+            description: newEventData.description,
+            facilitator: newEventData.facilitator,
+            status: newEventData.status,
+          }
+        };
 
-      let createEventData = {
-        data: {
-          location: { connect: { location_id: newEventData.location_id } },
-          start_time: new Date(newEventData.start_time),
-          end_time: new Date(newEventData.end_time),
-          summary: newEventData.summary,
-          description: newEventData.description,
-          facilitator: newEventData.facilitator,
-          status: newEventData.status,
+        // Additional logic for modified_by and created_by
+        if (newEventData.modified_by) {
+          createEventData.data = {
+            ...createEventData.data,
+            modifier: { connect: { email: newEventData.modified_by } }
+          }
         }
-      }
-
-      if (newEventData.modified_by) {
-        createEventData.data = {
-          ...createEventData.data,
-          modifier: { connect: { email: newEventData.modified_by } }
+        if (newEventData.created_by) {
+          createEventData.data = {
+            ...createEventData.data,
+            creator: { connect: { email: newEventData.created_by } }
+          }
         }
-      }
-      if (newEventData.created_by) {
-        createEventData.data = {
-          ...createEventData.data,
-          creator: { connect: { email: newEventData.created_by } }
+
+        try {
+          const createdEvent = await prisma.event.create(createEventData);
+          eventsQueueBatch.push(createdEvent);
+        } catch (error) {
+          logger.error({
+            message: "Error creating event on [" + currentDate.toISOString().split("T")[0] + "],",
+            error: error.stack,
+          });
         }
-      }
-
-      try {
-        const createdEvent = await prisma.event.create(
-          createEventData
-        );
-
-        eventsQueueBatch.push(createdEvent)
-
-      } catch (error) {
-        logger.error({
-          message: "Error creating event on [" + currentDate.toISOString().split("T")[0] + "],",
-          error: error.stack,
-        });
       }
     }
 
-    if (currentDate.getDay() == 0) { //if the day is sunday start count for another week
-      weekscounter++;
+    // Increment weeksCounter every 7 days
+    if ((Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)) + 1) % 7 === 0) {
+      weeksCounter++;
     }
 
-    currentDate.setDate(currentDate.getDate() + 1); //increment the date by 1 day
+    currentDate.setDate(currentDate.getDate() + 1); // Increment the date by 1 day
   }
 
   return eventsQueueBatch;
-
 };
 
 /**

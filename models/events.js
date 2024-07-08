@@ -238,6 +238,9 @@ const updateEvent = async (event) => {
         location_id: event.location_id,
       },
     });
+    if (!location) {
+      throw new Error(`Location with ID [${event.location_id}] not found`);
+    }
 
     // Prepare the data object with conditional series handling
     const updateData = {
